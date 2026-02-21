@@ -72,7 +72,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Binary comment - ensures PDF is treated as binary file (prevents text mode corruption)
             stream.Write(_pdfBinaryComment, 0, _pdfBinaryComment.Length);
-            writer.WriteLine();
+            writer.Write("\r\n");
 
             writer.Flush();
             xrefs.Add(stream.Position);
