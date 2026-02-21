@@ -69,14 +69,14 @@ public class PdfByteQRCodeRendererTests
         var eofIndex = pdfText.LastIndexOf("%%EOF", StringComparison.Ordinal);
         eofIndex.ShouldBeGreaterThan(0, "%%EOF not found");
 
-        var startxrefIndex = pdfText.LastIndexOf("startxref", eofIndex, StringComparison.Ordinal);
+        var startxrefIndex = pdfText.LastIndexOf("startxref\r\n", eofIndex, StringComparison.Ordinal);
         startxrefIndex.ShouldBeGreaterThan(0, "startxref not found");
 
         // Read the xref byte offset (the number on the line after "startxref")
-        var afterStartxref = pdfText.IndexOf('\n', startxrefIndex) + 1;
-        var endOfOffset = pdfText.IndexOfAny(_lineEndChars, afterStartxref);
-        var xrefOffsetStr = pdfText.Substring(afterStartxref, endOfOffset - afterStartxref).Trim();
-        var xrefOffset = int.Parse(xrefOffsetStr, CultureInfo.InvariantCulture);
+        var afterStartxref = startxrefIndex + "startxref\r\n".Length;
+        var endOfOffset = pdfText.IndexOf("\r\n", afterStartxref, StringComparison.Ordinal);
+        var xrefOffsetStr = pdfText.Substring(afterStartxref, endOfOffset - afterStartxref);
+        var xrefOffset = int.Parse(xrefOffsetStr, NumberStyles.None, CultureInfo.InvariantCulture);
         xrefOffset.ShouldBeGreaterThan(0, "xref byte offset should be positive");
 
         // Seek to xref table and parse it
@@ -93,24 +93,37 @@ public class PdfByteQRCodeRendererTests
         string? subsectionLine;
         while ((subsectionLine = reader.ReadLine()) != null && subsectionLine != "trailer")
         {
-            var parts = subsectionLine.Trim().Split(' ');
+            var parts = subsectionLine.Split(' ');
             parts.Length.ShouldBe(2, $"Expected 'firstObj count' but got: {subsectionLine}");
-            var firstObj = int.Parse(parts[0], CultureInfo.InvariantCulture);
-            var count = int.Parse(parts[1], CultureInfo.InvariantCulture);
+            var firstObj = int.Parse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture);
+            firstObj.ShouldBe(0);
+            var count = int.Parse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture);
 
             for (int i = 0; i < count; i++)
             {
                 // Each entry: "NNNNNNNNNN GGGGG f\r\n" or "NNNNNNNNNN GGGGG n\r\n"
                 var entry = reader.ReadLine();
                 entry.ShouldNotBeNull();
-                var entryParts = entry!.Trim().Split(' ');
+                entry.Length.ShouldBe(18);
+                var entryParts = entry.Split(' ');
                 entryParts.Length.ShouldBe(3, $"Expected 'offset gen type' but got: {entry}");
-                var offset = long.Parse(entryParts[0], CultureInfo.InvariantCulture);
+                var offset = long.Parse(entryParts[0], NumberStyles.None, CultureInfo.InvariantCulture);
+                var generation = int.Parse(entryParts[1], NumberStyles.None, CultureInfo.InvariantCulture);
                 var type = entryParts[2];
                 type.ShouldBeOneOf("n", "f");
 
                 if (type == "n")
-                    objectOffsets[firstObj + i] = offset;
+                {
+                    generation.ShouldBe(0, $"Expected generation 0 for in-use object but got {generation}");
+                    objectOffsets[i] = offset;
+                }
+                else
+                {
+                    // Free objects should only be listed for the first object in the subsection
+                    i.ShouldBe(0);
+                    offset.ShouldBe(0);
+                    generation.ShouldBe(65535, $"Expected generation 65535 for free object but got {generation}");
+                }
             }
         }
 
