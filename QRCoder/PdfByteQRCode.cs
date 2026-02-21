@@ -134,7 +134,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 4: Content stream - contains the drawing instructions
             writer.Write(
-                ToStr(xrefs.Count) + " 0 obj\r\n" +                                                  // Object number and generation number (0)
+                ToStr(xrefs.Count) + " 0 obj\r\n" +                                                   // Object number and generation number (0)
                 "<< /Length " + ToStr(System.Text.Encoding.ASCII.GetByteCount(content)) + " >>\r\n" + // Dictionary with stream length in bytes
                 "stream\r\n" +                                                                        // Begin stream data
                 content + "endstream\r\n" +                                                           // Stream content followed by end stream marker
