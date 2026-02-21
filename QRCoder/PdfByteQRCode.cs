@@ -92,18 +92,12 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 2: Pages - defines page tree structure
             writer.Write(
-                ToStr(xrefs.Count) + " 0 obj\r\n" +                                     // Object number and generation number (0)
-                "<<\r\n" +                                                              // Begin dictionary
-                "/Count 1\r\n" +                                                        // Number of pages in document
-                "/Kids [ <<\r\n" +                                                      // Array of page objects - begin inline page dictionary
-                    "/Type /Page\r\n" +                                                 // Declares this as a page
-                    "/Parent 2 0 R\r\n" +                                               // References parent Pages object
-                    "/MediaBox [0 0 " + pdfMediaSize + " " + pdfMediaSize + "]\r\n" +   // Page dimensions [x1 y1 x2 y2]
-                    "/Resources << /ProcSet [ /PDF ] >>\r\n" +                          // Required resources: PDF operations only (no images)
-                    "/Contents 3 0 R\r\n" +                                             // References content stream (object 3)
-                    ">> ]\r\n" +                                                        // End inline page dictionary and Kids array
-                ">>\r\n" +                                                              // End dictionary
-                "endobj\r\n"                                                            // End object
+                ToStr(xrefs.Count) + " 0 obj\r\n" +   // Object number and generation number (0)
+                "<<\r\n" +                             // Begin dictionary
+                "/Count 1\r\n" +                       // Number of pages in document
+                "/Kids [ 3 0 R ]\r\n" +                // Kids must contain indirect references to Page objects
+                ">>\r\n" +                             // End dictionary
+                "endobj\r\n"                           // End object
             );
 
             // Content stream - PDF drawing instructions
@@ -122,13 +116,29 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             writer.Flush();
             xrefs.Add(stream.Position);
 
-            // Object 3: Content stream - contains the drawing instructions
+            // Object 3: Page - indirect page object (Kids array must reference pages indirectly)
             writer.Write(
-                ToStr(xrefs.Count) + " 0 obj\r\n" +                  // Object number and generation number (0)
-                "<< /Length " + ToStr(content.Length) + " >>\r\n" +  // Dictionary with stream length in bytes
-                "stream\r\n" +                                       // Begin stream data
-                content + "endstream\r\n" +                          // Stream content followed by end stream marker
-                "endobj\r\n"                                         // End object
+                ToStr(xrefs.Count) + " 0 obj\r\n" +                                     // Object number and generation number (0)
+                "<<\r\n" +                                                              // Begin dictionary
+                "/Type /Page\r\n" +                                                     // Declares this as a page
+                "/Parent 2 0 R\r\n" +                                                   // References parent Pages object
+                "/MediaBox [0 0 " + pdfMediaSize + " " + pdfMediaSize + "]\r\n" +       // Page dimensions [x1 y1 x2 y2]
+                "/Resources << /ProcSet [ /PDF ] >>\r\n" +                              // Required resources: PDF operations only (no images)
+                "/Contents 4 0 R\r\n" +                                                 // References content stream (object 4)
+                ">>\r\n" +                                                              // End dictionary
+                "endobj\r\n"                                                            // End object
+            );
+
+            writer.Flush();
+            xrefs.Add(stream.Position);
+
+            // Object 4: Content stream - contains the drawing instructions
+            writer.Write(
+                ToStr(xrefs.Count) + " 0 obj\r\n" +                                                  // Object number and generation number (0)
+                "<< /Length " + ToStr(System.Text.Encoding.ASCII.GetByteCount(content)) + " >>\r\n" + // Dictionary with stream length in bytes
+                "stream\r\n" +                                                                        // Begin stream data
+                content + "endstream\r\n" +                                                           // Stream content followed by end stream marker
+                "endobj\r\n"                                                                          // End object
             );
 
             writer.Flush();
