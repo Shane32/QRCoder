@@ -65,6 +65,10 @@ public class PdfByteQRCodeRendererTests
         // Parse from the end to find startxref
         var pdfText = Encoding.ASCII.GetString(pdfBytes);
 
+        // Verify no \n line breaks; only \r\n should be used (this test file has no binary image data)
+        pdfText.Replace("\r\n", "CRLF").ShouldNotContain('\n', "PDF should not contain LF line breaks; only CRLF should be used");
+        pdfText.Replace("\r\n", "CRLF").ShouldNotContain('\r', "PDF should not contain CR line breaks; only CRLF should be used");
+
         // Find %%EOF at the end, then work backward to find startxref
         var eofIndex = pdfText.LastIndexOf("%%EOF", StringComparison.Ordinal);
         eofIndex.ShouldBeGreaterThan(0, "%%EOF not found");
