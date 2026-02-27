@@ -16,7 +16,7 @@
 *.DOCX diff=astextplain
 *.dot  diff=astextplain
 *.DOT  diff=astextplain
-*.pdf  diff=astextplain
-*.PDF	 diff=astextplain
+*.pdf  binary
+*.PDF  binary
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
