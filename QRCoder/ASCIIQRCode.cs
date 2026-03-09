@@ -109,10 +109,10 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
 
         var palette = new
         {
-            WHITE_ALL = "\u2588",
-            WHITE_BLACK = "\u2580",
-            BLACK_WHITE = "\u2584",
-            BLACK_ALL = " ",
+            WHITE_ALL = " ",
+            WHITE_BLACK = "\u2584",
+            BLACK_WHITE = "\u2580",
+            BLACK_ALL = "\u2588",
         };
 
         var moduleData = QrCodeData.ModuleMatrix;
