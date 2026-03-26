@@ -226,6 +226,7 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
     // not leak the current point into the surrounding document.
     private const string EPS_FUNCTIONS = """
         %%BeginProlog
+        5 dict begin
         /csquare {{
             newpath
             0 0 moveto
@@ -254,7 +255,6 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         /sz {7} def
         /sc {8} def
         %%EndSetup
-        %%BeginBody
         gsave
         0 0 moveto
         sz sz scale
@@ -276,9 +276,10 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         """;
 
     // EPS footer — showpage is forbidden in EPS files (Adobe Technical Note #5002).
+    // 'end' pops the private dictionary pushed in %%BeginProlog to avoid polluting the host dict stack.
     private const string EPS_FOOTER = """
-        %%EndBody
         grestore
+        end
         %%EOF
 
         """;

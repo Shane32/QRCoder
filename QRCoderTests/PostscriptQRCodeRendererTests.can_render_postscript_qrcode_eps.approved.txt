@@ -7,6 +7,7 @@
 %%LanguageLevel: 2
 %%EndComments
 %%BeginProlog
+5 dict begin
 /csquare {
     newpath
     0 0 moveto
@@ -35,7 +36,6 @@
 /sz 165 def
 /sc 5 def
 %%EndSetup
-%%BeginBody
 gsave
 0 0 moveto
 sz sz scale
@@ -77,6 +77,6 @@ b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-%%EndBody
 grestore
+end
 %%EOF
