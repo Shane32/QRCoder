@@ -176,7 +176,6 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         %%Creator: QRCoder.NET
         %%Title: QRCode
         %%DocumentData: Clean7Bit
-        %%Origin: 0
         %%BoundingBox: 0 0 {0} {0}
         %%LanguageLevel: 2
         %%EndComments

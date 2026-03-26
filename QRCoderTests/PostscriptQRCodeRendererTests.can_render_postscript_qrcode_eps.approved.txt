@@ -2,7 +2,6 @@
 %%Creator: QRCoder.NET
 %%Title: QRCode
 %%DocumentData: Clean7Bit
-%%Origin: 0
 %%BoundingBox: 0 0 165 165
 %%LanguageLevel: 2
 %%EndComments
