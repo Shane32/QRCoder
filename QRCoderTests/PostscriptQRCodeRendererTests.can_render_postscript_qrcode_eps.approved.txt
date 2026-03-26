@@ -6,11 +6,7 @@
 %%BoundingBox: 0 0 165 165
 %%LanguageLevel: 2
 %%EndComments
-%%BeginConstants
-/sz 165 def
-/sc 5 def
-%%EndConstants
-%%BeginFunctions
+%%BeginProlog
 /csquare {
     newpath
     0 0 moveto
@@ -34,10 +30,14 @@
 /nl {
     -33 -1 translate
 } def
-%%EndFunctions
+%%EndProlog
+%%BeginSetup
+/sz 165 def
+/sc 5 def
+%%EndSetup
 %%BeginBody
-0 0 moveto
 gsave
+0 0 moveto
 sz sz scale
 background
 grestore

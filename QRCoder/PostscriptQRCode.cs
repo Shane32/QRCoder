@@ -102,9 +102,10 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         var pointsPerModule = (double)Math.Min(viewBox.Width, viewBox.Height) / (double)drawableModulesCount;
 
         var header = epsFormat ? EPS_HEADER : PS_HEADER;
+        var functions = epsFormat ? EPS_FUNCTIONS : PS_FUNCTIONS;
         var footer = epsFormat ? EPS_FOOTER : PS_FOOTER;
 
-        var estimatedCapacity = header.Length + PS_FUNCTIONS.Length + footer.Length +
+        var estimatedCapacity = header.Length + functions.Length + footer.Length +
             (drawableModulesCount * drawableModulesCount * 2) + // modules (either "f " or "b ")
             drawableModulesCount * 3 + // newlines ("nl\n")
             200; // embedded numbers
@@ -113,10 +114,11 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         sb.AppendFormat(CultureInfo.InvariantCulture, header, [
             CleanSvgVal(viewBox.Width), CleanSvgVal(pointsPerModule)
         ]);
-        sb.AppendFormat(CultureInfo.InvariantCulture, PS_FUNCTIONS, [
+        sb.AppendFormat(CultureInfo.InvariantCulture, functions, [
             CleanSvgVal(darkColor.R /255.0), CleanSvgVal(darkColor.G /255.0), CleanSvgVal(darkColor.B /255.0),
             CleanSvgVal(lightColor.R /255.0), CleanSvgVal(lightColor.G /255.0), CleanSvgVal(lightColor.B /255.0),
-            drawableModulesCount
+            drawableModulesCount,
+            CleanSvgVal(viewBox.Width), CleanSvgVal(pointsPerModule)
         ]);
 
         for (int xi = offset; xi < offset + drawableModulesCount; xi++)
@@ -168,6 +170,7 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
 
     // EPS header — omits %%DocumentMedia, %%Pages, %%Page, and setpagedevice, all of which are
     // forbidden or inappropriate in Encapsulated PostScript (Adobe Technical Note #5002).
+    // Constants (sz, sc) and procedure definitions are emitted in EPS_FUNCTIONS below.
     private const string EPS_HEADER = """
         %!PS-Adobe-3.0 EPSF-3.0
         %%Creator: QRCoder.NET
@@ -177,10 +180,6 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         %%BoundingBox: 0 0 {0} {0}
         %%LanguageLevel: 2
         %%EndComments
-        %%BeginConstants
-        /sz {0} def
-        /sc {1} def
-        %%EndConstants
 
         """;
 
@@ -213,6 +212,51 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
         %%BeginBody
         0 0 moveto
         gsave
+        sz sz scale
+        background
+        grestore
+        gsave
+        sc sc scale
+        0 {6} 1 sub translate
+
+        """;
+
+    // EPS variant: uses standard DSC %%BeginProlog/%%EndProlog for procedure definitions,
+    // %%BeginSetup/%%EndSetup for constants, and moves 0 0 moveto inside gsave so it does
+    // not leak the current point into the surrounding document.
+    private const string EPS_FUNCTIONS = """
+        %%BeginProlog
+        /csquare {{
+            newpath
+            0 0 moveto
+            0 1 rlineto
+            1 0 rlineto
+            0 -1 rlineto
+            closepath
+            setrgbcolor
+            fill
+        }} def
+        /f {{
+            {0} {1} {2} csquare
+            1 0 translate
+        }} def
+        /b {{
+            1 0 translate
+        }} def
+        /background {{
+            {3} {4} {5} csquare
+        }} def
+        /nl {{
+            -{6} -1 translate
+        }} def
+        %%EndProlog
+        %%BeginSetup
+        /sz {7} def
+        /sc {8} def
+        %%EndSetup
+        %%BeginBody
+        gsave
+        0 0 moveto
         sz sz scale
         background
         grestore
