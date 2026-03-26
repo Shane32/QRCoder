@@ -225,7 +225,7 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
     // not leak the current point into the surrounding document.
     private const string EPS_FUNCTIONS = """
         %%BeginProlog
-        5 dict begin
+        7 dict begin
         /csquare {{
             newpath
             0 0 moveto

@@ -6,7 +6,7 @@
 %%LanguageLevel: 2
 %%EndComments
 %%BeginProlog
-5 dict begin
+7 dict begin
 /csquare {
     newpath
     0 0 moveto
