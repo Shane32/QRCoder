@@ -2,21 +2,11 @@
 %%Creator: QRCoder.NET
 %%Title: QRCode
 %%DocumentData: Clean7Bit
-%%Origin: 0
-%%DocumentMedia: Default 165 165 0 () ()
 %%BoundingBox: 0 0 165 165
-%%LanguageLevel: 2 
-%%Pages: 1
-%%Page: 1 1
+%%LanguageLevel: 2
 %%EndComments
-%%BeginConstants
-/sz 165 def
-/sc 5 def
-%%EndConstants
-%%BeginFeature: *PageSize Default
-<< /PageSize [ sz sz ] /ImagingBBox null >> setpagedevice
-%%EndFeature
-%%BeginFunctions 
+%%BeginProlog
+7 dict begin
 /csquare {
     newpath
     0 0 moveto
@@ -27,23 +17,26 @@
     setrgbcolor
     fill
 } def
-/f { 
+/f {
     0 0 0 csquare
     1 0 translate
 } def
-/b { 
+/b {
     1 0 translate
-} def 
-/background { 
-    1 1 1 csquare 
+} def
+/background {
+    1 1 1 csquare
 } def
 /nl {
     -33 -1 translate
 } def
-%%EndFunctions
-%%BeginBody
-0 0 moveto
+%%EndProlog
+%%BeginSetup
+/sz 165 def
+/sc 5 def
+%%EndSetup
 gsave
+0 0 moveto
 sz sz scale
 background
 grestore
@@ -83,7 +76,6 @@ b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b nl
 b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b 
-%%EndBody
 grestore
-showpage   
+end
 %%EOF
