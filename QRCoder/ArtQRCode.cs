@@ -83,17 +83,21 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             if (backgroundImage != null)
             {
                 if (backgroundImageStyle == BackgroundImageStyle.Fill)
-                    graphics.DrawImage(Resize(backgroundImage, size), 0, 0);
+                {
+                    using var resizedBg = Resize(backgroundImage, size);
+                    graphics.DrawImage(resizedBg, 0, 0);
+                }
                 else if (backgroundImageStyle == BackgroundImageStyle.DataAreaOnly)
                 {
                     var bgOffset = 4 - offset;
-                    graphics.DrawImage(Resize(backgroundImage, size - (2 * bgOffset * pixelsPerModule)), 0 + (bgOffset * pixelsPerModule), (bgOffset * pixelsPerModule));
+                    using var resizedBg = Resize(backgroundImage, size - (2 * bgOffset * pixelsPerModule));
+                    graphics.DrawImage(resizedBg, 0 + (bgOffset * pixelsPerModule), (bgOffset * pixelsPerModule));
                 }
             }
 
 
-            var darkModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, darkBrush);
-            var lightModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, lightBrush);
+            using var darkModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, darkBrush);
+            using var lightModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, lightBrush);
 
             for (var x = 0; x < numModules; x += 1)
             {
@@ -137,7 +141,7 @@ public class ArtQRCode : AbstractQRCode, IDisposable
     private static Bitmap MakeDotPixel(int pixelsPerModule, int pixelSize, SolidBrush brush)
     {
         // draw a dot
-        var bitmap = new Bitmap(pixelSize, pixelSize);
+        using var bitmap = new Bitmap(pixelSize, pixelSize);
         using (var graphics = Graphics.FromImage(bitmap))
         {
             graphics.FillEllipse(brush, new Rectangle(0, 0, pixelSize, pixelSize));
@@ -212,7 +216,7 @@ public class ArtQRCode : AbstractQRCode, IDisposable
         var offsetX = (newSize - scaledWidth) / 2;
         var offsetY = (newSize - scaledHeight) / 2;
 
-        var scaledImage = new Bitmap(image, new Size(scaledWidth, scaledHeight));
+        using var scaledImage = new Bitmap(image, new Size(scaledWidth, scaledHeight));
 
         var bm = new Bitmap(newSize, newSize);
 
