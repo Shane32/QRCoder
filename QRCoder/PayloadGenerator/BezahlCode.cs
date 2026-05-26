@@ -148,7 +148,7 @@ public static partial class PayloadGenerator
             _name = name;
 
             //Limit reason length depending on payment type
-            //140 chars for SEPA payments and 27 chars for others 
+            //140 chars for SEPA payments and 27 chars for others
             var reasonLength = authority == AuthorityType.periodicsinglepaymentsepa || authority == AuthorityType.singledirectdebitsepa || authority == AuthorityType.singlepaymentsepa || (authority == AuthorityType.contact_v2 && newWayFilled) ? 140 : 27;
             if (reason.Length > reasonLength)
                 throw new BezahlCodeException($"Reasons texts have to be shorter than {reasonLength + 1} chars.");
@@ -246,9 +246,8 @@ public static partial class PayloadGenerator
         /// <inheritdoc/>
         public override string ToString()
         {
-            var bezahlCodePayload = $"bank://{_authority}?";
-
-            bezahlCodePayload += $"name={Uri.EscapeDataString(_name)}&";
+            var bezahlCodePayload = new StringBuilder($"bank://{_authority}?");
+            StringExtensions.AppendInvariant(bezahlCodePayload,$"name={Uri.EscapeDataString(_name)}&");
 
             if (_authority != AuthorityType.contact && _authority != AuthorityType.contact_v2)
             {
@@ -257,44 +256,44 @@ public static partial class PayloadGenerator
                 if (_authority == AuthorityType.periodicsinglepayment || _authority == AuthorityType.singledirectdebit || _authority == AuthorityType.singlepayment)
 #pragma warning restore CS0618
                 {
-                    bezahlCodePayload += $"account={_account}&";
-                    bezahlCodePayload += $"bnc={_bnc}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"account={_account}&");
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"bnc={_bnc}&");
                     if (_postingKey > 0)
-                        bezahlCodePayload += $"postingkey={_postingKey}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"postingkey={_postingKey}&");
                 }
                 else
                 {
-                    bezahlCodePayload += $"iban={_iban}&";
-                    bezahlCodePayload += $"bic={_bic}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"iban={_iban}&");
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"bic={_bic}&");
 
                     if (!string.IsNullOrEmpty(_sepaReference))
-                        bezahlCodePayload += $"separeference={Uri.EscapeDataString(_sepaReference)}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"separeference={Uri.EscapeDataString(_sepaReference)}&");
 
                     if (_authority == AuthorityType.singledirectdebitsepa)
                     {
                         if (!string.IsNullOrEmpty(_creditorId))
-                            bezahlCodePayload += $"creditorid={Uri.EscapeDataString(_creditorId)}&";
+                            StringExtensions.AppendInvariant(bezahlCodePayload,$"creditorid={Uri.EscapeDataString(_creditorId)}&");
                         if (!string.IsNullOrEmpty(_mandateId))
-                            bezahlCodePayload += $"mandateid={Uri.EscapeDataString(_mandateId)}&";
+                            StringExtensions.AppendInvariant(bezahlCodePayload,$"mandateid={Uri.EscapeDataString(_mandateId)}&");
                         if (_dateOfSignature != DateTime.MinValue)
-                            bezahlCodePayload += $"dateofsignature={_dateOfSignature.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&";
+                            StringExtensions.AppendInvariant(bezahlCodePayload,$"dateofsignature={_dateOfSignature.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
                     }
                 }
-                bezahlCodePayload += string.Format(CultureInfo.InvariantCulture, "amount={0:0.00}&", _amount).Replace(".", ",");
+                bezahlCodePayload.Append(string.Format(CultureInfo.InvariantCulture, "amount={0:0.00}&", _amount).Replace(".", ","));
 
                 if (!string.IsNullOrEmpty(_reason))
-                    bezahlCodePayload += $"reason={Uri.EscapeDataString(_reason)}&";
-                bezahlCodePayload += $"currency={_currency}&";
-                bezahlCodePayload += $"executiondate={_executionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"reason={Uri.EscapeDataString(_reason)}&");
+                StringExtensions.AppendInvariant(bezahlCodePayload,$"currency={_currency}&");
+                StringExtensions.AppendInvariant(bezahlCodePayload,$"executiondate={_executionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
 #pragma warning disable CS0618
                 if (_authority == AuthorityType.periodicsinglepayment || _authority == AuthorityType.periodicsinglepaymentsepa)
                 {
-                    bezahlCodePayload += $"periodictimeunit={_periodicTimeunit}&";
-                    bezahlCodePayload += $"periodictimeunitrotation={_periodicTimeunitRotation}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"periodictimeunit={_periodicTimeunit}&");
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"periodictimeunitrotation={_periodicTimeunitRotation}&");
                     if (_periodicFirstExecutionDate != DateTime.MinValue)
-                        bezahlCodePayload += $"periodicfirstexecutiondate={_periodicFirstExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"periodicfirstexecutiondate={_periodicFirstExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
                     if (_periodicLastExecutionDate != DateTime.MinValue)
-                        bezahlCodePayload += $"periodiclastexecutiondate={_periodicLastExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"periodiclastexecutiondate={_periodicLastExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
                 }
 #pragma warning restore CS0618
             }
@@ -303,28 +302,29 @@ public static partial class PayloadGenerator
                 //Handle what is same for all contacts
                 if (_authority == AuthorityType.contact)
                 {
-                    bezahlCodePayload += $"account={_account}&";
-                    bezahlCodePayload += $"bnc={_bnc}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"account={_account}&");
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"bnc={_bnc}&");
                 }
                 else if (_authority == AuthorityType.contact_v2)
                 {
                     if (!string.IsNullOrEmpty(_account) && !string.IsNullOrEmpty(_bnc))
                     {
-                        bezahlCodePayload += $"account={_account}&";
-                        bezahlCodePayload += $"bnc={_bnc}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"account={_account}&");
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"bnc={_bnc}&");
                     }
                     else
                     {
-                        bezahlCodePayload += $"iban={_iban}&";
-                        bezahlCodePayload += $"bic={_bic}&";
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"iban={_iban}&");
+                        StringExtensions.AppendInvariant(bezahlCodePayload,$"bic={_bic}&");
                     }
                 }
 
                 if (!string.IsNullOrEmpty(_reason))
-                    bezahlCodePayload += $"reason={Uri.EscapeDataString(_reason)}&";
+                    StringExtensions.AppendInvariant(bezahlCodePayload,$"reason={Uri.EscapeDataString(_reason)}&");
             }
 
-            return bezahlCodePayload.Trim('&');
+            string result = bezahlCodePayload.ToString();
+            return result.TrimEnd('&');
         }
 
         /// <summary>

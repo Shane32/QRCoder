@@ -21,9 +21,9 @@ public static partial class PayloadGenerator
         public WiFi(string ssid, string password, Authentication authenticationMode, bool isHiddenSSID = false, bool escapeHexStrings = true)
         {
             _ssid = EscapeInput(ssid);
-            _ssid = escapeHexStrings && isHexStyle(_ssid) ? "\"" + _ssid + "\"" : _ssid;
+            _ssid = escapeHexStrings && isHexStyle(_ssid) ? $"\"{_ssid}\"" : _ssid;
             _password = EscapeInput(password);
-            _password = escapeHexStrings && isHexStyle(_password) ? "\"" + _password + "\"" : _password;
+            _password = escapeHexStrings && isHexStyle(_password) ? $"\"{_password}\"" : _password;
             _authenticationMode = authenticationMode.ToString();
             _isHiddenSsid = isHiddenSSID;
         }
