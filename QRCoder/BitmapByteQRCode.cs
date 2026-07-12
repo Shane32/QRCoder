@@ -74,11 +74,12 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
 
         // The size of each row must be rounded up to a multiple of 4 bytes by padding.
         // Pre-calculate padding bytes
-        var paddingLen = -sideLength & 3;
-        Debug.Assert(paddingLen >= 0 && paddingLen < 4 && (sideLength + paddingLen) % 4 == 0);
+        var rowByteLength = sideLength * 3;
+        var paddingLen = -rowByteLength & 3;
+        Debug.Assert(paddingLen >= 0 && paddingLen < 4 && (rowByteLength + paddingLen) % 4 == 0);
 
         // Calculate filesize (header + pixel data + padding)
-        var fileSize = 54 + (3 * (sideLength * sideLength)) + (sideLength * paddingLen);
+        var fileSize = 54 + (rowByteLength + paddingLen) * sideLength;
 
         // Bitmap container
         byte[] bmp = new byte[fileSize];
