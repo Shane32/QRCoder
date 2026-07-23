@@ -1,3 +1,8 @@
+#if NETCOREAPP2_1_OR_GREATER
+using System.Buffers.Binary;
+#endif
+using System.Diagnostics;
+
 using static QRCoder.QRCodeGenerator;
 
 namespace QRCoder;
@@ -67,11 +72,14 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
             moduleLight[i + 2] = lightColorRgb[0];
         }
 
+        // The size of each row must be rounded up to a multiple of 4 bytes by padding.
         // Pre-calculate padding bytes
-        var paddingLen = sideLength % 4;
+        var rowByteLength = sideLength * 3;
+        var paddingLen = -rowByteLength & 3;
+        Debug.Assert(paddingLen >= 0 && paddingLen < 4 && (rowByteLength + paddingLen) % 4 == 0);
 
         // Calculate filesize (header + pixel data + padding)
-        var fileSize = 54 + (3 * (sideLength * sideLength)) + (sideLength * paddingLen);
+        var fileSize = 54 + (rowByteLength + paddingLen) * sideLength;
 
         // Bitmap container
         byte[] bmp = new byte[fileSize];
@@ -142,6 +150,9 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <param name="destinationArray">Destination byte array that receives the bytes</param>
     private static void CopyIntAs4ByteToArray(int inp, int destinationIndex, byte[] destinationArray)
     {
+#if NETCOREAPP2_1_OR_GREATER
+        BinaryPrimitives.WriteInt32LittleEndian(destinationArray.AsSpan(destinationIndex), inp);
+#else
         unchecked
         {
             destinationArray[destinationIndex + 3] = (byte)(inp >> 24);
@@ -149,6 +160,7 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
             destinationArray[destinationIndex + 1] = (byte)(inp >> 8);
             destinationArray[destinationIndex + 0] = (byte)(inp);
         }
+#endif
     }
 }
 
