@@ -18,9 +18,14 @@ public partial class QRCodeGenerator
         private static readonly Point[][] _alignmentPatternTable = CreateAlignmentPatternTable();
 
         /// <summary>
+        /// Offset used to map -4 .. 40 to 0 .. 44
+        /// </summary>
+        private const int INDEX_OFFSET = 4;
+
+        /// <summary>
         /// Retrieves the alignment pattern for a specific QR code version.
         /// </summary>
-        public static Point[] FromVersion(int version) => _alignmentPatternTable[version + 4];
+        public static Point[] FromVersion(int version) => _alignmentPatternTable[version + INDEX_OFFSET];
 
         /// <summary>
         /// Creates a lookup table mapping QR code versions to their corresponding alignment patterns.
@@ -35,13 +40,13 @@ public partial class QRCodeGenerator
             // Micro QR codes do not have alignment patterns.
             Point[] empty = [];
 
-            localAlignmentPatternTable[-4 + 4] = empty;
-            localAlignmentPatternTable[-3 + 4] = empty;
-            localAlignmentPatternTable[-2 + 4] = empty;
-            localAlignmentPatternTable[-1 + 4] = empty;
+            localAlignmentPatternTable[-4 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-3 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-2 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-1 + INDEX_OFFSET] = empty;
 
             // A Version 1 QR code does not have alignment patterns.
-            localAlignmentPatternTable[1 + 4] = empty;
+            localAlignmentPatternTable[1 + INDEX_OFFSET] = empty;
 
 #if HAS_SPAN
             ReadOnlySpan<byte> alignmentPatternBaseValues =
@@ -66,7 +71,7 @@ public partial class QRCodeGenerator
 
                 Debug.Assert(points.Count <= 7 * 7);
 
-                localAlignmentPatternTable[version + 4] = points.ToArray();
+                localAlignmentPatternTable[version + INDEX_OFFSET] = points.ToArray();
 
                 points.Clear();
             }
