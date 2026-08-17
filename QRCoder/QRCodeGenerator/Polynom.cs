@@ -7,8 +7,80 @@ public partial class QRCodeGenerator
     /// <summary>
     /// Represents a polynomial, which is a sum of polynomial terms.
     /// </summary>
-    private struct Polynom : IDisposable
+    internal struct Polynom : IDisposable
     {
+#if HAS_SPAN
+        private static ReadOnlySpan<byte> _generatorPolynomCoefficients =>
+#else
+        private static readonly byte[] _generatorPolynomCoefficients =
+#endif
+            [
+                0,
+                1, 25,
+                3, 199, 198,
+                6, 78, 249, 75,
+                10, 119, 166, 164, 113,
+                15, 176, 5, 134, 0, 166,
+                21, 102, 238, 149, 146, 229, 87,
+                28, 196, 252, 215, 249, 208, 238, 175,
+                36, 123, 11, 149, 235, 231, 137, 246, 95,
+                45, 32, 94, 64, 70, 118, 61, 46, 67, 251,
+                55, 10, 227, 116, 209, 177, 172, 194, 91, 192, 220,
+                66, 157, 87, 131, 143, 198, 113, 187, 121, 98, 43, 102,
+                78, 140, 206, 218, 130, 104, 106, 100, 86, 100, 176, 152, 74,
+                91, 22, 59, 207, 87, 216, 137, 218, 124, 190, 48, 155, 249, 199,
+                105, 99, 5, 124, 140, 237, 58, 58, 51, 37, 202, 91, 61, 183, 8,
+                120, 225, 194, 182, 169, 147, 191, 91, 3, 76, 161, 102, 109, 107, 104, 120,
+                136, 163, 243, 39, 150, 99, 24, 147, 214, 206, 123, 239, 43, 78, 206, 139, 43,
+                153, 96, 98, 5, 179, 252, 148, 152, 187, 79, 170, 118, 97, 184, 94, 158, 234, 215,
+                171, 220, 138, 222, 252, 133, 153, 128, 44, 159, 150, 17, 83, 90, 52, 153, 105, 3, 67,
+                190, 188, 212, 212, 164, 156, 239, 83, 225, 221, 180, 202, 187, 26, 163, 61, 50, 79, 60, 17,
+                210, 175, 148, 254, 122, 36, 230, 137, 148, 115, 210, 200, 85, 98, 67, 140, 181, 247, 104, 233, 240,
+                231, 165, 105, 160, 134, 219, 80, 98, 172, 8, 74, 200, 53, 221, 109, 14, 230, 93, 242, 247, 171, 210,
+                253, 147, 56, 78, 1, 192, 224, 164, 94, 248, 183, 25, 14, 150, 193, 17, 65, 103, 49, 91, 146, 102, 171,
+                21, 227, 96, 87, 232, 117, 0, 111, 218, 228, 226, 192, 152, 169, 180, 159, 126, 251, 117, 211, 48, 135, 121, 229,
+                45, 252, 178, 129, 243, 95, 182, 144, 167, 99, 208, 237, 66, 54, 201, 148, 15, 59, 12, 26, 170, 39, 156, 181, 231,
+                70, 218, 145, 153, 227, 48, 102, 13, 142, 245, 21, 161, 53, 165, 28, 111, 201, 145, 17, 118, 182, 103, 2, 158, 125, 173,
+                96, 149, 17, 26, 157, 193, 216, 94, 172, 126, 73, 135, 138, 58, 45, 99, 70, 237, 9, 29, 180, 21, 227, 165, 8, 228, 79,
+                123, 9, 37, 242, 119, 212, 195, 42, 87, 245, 43, 21, 201, 232, 27, 205, 147, 195, 190, 110, 180, 108, 234, 224, 104, 200, 223, 168,
+                151, 24, 140, 250, 68, 162, 202, 9, 23, 148, 150, 234, 75, 28, 189, 175, 241, 5, 136, 24, 249, 96, 54, 219, 151, 29, 183, 45, 156,
+                180, 192, 40, 238, 216, 251, 37, 156, 130, 224, 193, 226, 173, 42, 125, 222, 96, 239, 86, 110, 48, 50, 182, 179, 31, 216, 152, 145, 173, 41,
+                210, 200, 187, 117, 183, 123, 105, 225, 1, 55, 248, 248, 144, 119, 118, 137, 122, 73, 44, 39, 113, 83, 115, 31, 225, 75, 63, 93, 252, 37, 20
+            ];
+
+        /// <summary>
+        /// Creates the generator polynomial used for creating error correction codewords.
+        /// </summary>
+        /// <param name="numEccWords">The number of error correction codewords to generate.</param>
+        /// <returns>A polynomial that can be used to generate ECC codewords.</returns>
+        public static Polynom CreateGeneratorPolynom(int numEccWords)
+        {
+            Debug.Assert(numEccWords < 32);
+
+            int startIndex = (numEccWords - 1) * numEccWords / 2;
+
+            var generatorPolynomial = new Polynom(numEccWords + 1);
+
+            // Return the polynomial terms by exponent in descending order.
+            // The highest order coefficient is always 0.
+            generatorPolynomial.Add(new PolynomItem(0, numEccWords));
+
+#if HAS_SPAN
+            var coefficients = _generatorPolynomCoefficients.Slice(startIndex, numEccWords);
+            for (int i = coefficients.Length - 1; i >= 0; i--)
+            {
+                generatorPolynomial.Add(new PolynomItem(coefficients[i], i));
+            }
+#else
+            for (int i = numEccWords - 1; i >= 0; i--)
+            {
+                generatorPolynomial.Add(new PolynomItem(_generatorPolynomCoefficients[startIndex + i], i));
+            }
+#endif
+
+            return generatorPolynomial;
+        }
+
         private PolynomItem[] _polyItems;
 
         /// <summary>
@@ -35,8 +107,7 @@ public partial class QRCodeGenerator
         /// </summary>
         public void RemoveAt(int index)
         {
-            if ((uint)index >= (uint)Count)
-                ThrowIndexArgumentOutOfRangeException();
+            Debug.Assert((uint)index < (uint)Count);
 
             if (index < Count - 1)
                 Array.Copy(_polyItems, index + 1, _polyItems, index, Count - index - 1);
@@ -51,22 +122,15 @@ public partial class QRCodeGenerator
         {
             get
             {
-                if ((uint)index >= Count)
-                    ThrowIndexArgumentOutOfRangeException();
+                Debug.Assert((uint)index < Count);
                 return _polyItems[index];
             }
             set
             {
-                if ((uint)index >= Count)
-                    ThrowIndexArgumentOutOfRangeException();
+                Debug.Assert((uint)index < Count);
                 _polyItems[index] = value;
             }
         }
-
-#if NET6_0_OR_GREATER
-        [StackTraceHidden]
-#endif
-        private static void ThrowIndexArgumentOutOfRangeException() => throw new ArgumentOutOfRangeException("index");
 
 
         /// <summary>
@@ -88,59 +152,6 @@ public partial class QRCodeGenerator
             Array.Copy(_polyItems, newPolynom._polyItems, Count);
             newPolynom.Count = Count;
             return newPolynom;
-        }
-
-        /// <summary>
-        /// Sorts the collection of <see cref="PolynomItem"/> using a custom comparer function.
-        /// </summary>
-        /// <param name="comparer">
-        /// A function that compares two <see cref="PolynomItem"/> objects and returns an integer indicating their relative order:
-        /// less than zero if the first is less than the second, zero if they are equal, or greater than zero if the first is greater than the second.
-        /// </param>
-        public void Sort(Func<PolynomItem, PolynomItem, int> comparer)
-        {
-            if (comparer == null)
-                throw new ArgumentNullException(nameof(comparer));
-
-            var items = _polyItems ?? throw new ObjectDisposedException(nameof(Polynom));
-
-            if (Count <= 1)
-            {
-                return; // Nothing to sort if the list is empty or contains only one element
-            }
-
-            void QuickSort(int left, int right)
-            {
-                int i = left;
-                int j = right;
-                var pivot = items[(left + right) / 2];
-
-                while (i <= j)
-                {
-                    while (comparer(items[i], pivot) < 0)
-                        i++;
-                    while (comparer(items[j], pivot) > 0)
-                        j--;
-
-                    if (i <= j)
-                    {
-                        // Swap items[i] and items[j]
-                        var temp = items[i];
-                        items[i] = items[j];
-                        items[j] = temp;
-                        i++;
-                        j--;
-                    }
-                }
-
-                // Recursively sort the sub-arrays
-                if (left < j)
-                    QuickSort(left, j);
-                if (i < right)
-                    QuickSort(i, right);
-            }
-
-            QuickSort(0, Count - 1);
         }
 
         /// <summary>
@@ -176,22 +187,8 @@ public partial class QRCodeGenerator
         /// </summary>
         private void AssertCapacity(int min)
         {
-            if (_polyItems.Length < min)
-            {
-                // All math by QRCoder should be done with fixed polynomials, so we don't need to grow the capacity.
-                ThrowNotSupportedException();
-
-                // Sample code for growing the capacity:
-                //var newArray = RentArray(Math.Max(min - 1, 8) * 2); // Grow by 2x, but at least by 8
-                //Array.Copy(_polyItems, newArray, _length);
-                //ReturnArray(_polyItems);
-                //_polyItems = newArray;
-            }
-
-#if NET6_0_OR_GREATER
-            [StackTraceHidden]
-#endif
-            void ThrowNotSupportedException() => throw new NotSupportedException("The polynomial capacity is fixed and cannot be increased.");
+            // All math by QRCoder should be done with fixed polynomials, so we don't need to grow the capacity.
+            Debug.Assert(_polyItems.Length >= min);
         }
 
 #if HAS_SPAN

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace QRCoder;
 
 public partial class QRCodeGenerator
@@ -5,7 +7,7 @@ public partial class QRCodeGenerator
     /// <summary>
     /// Represents the error correction coding (ECC) information for a specific version and error correction level of a QR code.
     /// </summary>
-    private struct ECCInfo
+    private readonly struct ECCInfo
     {
         /// <summary>
         /// Initializes a new instance of the ECCInfo struct with specified properties.
@@ -21,6 +23,7 @@ public partial class QRCodeGenerator
         public ECCInfo(int version, ECCLevel errorCorrectionLevel, int totalDataCodewords, int eccPerBlock, int blocksInGroup1,
             int codewordsInGroup1, int blocksInGroup2, int codewordsInGroup2)
         {
+            Debug.Assert(eccPerBlock < 32);
             Version = version;
             ErrorCorrectionLevel = errorCorrectionLevel;
             TotalDataCodewords = totalDataCodewords;
@@ -42,6 +45,7 @@ public partial class QRCodeGenerator
         /// <param name="eccPerBlock">The number of error correction codewords per block.</param>
         public ECCInfo(int version, ECCLevel errorCorrectionLevel, int totalDataCodewords, int totalDataBits, int eccPerBlock)
         {
+            Debug.Assert(eccPerBlock < 32);
             Version = version;
             ErrorCorrectionLevel = errorCorrectionLevel;
             TotalDataCodewords = totalDataCodewords;
