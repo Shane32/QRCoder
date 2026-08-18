@@ -5,6 +5,7 @@ public partial class QRCodeGenerator
     /// <summary>
     /// Represents a 2D point with byte coordinates.
     /// </summary>
+    // Be sure to add an IEquatable<> implementation if calling List<Point>.Contains or similar methods requiring equality comparison.
     private readonly struct Point
     {
         /// <summary>
