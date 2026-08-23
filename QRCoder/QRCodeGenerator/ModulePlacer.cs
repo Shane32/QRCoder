@@ -362,7 +362,7 @@ public partial class QRCodeGenerator
         /// <param name="qrCode">The QR code data structure where the alignment patterns will be placed.</param>
         /// <param name="alignmentPatternLocations">A list of points representing the centers of where alignment patterns should be placed.</param>
         /// <param name="blockedModules">A list of rectangles representing areas that must not be overwritten. Updated with the areas occupied by alignment patterns.</param>
-        public static void PlaceAlignmentPatterns(QRCodeData qrCode, List<Point> alignmentPatternLocations, BlockedModules blockedModules)
+        public static void PlaceAlignmentPatterns(QRCodeData qrCode, Point[] alignmentPatternLocations, BlockedModules blockedModules)
         {
             // Iterate through each specified location for alignment patterns.
             foreach (var loc in alignmentPatternLocations)
@@ -377,22 +377,36 @@ public partial class QRCodeGenerator
                     continue;
                 }
 
+                // Add the alignment pattern's area to the list of blocked modules to prevent future overwrites.
+                blockedModules.Add(alignmentPatternRect);
+
                 // Place the alignment pattern by setting modules within the 5x5 area.
                 // The pattern consists of a 3x3 center block with a single module border.
-                for (var x = 0; x < 5; x++)
+                // Create the pattern: a 3x3 block surrounded by a border, with the very center module set.
+                for (var y = 0; y < 5; y++)
                 {
-                    for (var y = 0; y < 5; y++)
+                    var moduleRow = qrCode.ModuleMatrix[loc.Y + 4 + y];
+
+                    switch (y)
                     {
-                        // Create the pattern: a 3x3 block surrounded by a border, with the very center module set.
-                        if (y == 0 || y == 4 || x == 0 || x == 4 || (x == 2 && y == 2))
-                        {
-                            qrCode.ModuleMatrix[loc.Y + y + 4][loc.X + x + 4] = true;
-                        }
+                        case 0 or 4:
+                            moduleRow[loc.X + 4 + 0] = true;
+                            moduleRow[loc.X + 4 + 1] = true;
+                            moduleRow[loc.X + 4 + 2] = true;
+                            moduleRow[loc.X + 4 + 3] = true;
+                            moduleRow[loc.X + 4 + 4] = true;
+                            break;
+                        case 1 or 3:
+                            moduleRow[loc.X + 4 + 0] = true;
+                            moduleRow[loc.X + 4 + 4] = true;
+                            break;
+                        case 2:
+                            moduleRow[loc.X + 4 + 0] = true;
+                            moduleRow[loc.X + 4 + 2] = true;
+                            moduleRow[loc.X + 4 + 4] = true;
+                            break;
                     }
                 }
-
-                // Add the alignment pattern's area to the list of blocked modules to prevent future overwrites.
-                blockedModules.Add(new Rectangle(loc.X, loc.Y, 5, 5));
             }
         }
 

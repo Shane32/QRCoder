@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace QRCoder;
 
 public partial class QRCodeGenerator
@@ -10,57 +12,69 @@ public partial class QRCodeGenerator
         /// <summary>
         /// A lookup table mapping QR code versions to their corresponding alignment patterns.
         /// </summary>
-        private static readonly Dictionary<int, AlignmentPattern> _alignmentPatternTable = CreateAlignmentPatternTable();
+        /// <remarks>
+        /// Versions range from -4 up to and including -1 and 1 up to and including 40.
+        /// </remarks>
+        private static readonly Point[][] _alignmentPatternTable = CreateAlignmentPatternTable();
+
+        /// <summary>
+        /// Offset used to map -4 .. 40 to 0 .. 44
+        /// </summary>
+        private const int INDEX_OFFSET = 4;
 
         /// <summary>
         /// Retrieves the alignment pattern for a specific QR code version.
         /// </summary>
-        public static AlignmentPattern FromVersion(int version) => _alignmentPatternTable[version];
+        public static Point[] FromVersion(int version) => _alignmentPatternTable[version + INDEX_OFFSET];
 
         /// <summary>
         /// Creates a lookup table mapping QR code versions to their corresponding alignment patterns.
         /// Alignment patterns are used in QR codes to help scanners accurately read the code at high speeds and when partially obscured.
         /// This table provides the necessary patterns based on the QR code version which dictates the size and complexity of the QR code.
         /// </summary>
-        /// <returns>A dictionary where keys are QR code version numbers and values are AlignmentPattern structures detailing the positions of alignment patterns for each version.</returns>
-        private static Dictionary<int, AlignmentPattern> CreateAlignmentPatternTable()
+        /// <returns>An array where indices are QR code version numbers offset by 4 and values are Point arrays containing the positions of alignment patterns for each version.</returns>
+        private static Point[][] CreateAlignmentPatternTable()
         {
-            var alignmentPatternBaseValues = new int[] { 0, 0, 0, 0, 0, 0, 0, 6, 18, 0, 0, 0, 0, 0, 6, 22, 0, 0, 0, 0, 0, 6, 26, 0, 0, 0, 0, 0, 6, 30, 0, 0, 0, 0, 0, 6, 34, 0, 0, 0, 0, 0, 6, 22, 38, 0, 0, 0, 0, 6, 24, 42, 0, 0, 0, 0, 6, 26, 46, 0, 0, 0, 0, 6, 28, 50, 0, 0, 0, 0, 6, 30, 54, 0, 0, 0, 0, 6, 32, 58, 0, 0, 0, 0, 6, 34, 62, 0, 0, 0, 0, 6, 26, 46, 66, 0, 0, 0, 6, 26, 48, 70, 0, 0, 0, 6, 26, 50, 74, 0, 0, 0, 6, 30, 54, 78, 0, 0, 0, 6, 30, 56, 82, 0, 0, 0, 6, 30, 58, 86, 0, 0, 0, 6, 34, 62, 90, 0, 0, 0, 6, 28, 50, 72, 94, 0, 0, 6, 26, 50, 74, 98, 0, 0, 6, 30, 54, 78, 102, 0, 0, 6, 28, 54, 80, 106, 0, 0, 6, 32, 58, 84, 110, 0, 0, 6, 30, 58, 86, 114, 0, 0, 6, 34, 62, 90, 118, 0, 0, 6, 26, 50, 74, 98, 122, 0, 6, 30, 54, 78, 102, 126, 0, 6, 26, 52, 78, 104, 130, 0, 6, 30, 56, 82, 108, 134, 0, 6, 34, 60, 86, 112, 138, 0, 6, 30, 58, 86, 114, 142, 0, 6, 34, 62, 90, 118, 146, 0, 6, 30, 54, 78, 102, 126, 150, 6, 24, 50, 76, 102, 128, 154, 6, 28, 54, 80, 106, 132, 158, 6, 32, 58, 84, 110, 136, 162, 6, 26, 54, 82, 110, 138, 166, 6, 30, 58, 86, 114, 142, 170 };
-            var localAlignmentPatternTable = new Dictionary<int, AlignmentPattern>(40 + 4);
+            var localAlignmentPatternTable = new Point[4 + 1 + 40][];
 
-            for (var i = 0; i < (7 * 40); i += 7)
+            // Micro QR codes do not have alignment patterns.
+            Point[] empty = [];
+
+            localAlignmentPatternTable[-4 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-3 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-2 + INDEX_OFFSET] = empty;
+            localAlignmentPatternTable[-1 + INDEX_OFFSET] = empty;
+
+            // A Version 1 QR code does not have alignment patterns.
+            localAlignmentPatternTable[1 + INDEX_OFFSET] = empty;
+
+#if HAS_SPAN
+            ReadOnlySpan<byte> alignmentPatternBaseValues =
+#else
+            byte[] alignmentPatternBaseValues =
+#endif
+                [4, 16, 0, 0, 0, 0, 0, 4, 20, 0, 0, 0, 0, 0, 4, 24, 0, 0, 0, 0, 0, 4, 28, 0, 0, 0, 0, 0, 4, 32, 0, 0, 0, 0, 0, 4, 20, 36, 0, 0, 0, 0, 4, 22, 40, 0, 0, 0, 0, 4, 24, 44, 0, 0, 0, 0, 4, 26, 48, 0, 0, 0, 0, 4, 28, 52, 0, 0, 0, 0, 4, 30, 56, 0, 0, 0, 0, 4, 32, 60, 0, 0, 0, 0, 4, 24, 44, 64, 0, 0, 0, 4, 24, 46, 68, 0, 0, 0, 4, 24, 48, 72, 0, 0, 0, 4, 28, 52, 76, 0, 0, 0, 4, 28, 54, 80, 0, 0, 0, 4, 28, 56, 84, 0, 0, 0, 4, 32, 60, 88, 0, 0, 0, 4, 26, 48, 70, 92, 0, 0, 4, 24, 48, 72, 96, 0, 0, 4, 28, 52, 76, 100, 0, 0, 4, 26, 52, 78, 104, 0, 0, 4, 30, 56, 82, 108, 0, 0, 4, 28, 56, 84, 112, 0, 0, 4, 32, 60, 88, 116, 0, 0, 4, 24, 48, 72, 96, 120, 0, 4, 28, 52, 76, 100, 124, 0, 4, 24, 50, 76, 102, 128, 0, 4, 28, 54, 80, 106, 132, 0, 4, 32, 58, 84, 110, 136, 0, 4, 28, 56, 84, 112, 140, 0, 4, 32, 60, 88, 116, 144, 0, 4, 28, 52, 76, 100, 124, 148, 4, 22, 48, 74, 100, 126, 152, 4, 26, 52, 78, 104, 130, 156, 4, 30, 56, 82, 108, 134, 160, 4, 24, 52, 80, 108, 136, 164, 4, 28, 56, 84, 112, 140, 168];
+
+            var points = new List<Point>(7 * 7);
+
+            for (var version = 2; version <= 40; version++)
             {
-                var points = new List<Point>(50);
-                for (var x = 0; x < 7; x++)
+                var indexBase = (version - 2) * 7;
+
+                for (var x = 0; x < 7 && alignmentPatternBaseValues[indexBase + x] != 0; x++)
                 {
-                    if (alignmentPatternBaseValues[i + x] != 0)
+                    for (var y = 0; y < 7 && alignmentPatternBaseValues[indexBase + y] != 0; y++)
                     {
-                        for (var y = 0; y < 7; y++)
-                        {
-                            if (alignmentPatternBaseValues[i + y] != 0)
-                            {
-                                var p = new Point(alignmentPatternBaseValues[i + x] - 2, alignmentPatternBaseValues[i + y] - 2);
-                                if (!points.Contains(p))
-                                    points.Add(p);
-                            }
-                        }
+                        points.Add(new Point(alignmentPatternBaseValues[indexBase + x], alignmentPatternBaseValues[indexBase + y]));
                     }
                 }
 
-                var version = (i + 7) / 7;
-                localAlignmentPatternTable.Add(version, new AlignmentPattern()
-                {
-                    Version = version,
-                    PatternPositions = points
-                });
-            }
+                Debug.Assert(points.Count <= 7 * 7);
 
-            // Micro QR codes do not have alignment patterns.
-            var emptyPointList = new List<Point>();
-            localAlignmentPatternTable.Add(-1, new AlignmentPattern { Version = -1, PatternPositions = emptyPointList });
-            localAlignmentPatternTable.Add(-2, new AlignmentPattern { Version = -2, PatternPositions = emptyPointList });
-            localAlignmentPatternTable.Add(-3, new AlignmentPattern { Version = -3, PatternPositions = emptyPointList });
-            localAlignmentPatternTable.Add(-4, new AlignmentPattern { Version = -4, PatternPositions = emptyPointList });
+                localAlignmentPatternTable[version + INDEX_OFFSET] = points.ToArray();
+
+                points.Clear();
+            }
 
             return localAlignmentPatternTable;
         }
