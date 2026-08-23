@@ -55,7 +55,7 @@ public partial class QRCodeGenerator
         /// <returns>A polynomial that can be used to generate ECC codewords.</returns>
         public static Polynom CreateGeneratorPolynom(int numEccWords)
         {
-            Debug.Assert(numEccWords < 32);
+            Debug.Assert(numEccWords is > 0 and < 32);
 
             int startIndex = (numEccWords - 1) * numEccWords / 2;
 

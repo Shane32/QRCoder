@@ -23,7 +23,7 @@ public partial class QRCodeGenerator
         public ECCInfo(int version, ECCLevel errorCorrectionLevel, int totalDataCodewords, int eccPerBlock, int blocksInGroup1,
             int codewordsInGroup1, int blocksInGroup2, int codewordsInGroup2)
         {
-            Debug.Assert(eccPerBlock < 32);
+            Debug.Assert(eccPerBlock is > 0 and < 32);
             Version = version;
             ErrorCorrectionLevel = errorCorrectionLevel;
             TotalDataCodewords = totalDataCodewords;
@@ -45,7 +45,7 @@ public partial class QRCodeGenerator
         /// <param name="eccPerBlock">The number of error correction codewords per block.</param>
         public ECCInfo(int version, ECCLevel errorCorrectionLevel, int totalDataCodewords, int totalDataBits, int eccPerBlock)
         {
-            Debug.Assert(eccPerBlock < 32);
+            Debug.Assert(eccPerBlock is > 0 and < 32);
             Version = version;
             ErrorCorrectionLevel = errorCorrectionLevel;
             TotalDataCodewords = totalDataCodewords;
