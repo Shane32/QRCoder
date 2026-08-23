@@ -1,10 +1,7 @@
 #if HAS_SPAN
 using System.Buffers;
 #endif
-using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace QRCoder;
 
@@ -368,7 +365,7 @@ public partial class QRCodeGenerator : IDisposable
         {
             List<CodewordBlock> codewordBlocks;
             // Generate the generator polynomial using the number of ECC words.
-            using (var generatorPolynom = CalculateGeneratorPolynom(eccInfo.ECCPerBlock))
+            using (var generatorPolynom = Polynom.CreateGeneratorPolynom(eccInfo.ECCPerBlock))
             {
                 //Calculate error correction words
                 codewordBlocks = CodewordBlock.GetList(eccInfo.BlocksInGroup1 + eccInfo.BlocksInGroup2);
@@ -699,7 +696,7 @@ public partial class QRCodeGenerator : IDisposable
                 // Convert the first coefficient to its corresponding alpha exponent unless it's zero.
                 // Coefficients that are zero remain zero because log(0) is undefined.
                 var index0Coefficient = leadTermSource[0].Coefficient;
-                index0Coefficient = index0Coefficient == 0 ? 0 : GaloisField.GetAlphaExpFromIntVal(index0Coefficient);
+                index0Coefficient = GaloisField.GetAlphaExpFromIntVal((byte)index0Coefficient);
                 var alphaNotation = new PolynomItem(index0Coefficient, leadTermSource[0].Exponent);
                 var resPoly = MultiplyGeneratorPolynomByLeadterm(generatorPolynom, alphaNotation, i);
                 ConvertToDecNotationInPlace(resPoly);
@@ -742,7 +739,7 @@ public partial class QRCodeGenerator : IDisposable
         for (var i = 0; i < poly.Count; i++)
         {
             // Convert the alpha exponent of the coefficient to its decimal value and create a new polynomial item with the updated coefficient.
-            poly[i] = new PolynomItem(GaloisField.GetIntValFromAlphaExp(poly[i].Coefficient), poly[i].Exponent);
+            poly[i] = new PolynomItem(GaloisField.GetIntValFromAlphaExp((byte)poly[i].Coefficient), poly[i].Exponent);
         }
     }
 
@@ -816,7 +813,7 @@ public partial class QRCodeGenerator : IDisposable
         // Convert each 8-bit segment into a decimal value and add it to the polynomial
         for (int i = 0; i < polynomLength; i++)
         {
-            messagePol.Add(new PolynomItem(BinToDec(bitArray, offset, 8), exponent--));
+            messagePol.Add(new PolynomItem(BinToDec(bitArray, offset), exponent--));
             offset += 8;
         }
 
@@ -824,47 +821,17 @@ public partial class QRCodeGenerator : IDisposable
     }
 
     /// <summary>
-    /// Calculates the generator polynomial used for creating error correction codewords.
-    /// </summary>
-    /// <param name="numEccWords">The number of error correction codewords to generate.</param>
-    /// <returns>A polynomial that can be used to generate ECC codewords.</returns>
-    private static Polynom CalculateGeneratorPolynom(int numEccWords)
-    {
-        var generatorPolynom = new Polynom(2); // Start with the simplest form of the polynomial
-        generatorPolynom.Add(new PolynomItem(0, 1));
-        generatorPolynom.Add(new PolynomItem(0, 0));
-
-        using (var multiplierPolynom = new Polynom(numEccWords * 2)) // Used for polynomial multiplication
-        {
-            for (var i = 1; i <= numEccWords - 1; i++)
-            {
-                // Clear and set up the multiplier polynomial for the current multiplication
-                multiplierPolynom.Clear();
-                multiplierPolynom.Add(new PolynomItem(0, 1));
-                multiplierPolynom.Add(new PolynomItem(i, 0));
-
-                // Multiply the generator polynomial by the current multiplier polynomial
-                var newGeneratorPolynom = MultiplyAlphaPolynoms(generatorPolynom, multiplierPolynom);
-                generatorPolynom.Dispose();
-                generatorPolynom = newGeneratorPolynom;
-            }
-        }
-
-        return generatorPolynom; // Return the completed generator polynomial
-    }
-
-    /// <summary>
     /// Converts a segment of a BitArray into its decimal (integer) equivalent.
     /// </summary>
     /// <returns>The integer value that represents the specified binary data.</returns>
-    private static int BinToDec(BitArray bitArray, int offset, int count)
+    private static byte BinToDec(BitArray bitArray, int offset)
     {
         var ret = 0;
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < 8; i++)
         {
-            ret ^= bitArray[offset + i] ? 1 << (count - i - 1) : 0;
+            ret ^= bitArray[offset + i] ? 1 << (7 - i) : 0;
         }
-        return ret;
+        return (byte)ret;
     }
 
     /// <summary>
@@ -1083,8 +1050,7 @@ public partial class QRCodeGenerator : IDisposable
         for (var i = 1; i < longPoly.Count; i++)
         {
             var polItemRes = new PolynomItem(
-                longPoly[i].Coefficient ^
-                (shortPoly.Count > i ? shortPoly[i].Coefficient : 0),
+                longPoly[i].Coefficient ^ (shortPoly.Count > i ? shortPoly[i].Coefficient : 0),
                 messagePolynom[0].Exponent - i
             );
             resultPolynom.Add(polItemRes);
@@ -1103,167 +1069,12 @@ public partial class QRCodeGenerator : IDisposable
         foreach (var polItemBase in genPolynom)
         {
             var polItemRes = new PolynomItem(
-
                 (polItemBase.Coefficient + leadTerm.Coefficient) % 255,
                 polItemBase.Exponent - lowerExponentBy
             );
             resultPolynom.Add(polItemRes);
         }
         return resultPolynom;
-    }
-
-    /// <summary>
-    /// Multiplies two polynomials, treating coefficients as exponents of a primitive element (alpha), which is common in error correction algorithms such as Reed-Solomon.
-    /// </summary>
-    /// <param name="polynomBase">The first polynomial to multiply.</param>
-    /// <param name="polynomMultiplier">The second polynomial to multiply.</param>
-    /// <returns>A new polynomial which is the result of the multiplication of the two input polynomials.</returns>
-    private static Polynom MultiplyAlphaPolynoms(Polynom polynomBase, Polynom polynomMultiplier)
-    {
-        // Initialize a new polynomial with a size based on the product of the sizes of the two input polynomials.
-        var resultPolynom = new Polynom(polynomMultiplier.Count * polynomBase.Count);
-
-        // Multiply each term of the first polynomial by each term of the second polynomial.
-        foreach (var polItemBase in polynomMultiplier)
-        {
-            foreach (var polItemMulti in polynomBase)
-            {
-                // Create a new polynomial term with the coefficients added (as exponents) and exponents summed.
-                var polItemRes = new PolynomItem
-                (
-                    GaloisField.ShrinkAlphaExp(polItemBase.Coefficient + polItemMulti.Coefficient),
-                    (polItemBase.Exponent + polItemMulti.Exponent)
-                );
-                resultPolynom.Add(polItemRes);
-            }
-        }
-
-        // Identify and merge terms with the same exponent.
-#if NET5_0_OR_GREATER
-        var toGlue = GetNotUniqueExponents(resultPolynom, resultPolynom.Count <= 128 ? stackalloc int[128].Slice(0, resultPolynom.Count) : new int[resultPolynom.Count]);
-        var gluedPolynoms = toGlue.Length <= 128
-            ? stackalloc PolynomItem[128].Slice(0, toGlue.Length)
-            : new PolynomItem[toGlue.Length];
-#else
-        var toGlue = GetNotUniqueExponents(resultPolynom);
-        var gluedPolynoms = new PolynomItem[toGlue.Length];
-#endif
-        var gluedPolynomsIndex = 0;
-        foreach (var exponent in toGlue)
-        {
-            var coefficient = 0;
-            foreach (var polynomOld in resultPolynom)
-            {
-                if (polynomOld.Exponent == exponent)
-                    coefficient ^= GaloisField.GetIntValFromAlphaExp(polynomOld.Coefficient);
-            }
-
-            // Fix the polynomial terms by recalculating the coefficients based on XORed results.
-            var polynomFixed = new PolynomItem(GaloisField.GetAlphaExpFromIntVal(coefficient), exponent);
-            gluedPolynoms[gluedPolynomsIndex++] = polynomFixed;
-        }
-
-        // Remove duplicated exponents and add the corrected ones back.
-        for (int i = resultPolynom.Count - 1; i >= 0; i--)
-#if NET5_0_OR_GREATER
-            if (toGlue.Contains(resultPolynom[i].Exponent))
-#else
-            if (Array.IndexOf(toGlue, resultPolynom[i].Exponent) >= 0)
-#endif
-                resultPolynom.RemoveAt(i);
-        foreach (var polynom in gluedPolynoms)
-            resultPolynom.Add(polynom);
-
-        // Sort the polynomial terms by exponent in descending order.
-        resultPolynom.Sort((x, y) => -x.Exponent.CompareTo(y.Exponent));
-        return resultPolynom;
-
-        // Auxiliary function to identify exponents that appear more than once in the polynomial.
-#if NET5_0_OR_GREATER
-        static ReadOnlySpan<int> GetNotUniqueExponents(Polynom list, Span<int> buffer)
-        {
-            // It works as follows:
-            // 1. a scratch buffer of the same size as the list is passed in
-            // 2. exponents are written / copied to that scratch buffer
-            // 3. scratch buffer is sorted, thus the exponents are in order
-            // 4. for each item in the scratch buffer (= ordered exponents) it's compared w/ the previous one
-            //   * if equal, then increment a counter
-            //   * else check if the counter is $>0$ and if so write the exponent to the result
-            // 
-            // For writing the result the same scratch buffer is used, as by definition the index to write the result 
-            // is `<=` the iteration index, so no overlap, etc. can occur.
-
-            Debug.Assert(list.Count == buffer.Length);
-
-            int idx = 0;
-            foreach (var row in list)
-            {
-                buffer[idx++] = row.Exponent;
-            }
-
-            buffer.Sort();
-
-            idx = 0;
-            int expCount = 0;
-            int last = buffer[0];
-
-            for (int i = 1; i < buffer.Length; ++i)
-            {
-                if (buffer[i] == last)
-                {
-                    expCount++;
-                }
-                else
-                {
-                    if (expCount > 0)
-                    {
-                        Debug.Assert(idx <= i - 1);
-
-                        buffer[idx++] = last;
-                        expCount = 0;
-                    }
-                }
-
-                last = buffer[i];
-            }
-
-            return buffer.Slice(0, idx);
-        }
-#else
-        static int[] GetNotUniqueExponents(Polynom list)
-        {
-            var dic = new Dictionary<int, bool>(list.Count);
-            foreach (var row in list)
-            {
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-                if (!dic.TryAdd(row.Exponent, false))
-#else
-                if (!dic.ContainsKey(row.Exponent))
-                    dic.Add(row.Exponent, false);
-                else
-#endif
-                    dic[row.Exponent] = true;
-            }
-
-            // Collect all exponents that appeared more than once.
-            int count = 0;
-            foreach (var row in dic)
-            {
-                if (row.Value)
-                    count++;
-            }
-
-            var result = new int[count];
-            int i = 0;
-            foreach (var row in dic)
-            {
-                if (row.Value)
-                    result[i++] = row.Key;
-            }
-
-            return result;
-        }
-#endif
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>

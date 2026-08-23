@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace QRCoder;
 
 public partial class QRCodeGenerator
@@ -6,7 +8,7 @@ public partial class QRCodeGenerator
     /// Represents an individual term of a polynomial, consisting of a coefficient and an exponent.
     /// For example, the term 3x² would be represented as a <see cref="PolynomItem"/> with a coefficient of 3 and an exponent of 2.
     /// </summary>
-    private struct PolynomItem
+    internal readonly struct PolynomItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PolynomItem"/> struct with the specified coefficient and exponent.
@@ -15,6 +17,7 @@ public partial class QRCodeGenerator
         /// <param name="exponent">The exponent of the polynomial term. For example, in the term 3x², the exponent is 2.</param>
         public PolynomItem(int coefficient, int exponent)
         {
+            Debug.Assert((uint)coefficient < 256);
             Coefficient = coefficient;
             Exponent = exponent;
         }
