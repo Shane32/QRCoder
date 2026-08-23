@@ -165,7 +165,7 @@ public partial class QRCodeGenerator
             for (int i = 0; i < Count; i++)
             {
                 var polyItem = _polyItems[i];
-                sb.Append("a^" + polyItem.Coefficient + "*x^" + polyItem.Exponent + " + ");
+                StringExtensions.AppendInvariant(sb,$"a^{polyItem.Coefficient}*x^{polyItem.Exponent} + ");
             }
 
             // Remove the trailing " + " if the string builder has added terms
