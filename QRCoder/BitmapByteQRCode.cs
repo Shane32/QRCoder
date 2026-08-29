@@ -1,3 +1,6 @@
+#if HAS_SPAN
+using System.Buffers;
+#endif
 #if NETCOREAPP2_1_OR_GREATER
 using System.Buffers.Binary;
 #endif
@@ -14,9 +17,16 @@ namespace QRCoder;
 // ReSharper disable once InconsistentNaming
 public class BitmapByteQRCode : AbstractQRCode, IDisposable
 {
-    private static readonly byte[] _bitmapHeaderPart1 = new byte[] { 0x42, 0x4D };
-    private static readonly byte[] _bitmapHeaderPart2 = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00 };
-    private static readonly byte[] _bitmapHeaderPartEnd = new byte[] { 0x01, 0x00, 0x18, 0x00 };
+    // First 32 bytes of a bitmap file header (for 24-bit bitmaps)
+#if HAS_SPAN
+    private static ReadOnlySpan<byte> _bitmapHeader =>
+#else
+    private static readonly byte[] _bitmapHeader =
+#endif
+    [
+        0x42, 0x4D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00, 0x00, 0x00
+    ];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BitmapByteQRCode"/> class.
@@ -36,7 +46,7 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <param name="pixelsPerModule">The number of pixels each dark/light module of the QR code will occupy in the final QR code image.</param>
     /// <returns>Returns the QR code graphic as a bitmap byte array.</returns>
     public byte[] GetGraphic(int pixelsPerModule)
-        => GetGraphic(pixelsPerModule, new byte[] { 0x00, 0x00, 0x00 }, new byte[] { 0xFF, 0xFF, 0xFF });
+        => GetGraphic(pixelsPerModule, [0x00, 0x00, 0x00], [0xFF, 0xFF, 0xFF]);
 
     /// <summary>
     /// Returns the QR code graphic as a bitmap byte array.
@@ -57,12 +67,12 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a bitmap byte array.</returns>
     public byte[] GetGraphic(int pixelsPerModule, byte[] darkColorRgb, byte[] lightColorRgb)
     {
-        var sideLength = QrCodeData.ModuleMatrix.Count * pixelsPerModule;
-
         // Pre-calculate color/module bytes
-        byte[] moduleDark = new byte[pixelsPerModule * 3];
-        byte[] moduleLight = new byte[pixelsPerModule * 3];
-        for (int i = 0; i < pixelsPerModule * 3; i += 3)
+        int bytesPerModule = pixelsPerModule * 3;
+        byte[] moduleDark = new byte[bytesPerModule];
+        byte[] moduleLight = new byte[bytesPerModule];
+
+        for (int i = 0; i < bytesPerModule; i += 3)
         {
             moduleDark[i] = darkColorRgb[2];
             moduleDark[i + 1] = darkColorRgb[1];
@@ -72,69 +82,62 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
             moduleLight[i + 2] = lightColorRgb[0];
         }
 
+        var moduleMatrix = QrCodeData.ModuleMatrix;
+        var sideLength = moduleMatrix.Count * pixelsPerModule;
+
         // The size of each row must be rounded up to a multiple of 4 bytes by padding.
         // Pre-calculate padding bytes
-        var rowByteLength = sideLength * 3;
-        var paddingLen = -rowByteLength & 3;
+        int rowByteLength = sideLength * 3;
+        int paddingLen = -rowByteLength & 3;
         Debug.Assert(paddingLen >= 0 && paddingLen < 4 && (rowByteLength + paddingLen) % 4 == 0);
 
         // Calculate filesize (header + pixel data + padding)
-        var fileSize = 54 + (rowByteLength + paddingLen) * sideLength;
+        int fileSize = 54 + (rowByteLength + paddingLen) * sideLength;
 
         // Bitmap container
         byte[] bmp = new byte[fileSize];
-        int ix = 0;
 
-        // Header part 1
-        Array.Copy(_bitmapHeaderPart1, 0, bmp, ix, _bitmapHeaderPart1.Length);
-        ix += _bitmapHeaderPart1.Length;
+        // Header
+#if HAS_SPAN
+        _bitmapHeader.CopyTo(bmp);
+#else
+        Array.Copy(_bitmapHeader, 0, bmp, 0, _bitmapHeader.Length);
+#endif
 
-        // Filesize
-        CopyIntAs4ByteToArray(fileSize, ix, bmp);
-        ix += 4;
-
-        // Header part 2
-        Array.Copy(_bitmapHeaderPart2, 0, bmp, ix, _bitmapHeaderPart2.Length);
-        ix += _bitmapHeaderPart2.Length;
-
+        // File size
+        CopyIntAs4ByteToArray(fileSize, 2, bmp);
         // Width
-        CopyIntAs4ByteToArray(sideLength, ix, bmp);
-        ix += 4;
+        CopyIntAs4ByteToArray(sideLength, 18, bmp);
         // Height
-        CopyIntAs4ByteToArray(sideLength, ix, bmp);
-        ix += 4;
+        CopyIntAs4ByteToArray(sideLength, 22, bmp);
 
-        // Header end
-        Array.Copy(_bitmapHeaderPartEnd, 0, bmp, ix, _bitmapHeaderPartEnd.Length);
-        ix += _bitmapHeaderPartEnd.Length;
-
-        // Add header null-bytes
-        ix += 24;
-
+        // Header is 54 bytes in total, remaining bytes are zero.
+        Debug.Assert(bmp[10] == 54);
+        int ix = 54;
 
         // Draw qr code
-        for (var x = sideLength - 1; x >= 0; x -= pixelsPerModule)
+        for (int y = moduleMatrix.Count - 1; y >= 0; y--)
         {
-            var modMatrixX = (x + pixelsPerModule) / pixelsPerModule - 1;
+            var modules = moduleMatrix[y];
 
-            // Write data for first pixel of pixelsPerModule
-            int posStartFirstPx = ix;
-            for (var y = 0; y < sideLength; y += pixelsPerModule)
+            // Write data for first line of pixelsPerModule lines
+            int lineStart = ix;
+            for (int x = 0; x < modules.Length; x++)
             {
-                var module = QrCodeData.ModuleMatrix[modMatrixX][(y + pixelsPerModule) / pixelsPerModule - 1];
-                Array.Copy(module ? moduleDark : moduleLight, 0, bmp, ix, moduleDark.Length);
-                ix += moduleDark.Length;
+                byte[] module = modules[x] ? moduleDark : moduleLight;
+                Array.Copy(module, 0, bmp, ix, module.Length);
+                ix += module.Length;
             }
             // Add padding (to make line length a multiple of 4)
             ix += paddingLen;
-            int lenFirstPx = ix - posStartFirstPx;
+            int lineLength = ix - lineStart;
 
-            // Re-write (copy) first pixel (pixelsPerModule - 1) times
-            for (int pm = 0; pm < (pixelsPerModule - 1); pm++)
+            // Re-write (copy) first line (pixelsPerModule - 1) times
+            for (int pm = pixelsPerModule - 1; pm > 0; pm--)
             {
                 // Draw pixels
-                Array.Copy(bmp, posStartFirstPx, bmp, ix, lenFirstPx);
-                ix += lenFirstPx;
+                Array.Copy(bmp, lineStart, bmp, ix, lineLength);
+                ix += lineLength;
             }
         }
 
