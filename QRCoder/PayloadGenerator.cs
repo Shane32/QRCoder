@@ -24,7 +24,16 @@ public static partial class PayloadGenerator
 
         //Check IBAN checksum
         var checksumValid = false;
-        var sum = $"{ibanCleared.Substring(4)}{ibanCleared.Substring(0, 4)}".ToCharArray().Aggregate("", (current, c) => current + (char.IsLetter(c) ? (c - 55).ToString(CultureInfo.InvariantCulture) : c.ToString(CultureInfo.InvariantCulture)));
+        var sumChars = $"{ibanCleared.Substring(4)}{ibanCleared.Substring(0, 4)}".ToCharArray();
+        var sumBuilder = new StringBuilder(sumChars.Length * 2);
+        foreach (var c in sumChars)
+        {
+            if (char.IsLetter(c))
+                sumBuilder.Append((c - 55).ToString(CultureInfo.InvariantCulture));
+            else
+                sumBuilder.Append(c);
+        }
+        var sum = sumBuilder.ToString();
         int m = 0;
         for (int i = 0; i < (int)Math.Ceiling((sum.Length - 2) / 7d); i++)
         {
@@ -33,7 +42,7 @@ public static partial class PayloadGenerator
 #if NET5_0_OR_GREATER
             var n = string.Concat(i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture), sum.AsSpan(start, Math.Min(9 - offset, sum.Length - start)));
 #else
-            var n = (i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture)) + sum.Substring(start, Math.Min(9 - offset, sum.Length - start));
+            var n = $"{(i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture))}{sum.Substring(start, Math.Min(9 - offset, sum.Length - start))}";
 #endif
             if (!int.TryParse(n, NumberStyles.Any, CultureInfo.InvariantCulture, out m))
                 break;
@@ -112,7 +121,7 @@ public static partial class PayloadGenerator
         }
         foreach (var c in forbiddenChars)
         {
-            inp = inp.Replace(c.ToString(), "\\" + c);
+            inp = inp.Replace(c.ToString(), $"\\{c}");
         }
         return inp;
     }

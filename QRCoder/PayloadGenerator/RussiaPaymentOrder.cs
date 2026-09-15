@@ -90,12 +90,13 @@ public static partial class PayloadGenerator
             _separator = DetermineSeparator();
 
             //Create the payload string
-            string ret = $"ST0001" + ((int)_characterSet).ToString(CultureInfo.InvariantCulture) + //(separator != "|" ? separator : "") +
-                $"{_separator}Name={_mFields.Name}" +
-                $"{_separator}PersonalAcc={_mFields.PersonalAcc}" +
-                $"{_separator}BankName={_mFields.BankName}" +
-                $"{_separator}BIC={_mFields.BIC}" +
-                $"{_separator}CorrespAcc={_mFields.CorrespAcc}";
+            var retBuilder = new StringBuilder($"ST0001{(int)_characterSet}");
+            StringExtensions.AppendInvariant(retBuilder,$"{_separator}Name={_mFields.Name}");
+            StringExtensions.AppendInvariant(retBuilder,$"{_separator}PersonalAcc={_mFields.PersonalAcc}");
+            StringExtensions.AppendInvariant(retBuilder,$"{_separator}BankName={_mFields.BankName}");
+            StringExtensions.AppendInvariant(retBuilder,$"{_separator}BIC={_mFields.BIC}");
+            StringExtensions.AppendInvariant(retBuilder,$"{_separator}CorrespAcc={_mFields.CorrespAcc}");
+            var ret = retBuilder.ToString();
 
             //Check length of mandatory field block (-8 => Removing service data block bytes from ret length)
             int bytesMandatoryLen = Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(cp), Encoding.UTF8.GetBytes(ret)).Length - 8;
@@ -576,7 +577,7 @@ public static partial class PayloadGenerator
         }
 
 #pragma warning disable CA1707 // Underscore in identifier
-        /// <summary>            
+        /// <summary>
         /// (List of values of the technical code of the payment)
         /// <para>Перечень значений технического кода платежа</para>
         /// </summary>

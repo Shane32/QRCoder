@@ -37,9 +37,9 @@ public static partial class PayloadGenerator
                 case MailEncoding.MAILTO:
                     var parts = new List<string>();
                     if (!string.IsNullOrEmpty(_subject))
-                        parts.Add("subject=" + Uri.EscapeDataString(_subject));
+                        parts.Add($"subject={Uri.EscapeDataString(_subject)}");
                     if (!string.IsNullOrEmpty(_message))
-                        parts.Add("body=" + Uri.EscapeDataString(_message));
+                        parts.Add($"body={Uri.EscapeDataString(_message)}");
                     var queryString = parts.Count > 0 ? $"?{string.Join("&", parts.ToArray())}" : "";
                     return $"mailto:{_mailReceiver}{queryString}";
                 case MailEncoding.MATMSG:
