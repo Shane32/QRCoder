@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace QRCoder;
 
 public partial class QRCodeGenerator
@@ -36,6 +38,7 @@ public partial class QRCodeGenerator
         /// <param name="h">The height of the rectangle.</param>
         public Rectangle(int x, int y, int w, int h)
         {
+            Debug.Assert(x >= 0 && y >= 0 && w >= 0 && h >= 0);
             X = x;
             Y = y;
             Width = w;
