@@ -385,6 +385,8 @@ public partial class QRCodeGenerator
             Disposed = true;
 
 #if HAS_SPAN
+            // Avoid leaking QR code data into the pool
+            Bytes.AsSpan().Clear();
             ArrayPool<byte>.Shared.Return(Bytes);
 #elif NET40_OR_GREATER
             _pool.Push(Bytes);
