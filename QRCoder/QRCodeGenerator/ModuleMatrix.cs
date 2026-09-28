@@ -115,6 +115,10 @@ public partial class QRCodeGenerator
             var source = data.ModuleMatrix;
             var target = Bytes;
 
+#if NETSTANDARD1_3
+            Array.Clear(target, 0, target.Length);
+#endif
+
             for (int y = 0; y < Size; y++)
             {
                 var bitArray = source[y + 4];
