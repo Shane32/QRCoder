@@ -451,10 +451,10 @@ public partial class QRCodeGenerator : IDisposable
             var qr = new QRCodeData(version, true);
             var size = qr.ModuleMatrix.Count - 8;
             var tempBitArray = new BitArray(18); //version string requires 18 bits
-            using (var blockedModules = new ModulePlacer.BlockedModules(size))
+            using (var blockedModules = new ModuleMatrix(size))
             {
                 ModulePlacer.PlaceFinderPatterns(qr, blockedModules);
-                ModulePlacer.ReserveSeperatorAreas(version, size, blockedModules);
+                ModulePlacer.ReserveSeparatorAreas(version, size, blockedModules);
                 ModulePlacer.PlaceAlignmentPatterns(qr, AlignmentPatterns.FromVersion(version), blockedModules);
                 ModulePlacer.PlaceTimingPatterns(qr, blockedModules);
                 ModulePlacer.PlaceDarkModule(qr, version, blockedModules);
@@ -462,7 +462,7 @@ public partial class QRCodeGenerator : IDisposable
                 ModulePlacer.PlaceDataWords(qr, interleavedData, blockedModules);
                 var maskVersion = ModulePlacer.MaskCode(qr, version, blockedModules, eccLevel);
                 GetFormatString(tempBitArray, version, eccLevel, maskVersion);
-                ModulePlacer.PlaceFormat(qr, tempBitArray, true);
+                ModulePlacer.PlaceFormat(qr, tempBitArray);
             }
 
             if (version >= 7)
