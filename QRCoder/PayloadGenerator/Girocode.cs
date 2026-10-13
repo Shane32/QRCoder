@@ -74,24 +74,22 @@ public static partial class PayloadGenerator
         /// <returns>The Girocode payload as a string.</returns>
         public override string ToString()
         {
-            var girocodePayload = "BCD" + _br;
-            girocodePayload += ((_version == GirocodeVersion.Version1) ? "001" : "002") + _br;
-            girocodePayload += (int)_encoding + 1 + _br;
-            girocodePayload += "SCT" + _br;
-            girocodePayload += _bic + _br;
-            girocodePayload += _name + _br;
-            girocodePayload += _iban + _br;
-            girocodePayload += string.Format(CultureInfo.InvariantCulture, "EUR{0:0.00}", _amount) + _br;
-            girocodePayload += _purposeOfCreditTransfer + _br;
-            girocodePayload += ((_typeOfRemittance == TypeOfRemittance.Structured)
-                ? _remittanceInformation
-                : string.Empty) + _br;
-            girocodePayload += ((_typeOfRemittance == TypeOfRemittance.Unstructured)
-                ? _remittanceInformation
-                : string.Empty) + _br;
-            girocodePayload += _messageToGirocodeUser;
+            var girocodePayload = new StringBuilder();
+            StringExtensions.AppendInvariant(girocodePayload,$"BCD{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{(_version == GirocodeVersion.Version1 ? "001" : "002")}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{(int)_encoding + 1}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"SCT{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{_bic}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{_name}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{_iban}{_br}");
+            girocodePayload.Append(string.Format(CultureInfo.InvariantCulture, "EUR{0:0.00}", _amount));
+            girocodePayload.Append(_br);
+            StringExtensions.AppendInvariant(girocodePayload,$"{_purposeOfCreditTransfer}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{(_typeOfRemittance == TypeOfRemittance.Structured ? _remittanceInformation : string.Empty)}{_br}");
+            StringExtensions.AppendInvariant(girocodePayload,$"{(_typeOfRemittance == TypeOfRemittance.Unstructured ? _remittanceInformation : string.Empty)}{_br}");
+            girocodePayload.Append(_messageToGirocodeUser);
 
-            return ConvertStringToEncoding(girocodePayload, _encoding.ToString().Replace("_", "-"));
+            return ConvertStringToEncoding(girocodePayload.ToString(), _encoding.ToString().Replace("_", "-"));
         }
 
         /// <summary>
