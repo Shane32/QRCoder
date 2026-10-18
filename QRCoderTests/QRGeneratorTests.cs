@@ -741,6 +741,30 @@ public class QRGeneratorTests
     [InlineData(QRCodeData.Compression.Uncompressed)]
     [InlineData(QRCodeData.Compression.Deflate)]
     [InlineData(QRCodeData.Compression.GZip)]
+    public void can_save_and_load_qrcode_data_to_file(QRCodeData.Compression compressionMode)
+    {
+        // Arrange - Create a QR code
+        var originalQrData = QRCodeGenerator.GenerateQrCode("https://github.com/Shane32/QRCoder", ECCLevel.H);
+        var originalMatrix = string.Join("", originalQrData.ModuleMatrix.Select(x => x.ToBitString()).ToArray());
+        var filePath = System.IO.Path.GetTempFileName();
+
+        // Act - Save raw data and reload it
+        originalQrData.SaveRawData(filePath, compressionMode);
+        var reloadedQrData = new QRCodeData(filePath, compressionMode);
+        var reloadedMatrix = string.Join("", reloadedQrData.ModuleMatrix.Select(x => x.ToBitString()).ToArray());
+
+        // Assert - Verify the data matches
+        reloadedQrData.Version.ShouldBe(originalQrData.Version);
+        reloadedQrData.ModuleMatrix.Count.ShouldBe(originalQrData.ModuleMatrix.Count);
+        reloadedMatrix.ShouldBe(originalMatrix);
+
+        System.IO.File.Delete(filePath);
+    }
+
+    [Theory]
+    [InlineData(QRCodeData.Compression.Uncompressed)]
+    [InlineData(QRCodeData.Compression.Deflate)]
+    [InlineData(QRCodeData.Compression.GZip)]
     public void can_save_and_load_micro_qrcode_data(QRCodeData.Compression compressionMode)
     {
         // Arrange - Create a QR code
@@ -887,14 +911,13 @@ public static class ExtensionMethods
 {
     public static string ToBitString(this BitArray bits)
     {
-        var sb = new StringBuilder();
         int bitLength = bits.Length;
+        char[] sb = new char[bitLength];
         for (int i = 0; i < bitLength; i++)
         {
-            char c = bits[i] ? '1' : '0';
-            sb.Append(c);
+            sb[i] = bits[i] ? '1' : '0';
         }
 
-        return sb.ToString();
+        return new string(sb);
     }
 }
