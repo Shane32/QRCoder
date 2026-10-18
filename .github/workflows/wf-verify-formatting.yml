@@ -17,7 +17,7 @@ jobs:
     - name: Install additional .NET SDKs
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
 
     - name: Restore NuGet Packages
       run: dotnet restore

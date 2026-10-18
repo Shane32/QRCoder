@@ -1,5 +1,4 @@
 using System.IO;
-using System.Security.Cryptography;
 using System.Reflection;
 #if TEST_XAML
 using SW = System.Windows;
@@ -8,6 +7,7 @@ using System.Windows.Media.Imaging;
 #endif
 
 namespace QRCoderTests.Helpers;
+
 public static class HelperFunctions
 {
 
@@ -40,7 +40,7 @@ public static class HelperFunctions
 #if NET5_0_OR_GREATER
         => AppDomain.CurrentDomain.BaseDirectory;
 #else
-        => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)?.Replace("file:\\", "") ?? "";
+        => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)?.Replace("file:\\", "") ?? "";
 #endif
 
     /// <summary>
