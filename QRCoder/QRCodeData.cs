@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Compression;
 
 namespace QRCoder;
@@ -119,6 +120,8 @@ public class QRCodeData : IDisposable
                 ModuleMatrix[y][x] = modules.Dequeue();
             }
         }
+
+        Debug.Assert(modules.Count < 8);
     }
 
     /// <summary>
@@ -202,11 +205,11 @@ public class QRCodeData : IDisposable
                 }
             }
 
-            int padding = 8 - ((ModuleMatrix.Count * ModuleMatrix.Count) & 7);
-
-            if (padding > 0)
+            if (bits > 0)
             {
-                data <<= padding;
+                Debug.Assert(bits < 8);
+
+                data <<= 8 - bits;
 
                 targetStream.WriteByte((byte)data);
             }
