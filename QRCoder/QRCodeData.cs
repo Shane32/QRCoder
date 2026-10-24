@@ -55,7 +55,7 @@ public class QRCodeData : IDisposable
     /// <param name="compressMode">The compression mode used for the raw data.</param>
     public QRCodeData(byte[] rawData, Compression compressMode)
     {
-        //Decompress
+        // Decompress
         if (compressMode == Compression.Deflate)
         {
             using var input = new MemoryStream(rawData);
@@ -77,46 +77,53 @@ public class QRCodeData : IDisposable
             rawData = output.ToArray();
         }
 
-        if (rawData.Length < 5)
+        const int HeaderLength = 5; // 4 bytes signature + 1 byte side length
+
+        if (rawData.Length < HeaderLength)
             throw new InvalidDataException("Invalid raw data file. File too short.");
-        if (rawData[0] != 0x51 || rawData[1] != 0x52 || rawData[2] != 0x52)
+
+        if (rawData[0] != 0x51 || rawData[1] != 0x52 || rawData[2] != 0x52 || rawData[3] != 0)
             throw new InvalidDataException("Invalid raw data file. Filetype doesn't match \"QRR\".");
 
         // Set QR code version from side length (includes 8-module quiet zone)
-        var sideLen = (int)rawData[4];
+        int sideLen = rawData[4];
         if (sideLen < 29) // Micro QR: sideLen = 19 + 2*(m-1), m in [1..4] -> versions -1..-4
         {
-            if (((sideLen - 19) & 1) != 0)
+            if (sideLen < 19 || sideLen > 25 || (sideLen & 1) == 0)
                 throw new InvalidDataException("Invalid raw data file. Side length not valid for Micro QR.");
-            var m = ((sideLen - 19) / 2) + 1;
-            Version = -m;
+
+            Version = -((sideLen - 17) >>> 1);
         }
         else // Standard QR: sideLen = 29 + 4*(v-1), v in [1..40]
         {
-            if (((sideLen - 29) % 4) != 0)
+            if (sideLen > 185 || (sideLen & 3) != 1)
                 throw new InvalidDataException("Invalid raw data file. Side length not valid for QR.");
-            Version = ((sideLen - 29) / 4) + 1;
+
+            Version = (sideLen - 25) >>> 2;
         }
 
-        //Unpack
-        var modules = new Queue<bool>(8 * (rawData.Length - 5));
-        for (int j = 5; j < rawData.Length; j++)
+        int byteLength = (sideLen * sideLen + 7) >>> 3;
+        if (rawData.Length < 5 + byteLength)
         {
-            var b = rawData[j];
-            for (int i = 7; i >= 0; i--)
-            {
-                modules.Enqueue((b & (1 << i)) != 0);
-            }
+            throw new InvalidDataException("Invalid raw data file. Not enough data.");
         }
 
-        //Build module matrix
+        // Build module matrix
         ModuleMatrix = new List<BitArray>(sideLen);
+        int bitIndex = HeaderLength * 8; // Skip header bytes
+
         for (int y = 0; y < sideLen; y++)
         {
-            ModuleMatrix.Add(new BitArray(sideLen));
+            var row = new BitArray(sideLen);
+            ModuleMatrix.Add(row);
+
             for (int x = 0; x < sideLen; x++)
             {
-                ModuleMatrix[y][x] = modules.Dequeue();
+                int byteIndex = bitIndex >>> 3;
+                int mask = 1 << (~bitIndex & 7);
+                row[x] = (rawData[byteIndex] & mask) != 0;
+
+                bitIndex++;
             }
         }
     }
