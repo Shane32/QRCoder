@@ -16,7 +16,7 @@ public class GirocodeTests
 
         generator
             .ToString()
-            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nWikimedia Fördergesellschaft\nDE33100205000001194700\nEUR10.00\n\n\n\n");
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nWikimedia Fördergesellschaft\nDE33100205000001194700\nEUR10.00");
     }
 
     [Fact]
@@ -341,7 +341,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\nINGBNL2A\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\nINGBNL2A\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -456,18 +456,52 @@ public class GirocodeTests
         exception.Message.ShouldBe("The BIC entered isn't valid.");
     }
 
-    [Fact]
-    public void girocode_generator_can_generate_payload_without_amount()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void girocode_generator_can_generate_payload_without_amount(bool omitAmount)
     {
         var iban = "DE33100205000001194700";
         var bic = "BFSWDE33BER";
         var name = "Payee";
 
-        var generator = new PayloadGenerator.Girocode(iban, bic, name);
+        var generator = omitAmount
+            ? new PayloadGenerator.Girocode(iban, bic, name)
+            : new PayloadGenerator.Girocode(iban, bic, name, amount: null);
 
         generator
             .ToString()
-            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700\n\n\n\n\n");
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700");
+    }
+
+    [Theory]
+    [InlineData(false, "CHAR", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\n\nCHAR")]
+    [InlineData(false, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Structured, "", "\n\n\nReference")]
+    [InlineData(false, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\n\n\n\nReference")]
+    [InlineData(false, "", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "Thank you ", "\n\n\n\n\nThank you ")]
+    [InlineData(true, "CHAR", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\nEUR10.00\nCHAR")]
+    [InlineData(true, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Structured, "", "\nEUR10.00\n\nReference")]
+    [InlineData(true, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\nEUR10.00\n\n\nReference")]
+    [InlineData(true, "", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "Thank you ", "\nEUR10.00\n\n\n\nThank you ")]
+    public void girocode_generator_should_end_payload_at_last_populated_field(
+        bool hasAmount,
+        string purposeOfCreditTransfer,
+        string remittanceInformation,
+        PayloadGenerator.Girocode.TypeOfRemittance typeOfRemittance,
+        string messageToGirocodeUser,
+        string expectedSuffix)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = "BFSWDE33BER";
+        var name = "Payee";
+
+        var generator = new PayloadGenerator.Girocode(iban, bic, name, amount: hasAmount ? 10m : (decimal?)null,
+            remittanceInformation: remittanceInformation, typeOfRemittance: typeOfRemittance,
+            purposeOfCreditTransfer: purposeOfCreditTransfer, messageToGirocodeUser: messageToGirocodeUser);
+
+        generator
+            .ToString()
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700" + expectedSuffix);
     }
 
     [Theory]
@@ -536,7 +570,7 @@ public class GirocodeTests
 
         generator
             .ToString()
-            .ShouldBe($"BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700\n{expectedAmount}\n\n\n\n");
+            .ShouldBe($"BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700\n{expectedAmount}");
         nullableGenerator
             .ToString()
             .ShouldBe(generator.ToString());

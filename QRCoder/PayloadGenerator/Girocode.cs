@@ -110,6 +110,8 @@ public static partial class PayloadGenerator
                 : string.Empty) + _br;
             girocodePayload += _messageToGirocodeUser;
 
+            girocodePayload = girocodePayload.TrimEnd('\n');
+
             return ConvertStringToEncoding(girocodePayload, _encoding.ToString().Replace("_", "-"));
         }
 
