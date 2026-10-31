@@ -1,0 +1,42 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="global.json" />
+  </Folder>
+  <Project Path="QRCoder.Xaml/QRCoder.Xaml.csproj" />
+  <Project Path="QRCoder/QRCoder.csproj" />
+  <Project Path="QRCoderApiTests/QRCoderApiTests.csproj" />
+  <Project Path="QRCoderBenchmarks/QRCoderBenchmarks.csproj" />
+  <Project Path="QRCoderConsole/QRCoderConsole.csproj">
+    <Build Solution="Release|Any CPU" Project="false" />
+  </Project>
+  <Project Path="QRCoderDemo/QRCoderDemo.csproj">
+    <Platform Solution="*|ARM" Project="x86" />
+    <Platform Solution="*|x64" Project="x86" />
+    <Platform Solution="Release|x86" Project="x86" />
+    <Build Solution="*|ARM" Project="false" />
+    <Build Solution="*|x64" Project="false" />
+    <Build Solution="Release|Any CPU" Project="false" />
+  </Project>
+  <Project Path="QRCoderDemoUWP/QRCoderDemoUWP.csproj" Id="61933d20-db1f-4ee8-ac8e-3a2316cdd20c">
+    <Platform Solution="*|Any CPU" Project="x86" />
+    <Platform Solution="*|ARM" Project="ARM" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Build Solution="*|Any CPU" Project="false" />
+    <Deploy Solution="*|ARM" />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="*|x86" />
+  </Project>
+  <Project Path="QRCoderSamples/QRCoderSamples.csproj" />
+  <Project Path="QRCoderTests/QRCoderTests.csproj" />
+  <Project Path="QRCoderTrimAnalysis/QRCoderTrimAnalysis.csproj" />
+</Solution>
