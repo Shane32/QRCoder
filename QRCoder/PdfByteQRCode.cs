@@ -78,100 +78,97 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             xrefs.Add(stream.Position);
 
             // Object 1: Catalog - root of PDF document structure
-            var catalogObject = new StringBuilder();
-            catalogObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n"); // Object number and generation number (0)
-            catalogObject.Append("<<\r\n");                                                            // Begin dictionary
-            catalogObject.Append("/Type /Catalog\r\n");                                                // Declares this as the document catalog
-            catalogObject.Append("/Pages 2 0 R\r\n");                                                  // References the Pages object (object 2)
-            catalogObject.Append(">>\r\n");                                                            // End dictionary
-            catalogObject.Append("endobj\r\n");                                                        // End object
-            writer.Write(catalogObject.ToString());
+            writer.Write(
+                ToStr(xrefs.Count) + " 0 obj\r\n" +       // Object number and generation number (0)
+                "<<\r\n" +                                // Begin dictionary
+                "/Type /Catalog\r\n" +                    // Declares this as the document catalog
+                "/Pages 2 0 R\r\n" +                      // References the Pages object (object 2)
+                ">>\r\n" +                                // End dictionary
+                "endobj\r\n"                              // End object
+            );
 
             writer.Flush();
             xrefs.Add(stream.Position);
 
             // Object 2: Pages - defines page tree structure
-            var pagesObject = new StringBuilder();
-            pagesObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");   // Object number and generation number (0)
-            pagesObject.Append("<<\r\n");                                                              // Begin dictionary
-            pagesObject.Append("/Count 1\r\n");                                                        // Number of pages in document
-            pagesObject.Append("/Kids [ 3 0 R ]\r\n");                                                 // Kids must contain indirect references to Page objects
-            pagesObject.Append(">>\r\n");                                                              // End dictionary
-            pagesObject.Append("endobj\r\n");                                                          // End object
-            writer.Write(pagesObject.ToString());
+            writer.Write(
+                ToStr(xrefs.Count) + " 0 obj\r\n" +   // Object number and generation number (0)
+                "<<\r\n" +                             // Begin dictionary
+                "/Count 1\r\n" +                       // Number of pages in document
+                "/Kids [ 3 0 R ]\r\n" +                // Kids must contain indirect references to Page objects
+                ">>\r\n" +                             // End dictionary
+                "endobj\r\n"                           // End object
+            );
 
             // Content stream - PDF drawing instructions
-            var scale = ToStr(imgSize * 72 / (float)dpi / moduleCount);                                             // Scale factor to convert module units to PDF points
-            var pathCommands = CreatePathFromModules();                                                             // Create path from dark modules
-            var content = new StringBuilder();
-            content.Append("q\r\n");                                                                                      // 'q' = Save graphics state
-            content.AppendInvariant($"{scale} 0 0 -{scale} 0 {pdfMediaSize} cm\r\n");            // 'cm' = Transformation matrix: scale X, scale & flip Y, translate to top
-            content.AppendInvariant($"{lightColorPdf} rg\r\n");                                  // 'rg' = Set RGB fill color for background
-            content.AppendInvariant($"0 0 {ToStr(moduleCount)} {ToStr(moduleCount)} re\r\n");    // 're' = Rectangle covering entire QR code
-            content.Append("f\r\n");                                                                                      // 'f' = Fill background
-            content.AppendInvariant($"{darkColorPdf} rg\r\n");                                   // 'rg' = Set RGB fill color for dark modules
-            content.AppendInvariant($"{pathCommands}f*\r\n");                                    // Add all dark module rectangles to path; 'f*' = Fill with even-odd rule
-            content.Append('Q');                                                                                          // 'Q' = Restore graphics state
-            var contentString = content.ToString();
+            var scale = ToStr(imgSize * 72 / (float)dpi / moduleCount);                 // Scale factor to convert module units to PDF points
+            var pathCommands = CreatePathFromModules();                                 // Create path from dark modules
+            var content = "q\r\n" +                                                     // 'q' = Save graphics state
+                scale + " 0 0 -" + scale + " 0 " + pdfMediaSize + " cm\r\n" +           // 'cm' = Transformation matrix: scale X, scale & flip Y, translate to top
+                lightColorPdf + " rg\r\n" +                                             // 'rg' = Set RGB fill color for background
+                "0 0 " + ToStr(moduleCount) + " " + ToStr(moduleCount) + " re\r\n" +    // 're' = Rectangle covering entire QR code
+                "f\r\n" +                                                               // 'f' = Fill background
+                darkColorPdf + " rg\r\n" +                                              // 'rg' = Set RGB fill color for dark modules
+                pathCommands +                                                          // Add all dark module rectangles to path
+                "f*\r\n" +                                                              // 'f*' = Fill with even-odd rule
+                "Q";                                                                    // 'Q' = Restore graphics state
 
             writer.Flush();
             xrefs.Add(stream.Position);
 
             // Object 3: Page - indirect page object (Kids array must reference pages indirectly)
-            var pageObject = new StringBuilder();
-            pageObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");                          // Object number and generation number (0)
-            pageObject.Append("<<\r\n");                                                                                     // Begin dictionary
-            pageObject.Append("/Type /Page\r\n");                                                                            // Declares this as a page
-            pageObject.Append("/Parent 2 0 R\r\n");                                                                          // References parent Pages object
-            pageObject.AppendInvariant($"/MediaBox [0 0 {pdfMediaSize} {pdfMediaSize}]\r\n");       // Page dimensions [x1 y1 x2 y2]
-            pageObject.Append("/Resources << /ProcSet [ /PDF ] >>\r\n");                                                     // Required resources: PDF operations only (no images)
-            pageObject.Append("/Contents 4 0 R\r\n");                                                                        // References content stream (object 4)
-            pageObject.Append(">>\r\n");                                                                                     // End dictionary
-            pageObject.Append("endobj\r\n");                                                                                 // End object
-            writer.Write(pageObject.ToString());
+            writer.Write(
+                ToStr(xrefs.Count) + " 0 obj\r\n" +                                     // Object number and generation number (0)
+                "<<\r\n" +                                                              // Begin dictionary
+                "/Type /Page\r\n" +                                                     // Declares this as a page
+                "/Parent 2 0 R\r\n" +                                                   // References parent Pages object
+                "/MediaBox [0 0 " + pdfMediaSize + " " + pdfMediaSize + "]\r\n" +       // Page dimensions [x1 y1 x2 y2]
+                "/Resources << /ProcSet [ /PDF ] >>\r\n" +                              // Required resources: PDF operations only (no images)
+                "/Contents 4 0 R\r\n" +                                                 // References content stream (object 4)
+                ">>\r\n" +                                                              // End dictionary
+                "endobj\r\n"                                                            // End object
+            );
 
             writer.Flush();
             xrefs.Add(stream.Position);
 
             // Object 4: Content stream - contains the drawing instructions
-            var contentStreamObject = new StringBuilder();
-            contentStreamObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");                                                    // Object number and generation number (0)
-            contentStreamObject.AppendInvariant($"<< /Length {ToStr(System.Text.Encoding.ASCII.GetByteCount(contentString))} >>\r\n"); // Dictionary with stream length in bytes
-            contentStreamObject.AppendInvariant($"stream\r\n{contentString}endstream\r\n");                                            // Begin stream data; stream content followed by end stream marker
-            contentStreamObject.Append("endobj\r\n");                                                                                                           // End object
-            writer.Write(contentStreamObject.ToString());
+            writer.Write(
+                ToStr(xrefs.Count) + " 0 obj\r\n" +                                                   // Object number and generation number (0)
+                "<< /Length " + ToStr(System.Text.Encoding.ASCII.GetByteCount(content)) + " >>\r\n" + // Dictionary with stream length in bytes
+                "stream\r\n" +                                                                        // Begin stream data
+                content + "endstream\r\n" +                                                           // Stream content followed by end stream marker
+                "endobj\r\n"                                                                          // End object
+            );
 
             writer.Flush();
             var startxref = checked((int)stream.Position);
 
             // Cross-reference table - maps object numbers to byte offsets
-            var xrefTable = new StringBuilder();
-            xrefTable.Append("xref\r\n");                                                            // Cross-reference table keyword
-            xrefTable.AppendInvariant($"0 {ToStr(xrefs.Count + 1)}\r\n");   // First object number (0) and count of entries
-            xrefTable.Append("0000000000 65535 f\r\n");                                              // Entry 0: always free, generation 65535, 'f' = free
-            writer.Write(xrefTable.ToString());
+            writer.Write(
+                "xref\r\n" +                                   // Cross-reference table keyword
+                "0 " + ToStr(xrefs.Count + 1) + "\r\n" +       // First object number (0) and count of entries
+                "0000000000 65535 f\r\n"                       // Entry 0: always free, generation 65535, 'f' = free
+            );
 
             // Write byte offset for each object
-            var xrefEntry = new StringBuilder();
             foreach (var refValue in xrefs)
             {
                 // Write each entry as a 10-digit zero-padded byte offset, 5-digit zero-padded generation number (0), and 'n' = in use
-                xrefEntry.Length = 0;
-                xrefEntry.AppendInvariant($"{checked((int)refValue).ToString("0000000000", CultureInfo.InvariantCulture)} 00000 n\r\n");
-                writer.Write(xrefEntry.ToString());
+                writer.Write(checked((int)refValue).ToString("0000000000", CultureInfo.InvariantCulture) + " 00000 n\r\n");
             }
 
             // Trailer - provides location of catalog and xref table
-            var trailer = new StringBuilder();
-            trailer.Append("trailer\r\n");                                                                 // Trailer keyword
-            trailer.Append("<<\r\n");                                                                      // Begin trailer dictionary
-            trailer.AppendInvariant($"/Size {ToStr(xrefs.Count + 1)}\r\n");       // Total number of entries in xref table
-            trailer.Append("/Root 1 0 R\r\n");                                                             // Reference to catalog object
-            trailer.Append(">>\r\n");                                                                      // End trailer dictionary
-            trailer.Append("startxref\r\n");                                                               // Start of xref keyword
-            trailer.AppendInvariant($"{ToStr(startxref)}\r\n");                   // Byte offset of xref table
-            trailer.Append("%%EOF");                                                                       // End of file marker
-            writer.Write(trailer.ToString());
+            writer.Write(
+                "trailer\r\n" +                                    // Trailer keyword
+                "<<\r\n" +                                         // Begin trailer dictionary
+                "/Size " + ToStr(xrefs.Count + 1) + "\r\n" +       // Total number of entries in xref table
+                "/Root 1 0 R\r\n" +                                // Reference to catalog object
+                ">>\r\n" +                                         // End trailer dictionary
+                "startxref\r\n" +                                  // Start of xref keyword
+                ToStr(startxref) + "\r\n" +                        // Byte offset of xref table
+                "%%EOF"                                            // End of file marker
+            );
 
             writer.Flush();
         }
@@ -217,7 +214,12 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
                 // Create a single rectangle for the entire run of dark modules
                 // Format: x y width height re
-                pathCommands.AppendInvariant($"{startX} {y} {x - startX} 1 re\r\n");
+                pathCommands.AppendInvariant(startX);
+                pathCommands.Append(' ');
+                pathCommands.AppendInvariant(y);
+                pathCommands.Append(' ');
+                pathCommands.AppendInvariant(x - startX);
+                pathCommands.Append(" 1 re\r\n");
             }
         }
 
@@ -239,7 +241,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
         var g = ToStr(color[1] * inv255);
         var b = ToStr(color[2] * inv255);
 
-        return $"{r} {g} {b}";
+        return r + " " + g + " " + b;
     }
 
     /// <summary>
