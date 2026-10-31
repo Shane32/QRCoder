@@ -16,7 +16,7 @@ public class GirocodeTests
 
         generator
             .ToString()
-            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nWikimedia Fördergesellschaft\nDE33100205000001194700\nEUR10.00\n\n\n\n");
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nWikimedia Fördergesellschaft\nDE33100205000001194700\nEUR10.00");
     }
 
     [Fact]
@@ -341,7 +341,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\n\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class GirocodeTests
 
         payload
             .ToString()
-            .ShouldBe("BCD\n002\n1\nSCT\nINGBNL2A\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info\n");
+            .ShouldBe("BCD\n002\n1\nSCT\nINGBNL2A\na name\nNL86INGB0002445588\nEUR1337.99\n\n\nsome info");
     }
 
     [Fact]
@@ -454,5 +454,145 @@ public class GirocodeTests
         Assert.NotNull(exception);
         Assert.IsType<PayloadGenerator.Girocode.GirocodeException>(exception);
         exception.Message.ShouldBe("The BIC entered isn't valid.");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void girocode_generator_can_generate_payload_without_amount(bool omitAmount)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = "BFSWDE33BER";
+        var name = "Payee";
+
+        var generator = omitAmount
+            ? new PayloadGenerator.Girocode(iban, bic, name)
+            : new PayloadGenerator.Girocode(iban, bic, name, amount: null);
+
+        generator
+            .ToString()
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700");
+    }
+
+    [Theory]
+    [InlineData(false, "CHAR", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\n\nCHAR")]
+    [InlineData(false, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Structured, "", "\n\n\nReference")]
+    [InlineData(false, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\n\n\n\nReference")]
+    [InlineData(false, "", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "Thank you ", "\n\n\n\n\nThank you ")]
+    [InlineData(true, "CHAR", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\nEUR10.00\nCHAR")]
+    [InlineData(true, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Structured, "", "\nEUR10.00\n\nReference")]
+    [InlineData(true, "", "Reference", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "", "\nEUR10.00\n\n\nReference")]
+    [InlineData(true, "", "", PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, "Thank you ", "\nEUR10.00\n\n\n\nThank you ")]
+    public void girocode_generator_should_end_payload_at_last_populated_field(
+        bool hasAmount,
+        string purposeOfCreditTransfer,
+        string remittanceInformation,
+        PayloadGenerator.Girocode.TypeOfRemittance typeOfRemittance,
+        string messageToGirocodeUser,
+        string expectedSuffix)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = "BFSWDE33BER";
+        var name = "Payee";
+
+        var generator = new PayloadGenerator.Girocode(iban, bic, name, amount: hasAmount ? 10m : (decimal?)null,
+            remittanceInformation: remittanceInformation, typeOfRemittance: typeOfRemittance,
+            purposeOfCreditTransfer: purposeOfCreditTransfer, messageToGirocodeUser: messageToGirocodeUser);
+
+        generator
+            .ToString()
+            .ShouldBe("BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700" + expectedSuffix);
+    }
+
+    [Theory]
+    [InlineData(false, PayloadGenerator.Girocode.GirocodeVersion.Version1, PayloadGenerator.Girocode.TypeOfRemittance.Structured)]
+    [InlineData(false, PayloadGenerator.Girocode.GirocodeVersion.Version1, PayloadGenerator.Girocode.TypeOfRemittance.Unstructured)]
+    [InlineData(false, PayloadGenerator.Girocode.GirocodeVersion.Version2, PayloadGenerator.Girocode.TypeOfRemittance.Structured)]
+    [InlineData(false, PayloadGenerator.Girocode.GirocodeVersion.Version2, PayloadGenerator.Girocode.TypeOfRemittance.Unstructured)]
+    [InlineData(true, PayloadGenerator.Girocode.GirocodeVersion.Version1, PayloadGenerator.Girocode.TypeOfRemittance.Structured)]
+    [InlineData(true, PayloadGenerator.Girocode.GirocodeVersion.Version1, PayloadGenerator.Girocode.TypeOfRemittance.Unstructured)]
+    [InlineData(true, PayloadGenerator.Girocode.GirocodeVersion.Version2, PayloadGenerator.Girocode.TypeOfRemittance.Structured)]
+    [InlineData(true, PayloadGenerator.Girocode.GirocodeVersion.Version2, PayloadGenerator.Girocode.TypeOfRemittance.Unstructured)]
+    public void girocode_generator_should_preserve_field_positions_without_amount(
+        bool omitAmount,
+        PayloadGenerator.Girocode.GirocodeVersion version,
+        PayloadGenerator.Girocode.TypeOfRemittance typeOfRemittance)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = version == PayloadGenerator.Girocode.GirocodeVersion.Version1 ? "BFSWDE33BER" : null;
+        var name = "Payee";
+        var remittanceInformation = "Reference";
+        var purposeOfCreditTransfer = "CHAR";
+        var messageToGirocodeUser = "Thank you";
+
+        var generator = omitAmount
+            ? new PayloadGenerator.Girocode(iban, bic, name, remittanceInformation: remittanceInformation,
+                typeOfRemittance: typeOfRemittance, purposeOfCreditTransfer: purposeOfCreditTransfer,
+                messageToGirocodeUser: messageToGirocodeUser, version: version)
+            : new PayloadGenerator.Girocode(iban, bic, name, amount: null, remittanceInformation: remittanceInformation,
+                typeOfRemittance: typeOfRemittance, purposeOfCreditTransfer: purposeOfCreditTransfer,
+                messageToGirocodeUser: messageToGirocodeUser, version: version);
+
+        generator
+            .ToString()
+            .Split('\n')
+            .ShouldBe(new[]
+            {
+                "BCD",
+                version == PayloadGenerator.Girocode.GirocodeVersion.Version1 ? "001" : "002",
+                "2",
+                "SCT",
+                bic ?? string.Empty,
+                "Payee",
+                iban,
+                string.Empty,
+                "CHAR",
+                typeOfRemittance == PayloadGenerator.Girocode.TypeOfRemittance.Structured ? "Reference" : string.Empty,
+                typeOfRemittance == PayloadGenerator.Girocode.TypeOfRemittance.Unstructured ? "Reference" : string.Empty,
+                "Thank you",
+            });
+    }
+
+    [Theory]
+    [InlineData("0.01", "EUR0.01")]
+    [InlineData("999999999.99", "EUR999999999.99")]
+    [InlineData("12", "EUR12.00")]
+    [InlineData("12.3400", "EUR12.34")]
+    public void girocode_generator_should_format_specified_amount(string amountText, string expectedAmount)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = "BFSWDE33BER";
+        var name = "Payee";
+        var amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
+
+        var generator = new PayloadGenerator.Girocode(iban, bic, name, amount);
+        var nullableGenerator = new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount);
+
+        generator
+            .ToString()
+            .ShouldBe($"BCD\n001\n2\nSCT\nBFSWDE33BER\nPayee\nDE33100205000001194700\n{expectedAmount}");
+        nullableGenerator
+            .ToString()
+            .ShouldBe(generator.ToString());
+    }
+
+    [Theory]
+    [InlineData("0", "Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.")]
+    [InlineData("-0.01", "Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.")]
+    [InlineData("1000000000", "Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.")]
+    [InlineData("0.001", "Amount must have less than 3 digits after decimal point.")]
+    [InlineData("10.521", "Amount must have less than 3 digits after decimal point.")]
+    public void girocode_generator_should_throw_invalid_amount_exception(string amountText, string expectedMessage)
+    {
+        var iban = "DE33100205000001194700";
+        var bic = "BFSWDE33BER";
+        var name = "Payee";
+        var amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
+
+        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount));
+        var nullableException = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount));
+
+        exception.Message.ShouldBe(expectedMessage);
+        nullableException.Message.ShouldBe(expectedMessage);
     }
 }
