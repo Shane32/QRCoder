@@ -70,18 +70,14 @@ internal static class StringExtensions
 
     /// <summary>
     /// Appends an interpolated string using invariant culture formatting.
-    /// On .NET 6+ appends via the invariant-culture interpolated-string handler overload (no extra string allocation).
-    /// Must be a static method (not an extension) so the handler can reference the <paramref name="sb"/> parameter (CS8944).
+    /// The handler writes directly to <paramref name="sb"/> during interpolation, without an intermediate string on .NET 6+.
     /// </summary>
-#if NET6_0_OR_GREATER
     internal static void AppendInvariant(
         StringBuilder sb,
-        [InterpolatedStringHandlerArgument(nameof(sb))] ref StringBuilder.AppendInterpolatedStringHandler handler)
-        => sb.Append(CultureInfo.InvariantCulture, ref handler);
-#else
-    internal static void AppendInvariant(StringBuilder sb, string value)
-        => sb.Append(value);
-#endif
+        [InterpolatedStringHandlerArgument(nameof(sb))] ref InvariantInterpolatedStringHandler handler)
+    {
+        // The handler has already appended the interpolated string to sb.
+    }
 
     /// <summary>
     /// Appends an integer value to the StringBuilder using invariant culture formatting.

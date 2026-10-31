@@ -205,6 +205,32 @@ public class SvgQRCodeRendererTests
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
+    [Theory]
+    [InlineData("de-DE")]
+    [InlineData("fr-FR")]
+    public void svg_logo_coordinates_use_invariant_culture(string cultureName)
+    {
+        var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+        try
+        {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
+
+            using var gen = new QRCodeGenerator();
+            using var data = gen.CreateQrCode("test", QRCodeGenerator.ECCLevel.H, requestedVersion: 1);
+            using var qrCode = new SvgQRCode(data);
+            var logo = new SvgQRCode.SvgLogo("<svg xmlns=\"http://www.w3.org/2000/svg\"/>", 20, iconEmbedded: false);
+
+            var svg = qrCode.GetGraphic(10, "#000000", "#ffffff", logo: logo);
+
+            // Version 1 includes 29 modules with quiet zones, giving a 5.8-module logo centered at 11.6.
+            svg.ShouldContain("<image x=\"11.6\" y=\"11.6\" width=\"5.8\" height=\"5.8\"");
+        }
+        finally
+        {
+            System.Threading.Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
+    }
+
     [Fact]
     public void can_instantate_parameterless()
     {
