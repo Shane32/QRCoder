@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace QRCoder;
 
@@ -68,6 +69,17 @@ internal static class StringExtensions
 #endif
 
     /// <summary>
+    /// Appends an interpolated string using invariant culture formatting.
+    /// The handler writes directly to <paramref name="sb"/> during interpolation, without an intermediate string on .NET 6+.
+    /// </summary>
+    internal static void AppendInvariant(
+        this StringBuilder sb,
+        [InterpolatedStringHandlerArgument(nameof(sb))] ref InvariantInterpolatedStringHandler handler)
+    {
+        // The handler has already appended the interpolated string to sb.
+    }
+
+    /// <summary>
     /// Appends an integer value to the StringBuilder using invariant culture formatting.
     /// </summary>
     /// <param name="sb">The StringBuilder to append to.</param>
@@ -75,7 +87,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, int num)
     {
 #if NET6_0_OR_GREATER
-        sb.Append(CultureInfo.InvariantCulture, $"{num}");
+        sb.AppendInvariant($"{num}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];
@@ -97,7 +109,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, float num)
     {
 #if NET6_0_OR_GREATER
-        sb.Append(CultureInfo.InvariantCulture, $"{num:G7}");
+        sb.AppendInvariant($"{num:G7}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];

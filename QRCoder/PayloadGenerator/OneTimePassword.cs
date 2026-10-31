@@ -141,7 +141,7 @@ public static partial class PayloadGenerator
             var sb = new StringBuilder("otpauth://hotp/");
             ProcessCommonFields(sb);
             var actualCounter = Counter ?? 1;
-            sb.Append("&counter=" + actualCounter);
+            sb.AppendInvariant($"&counter={actualCounter}");
             return sb.ToString();
         }
 
@@ -162,7 +162,7 @@ public static partial class PayloadGenerator
 
             if (Period != 30)
             {
-                sb.Append("&period=" + Period);
+                sb.AppendInvariant($"&period={Period}");
             }
 
             return sb.ToString();
@@ -203,7 +203,7 @@ public static partial class PayloadGenerator
 
             if (escapedLabel != null && escapedIssuer != null)
             {
-                label = escapedIssuer + ":" + escapedLabel;
+                label = $"{escapedIssuer}:{escapedLabel}";
             }
             else if (escapedIssuer != null)
             {
@@ -215,21 +215,21 @@ public static partial class PayloadGenerator
                 sb.Append(label);
             }
 
-            sb.Append("?secret=" + strippedSecret);
+            sb.AppendInvariant($"?secret={strippedSecret}");
 
             if (escapedIssuer != null)
             {
-                sb.Append("&issuer=" + escapedIssuer);
+                sb.AppendInvariant($"&issuer={escapedIssuer}");
             }
 
             if (AuthAlgorithm != OneTimePasswordAuthAlgorithm.SHA1)
             {
-                sb.Append("&algorithm=" + AuthAlgorithm.ToString());
+                sb.AppendInvariant($"&algorithm={AuthAlgorithm}");
             }
 
             if (Digits != 6)
             {
-                sb.Append("&digits=" + Digits);
+                sb.AppendInvariant($"&digits={Digits}");
             }
         }
     }
