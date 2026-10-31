@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace QRCoder;
 
@@ -66,6 +67,17 @@ internal static class StringExtensions
     internal static string ToString(this char c, CultureInfo _)
         => c.ToString();
 #endif
+
+    /// <summary>
+    /// Appends an interpolated string using invariant culture formatting.
+    /// The handler writes directly to <paramref name="sb"/> during interpolation, without an intermediate string on .NET 6+.
+    /// </summary>
+    internal static void AppendInvariant(
+        this StringBuilder sb,
+        [InterpolatedStringHandlerArgument(nameof(sb))] ref InvariantInterpolatedStringHandler handler)
+    {
+        // The handler has already appended the interpolated string to sb.
+    }
 
     /// <summary>
     /// Appends an integer value to the StringBuilder using invariant culture formatting.
