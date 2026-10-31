@@ -127,8 +127,6 @@ public class QRCodeData : IDisposable
                 bitIndex++;
             }
         }
-
-        Debug.Assert(modules.Count < 8);
     }
 
     /// <summary>
