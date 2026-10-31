@@ -12,7 +12,7 @@ public static partial class PayloadGenerator
 
         private readonly string _br = "\n";
         private readonly string _iban, _bic, _name, _purposeOfCreditTransfer, _remittanceInformation, _messageToGirocodeUser;
-        private readonly decimal _amount;
+        private readonly decimal? _amount;
         private readonly GirocodeVersion _version;
         private readonly GirocodeEncoding _encoding;
         private readonly TypeOfRemittance _typeOfRemittance;
@@ -28,7 +28,7 @@ public static partial class PayloadGenerator
         /// <param name="iban">Account number of the Beneficiary. Only IBAN is allowed.</param>
         /// <param name="bic">BIC of the Beneficiary Bank.</param>
         /// <param name="name">Name of the Beneficiary.</param>
-        /// <param name="amount">Amount of the Credit Transfer in Euro. (Amount must be more than 0.01 and less than 999999999.99)</param>
+        /// <param name="amount">Amount of the Credit Transfer in Euro, from 0.01 to 999999999.99 inclusive, with at most two decimal places.</param>
         /// <param name="remittanceInformation">Remittance Information (Purpose-/reference text). (optional)</param>
         /// <param name="typeOfRemittance">Type of remittance information. Either structured (e.g. ISO 11649 RF Creditor Reference) and max. 35 chars or unstructured and max. 140 chars.</param>
         /// <param name="purposeOfCreditTransfer">Purpose of the Credit Transfer (optional)</param>
@@ -37,6 +37,25 @@ public static partial class PayloadGenerator
         /// <param name="encoding">Encoding of the Girocode payload. Default: ISO-8859-1</param>
         /// <exception cref="GirocodeException">Thrown when the input values are not valid according to the Girocode specification.</exception>
         public Girocode(string iban, string? bic, string name, decimal amount, string remittanceInformation = "", TypeOfRemittance typeOfRemittance = TypeOfRemittance.Unstructured, string purposeOfCreditTransfer = "", string messageToGirocodeUser = "", GirocodeVersion version = GirocodeVersion.Version1, GirocodeEncoding encoding = GirocodeEncoding.ISO_8859_1)
+            : this(iban, bic, name, (decimal?)amount, remittanceInformation, typeOfRemittance, purposeOfCreditTransfer, messageToGirocodeUser, version, encoding)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Girocode"/> class, which contains a payload for a Girocode (QR-Code with credit transfer information).
+        /// </summary>
+        /// <param name="iban">Account number of the Beneficiary. Only IBAN is allowed.</param>
+        /// <param name="bic">BIC of the Beneficiary Bank.</param>
+        /// <param name="name">Name of the Beneficiary.</param>
+        /// <param name="amount">Amount of the Credit Transfer in Euro, from 0.01 to 999999999.99 inclusive, with at most two decimal places. Null or omitted leaves the amount empty for the payer to enter.</param>
+        /// <param name="remittanceInformation">Remittance Information (Purpose-/reference text). (optional)</param>
+        /// <param name="typeOfRemittance">Type of remittance information. Either structured (e.g. ISO 11649 RF Creditor Reference) and max. 35 chars or unstructured and max. 140 chars.</param>
+        /// <param name="purposeOfCreditTransfer">Purpose of the Credit Transfer (optional)</param>
+        /// <param name="messageToGirocodeUser">Beneficiary to originator information. (optional)</param>
+        /// <param name="version">Girocode version. Either 001 or 002. Default: 001.</param>
+        /// <param name="encoding">Encoding of the Girocode payload. Default: ISO-8859-1</param>
+        /// <exception cref="GirocodeException">Thrown when the input values are not valid according to the Girocode specification.</exception>
+        public Girocode(string iban, string? bic, string name, decimal? amount = null, string remittanceInformation = "", TypeOfRemittance typeOfRemittance = TypeOfRemittance.Unstructured, string purposeOfCreditTransfer = "", string messageToGirocodeUser = "", GirocodeVersion version = GirocodeVersion.Version1, GirocodeEncoding encoding = GirocodeEncoding.ISO_8859_1)
         {
             _version = version;
             _encoding = encoding;
@@ -49,7 +68,7 @@ public static partial class PayloadGenerator
             if (name.Length > 70)
                 throw new GirocodeException("(Payee-)Name must be shorter than 71 chars.");
             _name = name;
-            if (amount.ToString(CultureInfo.InvariantCulture).Contains('.') && amount.ToString(CultureInfo.InvariantCulture).Split('.')[1].TrimEnd('0').Length > 2)
+            if (amount.HasValue && amount.Value.ToString(CultureInfo.InvariantCulture).Contains('.') && amount.Value.ToString(CultureInfo.InvariantCulture).Split('.')[1].TrimEnd('0').Length > 2)
                 throw new GirocodeException("Amount must have less than 3 digits after decimal point.");
             if (amount < 0.01m || amount > 999999999.99m)
                 throw new GirocodeException("Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.");
@@ -81,7 +100,7 @@ public static partial class PayloadGenerator
             girocodePayload += _bic + _br;
             girocodePayload += _name + _br;
             girocodePayload += _iban + _br;
-            girocodePayload += string.Format(CultureInfo.InvariantCulture, "EUR{0:0.00}", _amount) + _br;
+            girocodePayload += (_amount.HasValue ? string.Format(CultureInfo.InvariantCulture, "EUR{0:0.00}", _amount.Value) : string.Empty) + _br;
             girocodePayload += _purposeOfCreditTransfer + _br;
             girocodePayload += ((_typeOfRemittance == TypeOfRemittance.Structured)
                 ? _remittanceInformation
@@ -90,6 +109,8 @@ public static partial class PayloadGenerator
                 ? _remittanceInformation
                 : string.Empty) + _br;
             girocodePayload += _messageToGirocodeUser;
+
+            girocodePayload = girocodePayload.TrimEnd('\n');
 
             return ConvertStringToEncoding(girocodePayload, _encoding.ToString().Replace("_", "-"));
         }
