@@ -91,11 +91,11 @@ public static partial class PayloadGenerator
 
             //Create the payload string
             var retBuilder = new StringBuilder($"ST0001{(int)_characterSet}");
-            StringExtensions.AppendInvariant(retBuilder, $"{_separator}Name={_mFields.Name}");
-            StringExtensions.AppendInvariant(retBuilder, $"{_separator}PersonalAcc={_mFields.PersonalAcc}");
-            StringExtensions.AppendInvariant(retBuilder, $"{_separator}BankName={_mFields.BankName}");
-            StringExtensions.AppendInvariant(retBuilder, $"{_separator}BIC={_mFields.BIC}");
-            StringExtensions.AppendInvariant(retBuilder, $"{_separator}CorrespAcc={_mFields.CorrespAcc}");
+            retBuilder.AppendInvariant($"{_separator}Name={_mFields.Name}");
+            retBuilder.AppendInvariant($"{_separator}PersonalAcc={_mFields.PersonalAcc}");
+            retBuilder.AppendInvariant($"{_separator}BankName={_mFields.BankName}");
+            retBuilder.AppendInvariant($"{_separator}BIC={_mFields.BIC}");
+            retBuilder.AppendInvariant($"{_separator}CorrespAcc={_mFields.CorrespAcc}");
             var ret = retBuilder.ToString();
 
             //Check length of mandatory field block (-8 => Removing service data block bytes from ret length)

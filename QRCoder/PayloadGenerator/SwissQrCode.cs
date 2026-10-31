@@ -480,13 +480,13 @@ public static partial class PayloadGenerator
             public override string ToString()
             {
                 var contactData = new StringBuilder();
-                StringExtensions.AppendInvariant(contactData, $"{(AddressType.StructuredAddress == _adrType ? "S" : "K")}{_br}"); //AdrTp
-                StringExtensions.AppendInvariant(contactData, $"{_name.Replace("\n", "")}{_br}"); //Name
-                StringExtensions.AppendInvariant(contactData, $"{(!string.IsNullOrEmpty(_streetOrAddressline1) ? _streetOrAddressline1!.Replace("\n", "") : string.Empty)}{_br}"); //StrtNmOrAdrLine1
-                StringExtensions.AppendInvariant(contactData, $"{(!string.IsNullOrEmpty(_houseNumberOrAddressline2) ? _houseNumberOrAddressline2!.Replace("\n", "") : string.Empty)}{_br}"); //BldgNbOrAdrLine2
-                StringExtensions.AppendInvariant(contactData, $"{_zipCode.Replace("\n", "")}{_br}"); //PstCd
-                StringExtensions.AppendInvariant(contactData, $"{_city.Replace("\n", "")}{_br}"); //TwnNm
-                StringExtensions.AppendInvariant(contactData, $"{_country}{_br}"); //Ctry
+                contactData.AppendInvariant($"{(AddressType.StructuredAddress == _adrType ? "S" : "K")}{_br}"); //AdrTp
+                contactData.AppendInvariant($"{_name.Replace("\n", "")}{_br}"); //Name
+                contactData.AppendInvariant($"{(!string.IsNullOrEmpty(_streetOrAddressline1) ? _streetOrAddressline1!.Replace("\n", "") : string.Empty)}{_br}"); //StrtNmOrAdrLine1
+                contactData.AppendInvariant($"{(!string.IsNullOrEmpty(_houseNumberOrAddressline2) ? _houseNumberOrAddressline2!.Replace("\n", "") : string.Empty)}{_br}"); //BldgNbOrAdrLine2
+                contactData.AppendInvariant($"{_zipCode.Replace("\n", "")}{_br}"); //PstCd
+                contactData.AppendInvariant($"{_city.Replace("\n", "")}{_br}"); //TwnNm
+                contactData.AppendInvariant($"{_country}{_br}"); //Ctry
                 return contactData.ToString();
             }
 
@@ -552,12 +552,12 @@ public static partial class PayloadGenerator
 
             //Header "logical" element
             var swissQrCodePayload = new StringBuilder();
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"SPC{_br}"); //QRType
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"0200{_br}"); //Version
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"1{_br}"); //Coding
+            swissQrCodePayload.AppendInvariant($"SPC{_br}"); //QRType
+            swissQrCodePayload.AppendInvariant($"0200{_br}"); //Version
+            swissQrCodePayload.AppendInvariant($"1{_br}"); //Coding
 
             //CdtrInf "logical" element
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{_iban}{_br}"); //IBAN
+            swissQrCodePayload.AppendInvariant($"{_iban}{_br}"); //IBAN
 
             //Cdtr "logical" element
             swissQrCodePayload.Append(_creditor.ToString());
@@ -568,10 +568,10 @@ public static partial class PayloadGenerator
 
             //CcyAmtDate "logical" element
             //Amoutn has to use . as decimal seperator in any case. See https://www.paymentstandards.ch/dam/downloads/ig-qr-bill-en.pdf page 27.
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{(_amount != null ? $"{_amount:0.00}".Replace(",", ".") : string.Empty)}{_br}"); //Amt
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{_currency}{_br}"); //Ccy
+            swissQrCodePayload.AppendInvariant($"{(_amount != null ? $"{_amount:0.00}".Replace(",", ".") : string.Empty)}{_br}"); //Amt
+            swissQrCodePayload.AppendInvariant($"{_currency}{_br}"); //Ccy
             //Removed in S-QR version 2.0
-            //StringExtensions.AppendInvariant(swissQrCodePayload,$"{(requestedDateOfPayment != null ? ((DateTime)requestedDateOfPayment).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty)}{_br}"); //ReqdExctnDt
+            //swissQrCodePayload.AppendInvariant($"{(requestedDateOfPayment != null ? ((DateTime)requestedDateOfPayment).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty)}{_br}"); //ReqdExctnDt
 
             //UltmtDbtr "logical" element
             if (_debitor != null)
@@ -580,21 +580,21 @@ public static partial class PayloadGenerator
                 AppendEmptyAddressLines(swissQrCodePayload, _br, 7);
 
             //RmtInf "logical" element
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{_reference.RefType}{_br}"); //Tp
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{(!string.IsNullOrEmpty(_reference.ReferenceText) ? _reference.ReferenceText : string.Empty)}{_br}"); //Ref
+            swissQrCodePayload.AppendInvariant($"{_reference.RefType}{_br}"); //Tp
+            swissQrCodePayload.AppendInvariant($"{(!string.IsNullOrEmpty(_reference.ReferenceText) ? _reference.ReferenceText : string.Empty)}{_br}"); //Ref
 
             //AddInf "logical" element
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{(!string.IsNullOrEmpty(_additionalInformation.UnstructureMessage) ? _additionalInformation.UnstructureMessage : string.Empty)}{_br}"); //Ustrd
-            StringExtensions.AppendInvariant(swissQrCodePayload, $"{_additionalInformation.Trailer}{_br}"); //Trailer
+            swissQrCodePayload.AppendInvariant($"{(!string.IsNullOrEmpty(_additionalInformation.UnstructureMessage) ? _additionalInformation.UnstructureMessage : string.Empty)}{_br}"); //Ustrd
+            swissQrCodePayload.AppendInvariant($"{_additionalInformation.Trailer}{_br}"); //Trailer
             // Bugfix PR #399 If BillInformation is empty, insert no linebreak
             if (!string.IsNullOrEmpty(_additionalInformation.BillInformation))
-                StringExtensions.AppendInvariant(swissQrCodePayload, $"{_additionalInformation.BillInformation}{_br}"); //StrdBkgInf
+                swissQrCodePayload.AppendInvariant($"{_additionalInformation.BillInformation}{_br}"); //StrdBkgInf
 
             //AltPmtInf "logical" element
             if (!string.IsNullOrEmpty(_alternativeProcedure1))
-                StringExtensions.AppendInvariant(swissQrCodePayload, $"{_alternativeProcedure1!.Replace("\n", "")}{_br}"); //AltPmt
+                swissQrCodePayload.AppendInvariant($"{_alternativeProcedure1!.Replace("\n", "")}{_br}"); //AltPmt
             if (!string.IsNullOrEmpty(_alternativeProcedure2))
-                StringExtensions.AppendInvariant(swissQrCodePayload, $"{_alternativeProcedure2!.Replace("\n", "")}{_br}"); //AltPmt
+                swissQrCodePayload.AppendInvariant($"{_alternativeProcedure2!.Replace("\n", "")}{_br}"); //AltPmt
 
             var result = swissQrCodePayload.ToString();
 

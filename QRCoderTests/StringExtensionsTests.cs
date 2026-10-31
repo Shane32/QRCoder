@@ -19,7 +19,7 @@ public class StringExtensionsTests
             builder.Append('|');
             builder.AppendInvariant(-1.5f);
             builder.Append('|');
-            StringExtensions.AppendInvariant(builder, $"{-42}|{-1.5f:G7}|{12.5m:F2}");
+            builder.AppendInvariant($"{-42}|{-1.5f:G7}|{12.5m:F2}");
 
             builder.ToString().ShouldBe("-42|-1.5|-42|-1.5|12.50");
         }

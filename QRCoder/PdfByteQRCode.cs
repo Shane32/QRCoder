@@ -79,7 +79,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 1: Catalog - root of PDF document structure
             var catalogObject = new StringBuilder();
-            StringExtensions.AppendInvariant(catalogObject, $"{ToStr(xrefs.Count)} 0 obj\r\n"); // Object number and generation number (0)
+            catalogObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n"); // Object number and generation number (0)
             catalogObject.Append("<<\r\n");                                                            // Begin dictionary
             catalogObject.Append("/Type /Catalog\r\n");                                                // Declares this as the document catalog
             catalogObject.Append("/Pages 2 0 R\r\n");                                                  // References the Pages object (object 2)
@@ -92,7 +92,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 2: Pages - defines page tree structure
             var pagesObject = new StringBuilder();
-            StringExtensions.AppendInvariant(pagesObject, $"{ToStr(xrefs.Count)} 0 obj\r\n");   // Object number and generation number (0)
+            pagesObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");   // Object number and generation number (0)
             pagesObject.Append("<<\r\n");                                                              // Begin dictionary
             pagesObject.Append("/Count 1\r\n");                                                        // Number of pages in document
             pagesObject.Append("/Kids [ 3 0 R ]\r\n");                                                 // Kids must contain indirect references to Page objects
@@ -105,12 +105,12 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             var pathCommands = CreatePathFromModules();                                                             // Create path from dark modules
             var content = new StringBuilder();
             content.Append("q\r\n");                                                                                      // 'q' = Save graphics state
-            StringExtensions.AppendInvariant(content, $"{scale} 0 0 -{scale} 0 {pdfMediaSize} cm\r\n");            // 'cm' = Transformation matrix: scale X, scale & flip Y, translate to top
-            StringExtensions.AppendInvariant(content, $"{lightColorPdf} rg\r\n");                                  // 'rg' = Set RGB fill color for background
-            StringExtensions.AppendInvariant(content, $"0 0 {ToStr(moduleCount)} {ToStr(moduleCount)} re\r\n");    // 're' = Rectangle covering entire QR code
+            content.AppendInvariant($"{scale} 0 0 -{scale} 0 {pdfMediaSize} cm\r\n");            // 'cm' = Transformation matrix: scale X, scale & flip Y, translate to top
+            content.AppendInvariant($"{lightColorPdf} rg\r\n");                                  // 'rg' = Set RGB fill color for background
+            content.AppendInvariant($"0 0 {ToStr(moduleCount)} {ToStr(moduleCount)} re\r\n");    // 're' = Rectangle covering entire QR code
             content.Append("f\r\n");                                                                                      // 'f' = Fill background
-            StringExtensions.AppendInvariant(content, $"{darkColorPdf} rg\r\n");                                   // 'rg' = Set RGB fill color for dark modules
-            StringExtensions.AppendInvariant(content, $"{pathCommands}f*\r\n");                                    // Add all dark module rectangles to path; 'f*' = Fill with even-odd rule
+            content.AppendInvariant($"{darkColorPdf} rg\r\n");                                   // 'rg' = Set RGB fill color for dark modules
+            content.AppendInvariant($"{pathCommands}f*\r\n");                                    // Add all dark module rectangles to path; 'f*' = Fill with even-odd rule
             content.Append('Q');                                                                                          // 'Q' = Restore graphics state
             var contentString = content.ToString();
 
@@ -119,11 +119,11 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 3: Page - indirect page object (Kids array must reference pages indirectly)
             var pageObject = new StringBuilder();
-            StringExtensions.AppendInvariant(pageObject, $"{ToStr(xrefs.Count)} 0 obj\r\n");                          // Object number and generation number (0)
+            pageObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");                          // Object number and generation number (0)
             pageObject.Append("<<\r\n");                                                                                     // Begin dictionary
             pageObject.Append("/Type /Page\r\n");                                                                            // Declares this as a page
             pageObject.Append("/Parent 2 0 R\r\n");                                                                          // References parent Pages object
-            StringExtensions.AppendInvariant(pageObject, $"/MediaBox [0 0 {pdfMediaSize} {pdfMediaSize}]\r\n");       // Page dimensions [x1 y1 x2 y2]
+            pageObject.AppendInvariant($"/MediaBox [0 0 {pdfMediaSize} {pdfMediaSize}]\r\n");       // Page dimensions [x1 y1 x2 y2]
             pageObject.Append("/Resources << /ProcSet [ /PDF ] >>\r\n");                                                     // Required resources: PDF operations only (no images)
             pageObject.Append("/Contents 4 0 R\r\n");                                                                        // References content stream (object 4)
             pageObject.Append(">>\r\n");                                                                                     // End dictionary
@@ -135,9 +135,9 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Object 4: Content stream - contains the drawing instructions
             var contentStreamObject = new StringBuilder();
-            StringExtensions.AppendInvariant(contentStreamObject, $"{ToStr(xrefs.Count)} 0 obj\r\n");                                                    // Object number and generation number (0)
-            StringExtensions.AppendInvariant(contentStreamObject, $"<< /Length {ToStr(System.Text.Encoding.ASCII.GetByteCount(contentString))} >>\r\n"); // Dictionary with stream length in bytes
-            StringExtensions.AppendInvariant(contentStreamObject, $"stream\r\n{contentString}endstream\r\n");                                            // Begin stream data; stream content followed by end stream marker
+            contentStreamObject.AppendInvariant($"{ToStr(xrefs.Count)} 0 obj\r\n");                                                    // Object number and generation number (0)
+            contentStreamObject.AppendInvariant($"<< /Length {ToStr(System.Text.Encoding.ASCII.GetByteCount(contentString))} >>\r\n"); // Dictionary with stream length in bytes
+            contentStreamObject.AppendInvariant($"stream\r\n{contentString}endstream\r\n");                                            // Begin stream data; stream content followed by end stream marker
             contentStreamObject.Append("endobj\r\n");                                                                                                           // End object
             writer.Write(contentStreamObject.ToString());
 
@@ -147,7 +147,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             // Cross-reference table - maps object numbers to byte offsets
             var xrefTable = new StringBuilder();
             xrefTable.Append("xref\r\n");                                                            // Cross-reference table keyword
-            StringExtensions.AppendInvariant(xrefTable, $"0 {ToStr(xrefs.Count + 1)}\r\n");   // First object number (0) and count of entries
+            xrefTable.AppendInvariant($"0 {ToStr(xrefs.Count + 1)}\r\n");   // First object number (0) and count of entries
             xrefTable.Append("0000000000 65535 f\r\n");                                              // Entry 0: always free, generation 65535, 'f' = free
             writer.Write(xrefTable.ToString());
 
@@ -157,7 +157,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             {
                 // Write each entry as a 10-digit zero-padded byte offset, 5-digit zero-padded generation number (0), and 'n' = in use
                 xrefEntry.Length = 0;
-                StringExtensions.AppendInvariant(xrefEntry, $"{checked((int)refValue).ToString("0000000000", CultureInfo.InvariantCulture)} 00000 n\r\n");
+                xrefEntry.AppendInvariant($"{checked((int)refValue).ToString("0000000000", CultureInfo.InvariantCulture)} 00000 n\r\n");
                 writer.Write(xrefEntry.ToString());
             }
 
@@ -165,11 +165,11 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             var trailer = new StringBuilder();
             trailer.Append("trailer\r\n");                                                                 // Trailer keyword
             trailer.Append("<<\r\n");                                                                      // Begin trailer dictionary
-            StringExtensions.AppendInvariant(trailer, $"/Size {ToStr(xrefs.Count + 1)}\r\n");       // Total number of entries in xref table
+            trailer.AppendInvariant($"/Size {ToStr(xrefs.Count + 1)}\r\n");       // Total number of entries in xref table
             trailer.Append("/Root 1 0 R\r\n");                                                             // Reference to catalog object
             trailer.Append(">>\r\n");                                                                      // End trailer dictionary
             trailer.Append("startxref\r\n");                                                               // Start of xref keyword
-            StringExtensions.AppendInvariant(trailer, $"{ToStr(startxref)}\r\n");                   // Byte offset of xref table
+            trailer.AppendInvariant($"{ToStr(startxref)}\r\n");                   // Byte offset of xref table
             trailer.Append("%%EOF");                                                                       // End of file marker
             writer.Write(trailer.ToString());
 
@@ -217,7 +217,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
                 // Create a single rectangle for the entire run of dark modules
                 // Format: x y width height re
-                StringExtensions.AppendInvariant(pathCommands, $"{startX} {y} {x - startX} 1 re\r\n");
+                pathCommands.AppendInvariant($"{startX} {y} {x - startX} 1 re\r\n");
             }
         }
 

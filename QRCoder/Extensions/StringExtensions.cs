@@ -73,7 +73,7 @@ internal static class StringExtensions
     /// The handler writes directly to <paramref name="sb"/> during interpolation, without an intermediate string on .NET 6+.
     /// </summary>
     internal static void AppendInvariant(
-        StringBuilder sb,
+        this StringBuilder sb,
         [InterpolatedStringHandlerArgument(nameof(sb))] ref InvariantInterpolatedStringHandler handler)
     {
         // The handler has already appended the interpolated string to sb.
@@ -87,7 +87,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, int num)
     {
 #if NET6_0_OR_GREATER
-        AppendInvariant(sb, $"{num}");
+        sb.AppendInvariant($"{num}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];
@@ -109,7 +109,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, float num)
     {
 #if NET6_0_OR_GREATER
-        AppendInvariant(sb, $"{num:G7}");
+        sb.AppendInvariant($"{num:G7}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];

@@ -141,7 +141,7 @@ public static partial class PayloadGenerator
             var sb = new StringBuilder("otpauth://hotp/");
             ProcessCommonFields(sb);
             var actualCounter = Counter ?? 1;
-            StringExtensions.AppendInvariant(sb, $"&counter={actualCounter}");
+            sb.AppendInvariant($"&counter={actualCounter}");
             return sb.ToString();
         }
 
@@ -162,7 +162,7 @@ public static partial class PayloadGenerator
 
             if (Period != 30)
             {
-                StringExtensions.AppendInvariant(sb, $"&period={Period}");
+                sb.AppendInvariant($"&period={Period}");
             }
 
             return sb.ToString();
@@ -215,21 +215,21 @@ public static partial class PayloadGenerator
                 sb.Append(label);
             }
 
-            StringExtensions.AppendInvariant(sb, $"?secret={strippedSecret}");
+            sb.AppendInvariant($"?secret={strippedSecret}");
 
             if (escapedIssuer != null)
             {
-                StringExtensions.AppendInvariant(sb, $"&issuer={escapedIssuer}");
+                sb.AppendInvariant($"&issuer={escapedIssuer}");
             }
 
             if (AuthAlgorithm != OneTimePasswordAuthAlgorithm.SHA1)
             {
-                StringExtensions.AppendInvariant(sb, $"&algorithm={AuthAlgorithm}");
+                sb.AppendInvariant($"&algorithm={AuthAlgorithm}");
             }
 
             if (Digits != 6)
             {
-                StringExtensions.AppendInvariant(sb, $"&digits={Digits}");
+                sb.AppendInvariant($"&digits={Digits}");
             }
         }
     }
