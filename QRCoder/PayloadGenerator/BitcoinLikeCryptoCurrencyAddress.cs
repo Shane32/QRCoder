@@ -55,10 +55,10 @@ public static partial class PayloadGenerator
 
             if (queryValues.Any(keyPair => !string.IsNullOrEmpty(keyPair.Value)))
             {
-                query = "?" + string.Join("&", queryValues
+                query = $"?{string.Join("&", queryValues
                     .Where(keyPair => !string.IsNullOrEmpty(keyPair.Value))
                     .Select(keyPair => $"{keyPair.Key}={keyPair.Value}")
-                    .ToArray());
+                    .ToArray())}";
             }
 
             return $"{Enum.GetName(typeof(BitcoinLikeCryptoCurrencyType), _currencyType)!.ToLowerInvariant()}:{_address}{query}";

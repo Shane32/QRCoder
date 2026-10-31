@@ -87,7 +87,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, int num)
     {
 #if NET6_0_OR_GREATER
-        sb.Append(CultureInfo.InvariantCulture, $"{num}");
+        sb.AppendInvariant($"{num}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];
@@ -109,7 +109,7 @@ internal static class StringExtensions
     internal static void AppendInvariant(this StringBuilder sb, float num)
     {
 #if NET6_0_OR_GREATER
-        sb.Append(CultureInfo.InvariantCulture, $"{num:G7}");
+        sb.AppendInvariant($"{num:G7}");
 #else
 #if HAS_SPAN
         Span<char> buffer = stackalloc char[16];

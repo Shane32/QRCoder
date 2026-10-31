@@ -114,139 +114,127 @@ public static partial class PayloadGenerator
         /// <returns>A string representation of the contact data in the specified format.</returns>
         public override string ToString()
         {
-            string payload = string.Empty;
+            var payload = new StringBuilder();
             if (_outputType == ContactOutputType.MeCard)
             {
-                payload += "MECARD+\r\n";
+                payload.Append("MECARD+\r\n");
                 if (!string.IsNullOrEmpty(_firstname) && !string.IsNullOrEmpty(_lastname))
-                    payload += $"N:{_lastname}, {_firstname}\r\n";
+                    payload.AppendInvariant($"N:{_lastname}, {_firstname}\r\n");
                 else if (!string.IsNullOrEmpty(_firstname) || !string.IsNullOrEmpty(_lastname))
-                    payload += $"N:{_firstname}{_lastname}\r\n";
+                    payload.AppendInvariant($"N:{_firstname}{_lastname}\r\n");
                 if (!string.IsNullOrEmpty(_org))
-                    payload += $"ORG:{_org}\r\n";
+                    payload.AppendInvariant($"ORG:{_org}\r\n");
                 if (!string.IsNullOrEmpty(_orgTitle))
-                    payload += $"TITLE:{_orgTitle}\r\n";
+                    payload.AppendInvariant($"TITLE:{_orgTitle}\r\n");
                 if (!string.IsNullOrEmpty(_phone))
-                    payload += $"TEL:{_phone}\r\n";
+                    payload.AppendInvariant($"TEL:{_phone}\r\n");
                 if (!string.IsNullOrEmpty(_mobilePhone))
-                    payload += $"TEL:{_mobilePhone}\r\n";
+                    payload.AppendInvariant($"TEL:{_mobilePhone}\r\n");
                 if (!string.IsNullOrEmpty(_workPhone))
-                    payload += $"TEL:{_workPhone}\r\n";
+                    payload.AppendInvariant($"TEL:{_workPhone}\r\n");
                 if (!string.IsNullOrEmpty(_email))
-                    payload += $"EMAIL:{_email}\r\n";
+                    payload.AppendInvariant($"EMAIL:{_email}\r\n");
                 if (!string.IsNullOrEmpty(_note))
-                    payload += $"NOTE:{_note}\r\n";
+                    payload.AppendInvariant($"NOTE:{_note}\r\n");
                 if (_birthday != null)
-                    payload += $"BDAY:{((DateTime)_birthday).ToString("yyyyMMdd", CultureInfo.InvariantCulture)}\r\n";
+                    payload.AppendInvariant($"BDAY:{((DateTime)_birthday).ToString("yyyyMMdd", CultureInfo.InvariantCulture)}\r\n");
                 // RFC 2426 Section 3.2.1: ADR format is PO Box; Extended Address; Street; Locality (City); Region; Postal Code; Country
-                string addressString = string.Empty;
                 if (_addressOrder == AddressOrder.Default)
                 {
-                    addressString = $"ADR:,,{(!string.IsNullOrEmpty(_street) ? _street + " " : "")}{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber : "")},{(!string.IsNullOrEmpty(_city) ? _city : "")},{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")},{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")},{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n";
+                    payload.AppendInvariant($"ADR:,,{(!string.IsNullOrEmpty(_street) ? $"{_street} " : "")}{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber : "")},{(!string.IsNullOrEmpty(_city) ? _city : "")},{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")},{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")},{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n");
                 }
                 else
                 {
-                    addressString = $"ADR:,,{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber + " " : "")}{(!string.IsNullOrEmpty(_street) ? _street : "")},{(!string.IsNullOrEmpty(_city) ? _city : "")},{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")},{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")},{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n";
+                    payload.AppendInvariant($"ADR:,,{(!string.IsNullOrEmpty(_houseNumber) ? $"{_houseNumber} " : "")}{(!string.IsNullOrEmpty(_street) ? _street : "")},{(!string.IsNullOrEmpty(_city) ? _city : "")},{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")},{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")},{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n");
                 }
-                payload += addressString;
                 if (!string.IsNullOrEmpty(_website))
-                    payload += $"URL:{_website}\r\n";
+                    payload.AppendInvariant($"URL:{_website}\r\n");
                 if (!string.IsNullOrEmpty(_nickname))
-                    payload += $"NICKNAME:{_nickname}\r\n";
-                payload = payload.Trim(_trimChars);
+                    payload.AppendInvariant($"NICKNAME:{_nickname}\r\n");
+                return payload.ToString().Trim(_trimChars);
+            }
+
+            var version = _outputType.ToString().Substring(5);
+            if (version.Length > 1)
+                version = version.Insert(1, ".");
+            else
+                version += ".0";
+
+            payload.Append("BEGIN:VCARD\r\n");
+            payload.AppendInvariant($"VERSION:{version}\r\n");
+
+            payload.AppendInvariant($"N:{(!string.IsNullOrEmpty(_lastname) ? _lastname : "")};{(!string.IsNullOrEmpty(_firstname) ? _firstname : "")};;;\r\n");
+            payload.AppendInvariant($"FN:{(!string.IsNullOrEmpty(_firstname) ? $"{_firstname} " : "")}{(!string.IsNullOrEmpty(_lastname) ? _lastname : "")}\r\n");
+            if (!string.IsNullOrEmpty(_org))
+                payload.AppendInvariant($"ORG:{_org}\r\n");
+            if (!string.IsNullOrEmpty(_orgTitle))
+                payload.AppendInvariant($"TITLE:{_orgTitle}\r\n");
+            if (!string.IsNullOrEmpty(_phone))
+            {
+                payload.Append("TEL;");
+                if (_outputType == ContactOutputType.VCard21)
+                    payload.AppendInvariant($"HOME;VOICE:{_phone}");
+                else if (_outputType == ContactOutputType.VCard3)
+                    payload.AppendInvariant($"TYPE=HOME,VOICE:{_phone}");
+                else
+                    payload.AppendInvariant($"TYPE=home,voice;VALUE=uri:tel:{_phone}");
+                payload.Append("\r\n");
+            }
+
+            if (!string.IsNullOrEmpty(_mobilePhone))
+            {
+                payload.Append("TEL;");
+                if (_outputType == ContactOutputType.VCard21)
+                    payload.AppendInvariant($"HOME;CELL:{_mobilePhone}");
+                else if (_outputType == ContactOutputType.VCard3)
+                    payload.AppendInvariant($"TYPE=HOME,CELL:{_mobilePhone}");
+                else
+                    payload.AppendInvariant($"TYPE=home,cell;VALUE=uri:tel:{_mobilePhone}");
+                payload.Append("\r\n");
+            }
+
+            if (!string.IsNullOrEmpty(_workPhone))
+            {
+                payload.Append("TEL;");
+                if (_outputType == ContactOutputType.VCard21)
+                    payload.AppendInvariant($"WORK;VOICE:{_workPhone}");
+                else if (_outputType == ContactOutputType.VCard3)
+                    payload.AppendInvariant($"TYPE=WORK,VOICE:{_workPhone}");
+                else
+                    payload.AppendInvariant($"TYPE=work,voice;VALUE=uri:tel:{_workPhone}");
+                payload.Append("\r\n");
+            }
+
+            // RFC 2426 Section 3.2.1: ADR format is PO Box; Extended Address; Street; Locality (City); Region; Postal Code; Country
+            payload.Append("ADR;");
+            if (_outputType == ContactOutputType.VCard21)
+                payload.AppendInvariant($"{GetAddressTypeString21()}:");
+            else if (_outputType == ContactOutputType.VCard3)
+                payload.AppendInvariant($"TYPE={GetAddressTypeString3()}:");
+            else
+                payload.AppendInvariant($"TYPE={GetAddressTypeString4()}:");
+            if (_addressOrder == AddressOrder.Default)
+            {
+                payload.AppendInvariant($";;{(!string.IsNullOrEmpty(_street) ? $"{_street} " : "")}{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber : "")};{(!string.IsNullOrEmpty(_city) ? _city : "")};{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")};{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")};{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n");
             }
             else
             {
-                var version = _outputType.ToString().Substring(5);
-                if (version.Length > 1)
-                    version = version.Insert(1, ".");
-                else
-                    version += ".0";
-
-                payload += "BEGIN:VCARD\r\n";
-                payload += $"VERSION:{version}\r\n";
-
-                payload += $"N:{(!string.IsNullOrEmpty(_lastname) ? _lastname : "")};{(!string.IsNullOrEmpty(_firstname) ? _firstname : "")};;;\r\n";
-                payload += $"FN:{(!string.IsNullOrEmpty(_firstname) ? _firstname + " " : "")}{(!string.IsNullOrEmpty(_lastname) ? _lastname : "")}\r\n";
-                if (!string.IsNullOrEmpty(_org))
-                {
-                    payload += $"ORG:" + _org + "\r\n";
-                }
-                if (!string.IsNullOrEmpty(_orgTitle))
-                {
-                    payload += $"TITLE:" + _orgTitle + "\r\n";
-                }
-                if (!string.IsNullOrEmpty(_phone))
-                {
-                    payload += $"TEL;";
-                    if (_outputType == ContactOutputType.VCard21)
-                        payload += $"HOME;VOICE:{_phone}";
-                    else if (_outputType == ContactOutputType.VCard3)
-                        payload += $"TYPE=HOME,VOICE:{_phone}";
-                    else
-                        payload += $"TYPE=home,voice;VALUE=uri:tel:{_phone}";
-                    payload += "\r\n";
-                }
-
-                if (!string.IsNullOrEmpty(_mobilePhone))
-                {
-                    payload += $"TEL;";
-                    if (_outputType == ContactOutputType.VCard21)
-                        payload += $"HOME;CELL:{_mobilePhone}";
-                    else if (_outputType == ContactOutputType.VCard3)
-                        payload += $"TYPE=HOME,CELL:{_mobilePhone}";
-                    else
-                        payload += $"TYPE=home,cell;VALUE=uri:tel:{_mobilePhone}";
-                    payload += "\r\n";
-                }
-
-                if (!string.IsNullOrEmpty(_workPhone))
-                {
-                    payload += $"TEL;";
-                    if (_outputType == ContactOutputType.VCard21)
-                        payload += $"WORK;VOICE:{_workPhone}";
-                    else if (_outputType == ContactOutputType.VCard3)
-                        payload += $"TYPE=WORK,VOICE:{_workPhone}";
-                    else
-                        payload += $"TYPE=work,voice;VALUE=uri:tel:{_workPhone}";
-                    payload += "\r\n";
-                }
-
-
-                // RFC 2426 Section 3.2.1: ADR format is PO Box; Extended Address; Street; Locality (City); Region; Postal Code; Country
-                payload += "ADR;";
-                if (_outputType == ContactOutputType.VCard21)
-                    payload += GetAddressTypeString21() + ":";
-                else if (_outputType == ContactOutputType.VCard3)
-                    payload += "TYPE=" + GetAddressTypeString3() + ":";
-                else
-                    payload += "TYPE=" + GetAddressTypeString4() + ":";
-                string addressString = string.Empty;
-                if (_addressOrder == AddressOrder.Default)
-                {
-                    addressString = $";;{(!string.IsNullOrEmpty(_street) ? _street + " " : "")}{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber : "")};{(!string.IsNullOrEmpty(_city) ? _city : "")};{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")};{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")};{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n";
-                }
-                else
-                {
-                    addressString = $";;{(!string.IsNullOrEmpty(_houseNumber) ? _houseNumber + " " : "")}{(!string.IsNullOrEmpty(_street) ? _street : "")};{(!string.IsNullOrEmpty(_city) ? _city : "")};{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")};{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")};{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n";
-                }
-                payload += addressString;
-
-                if (_birthday != null)
-                    payload += $"BDAY:{((DateTime)_birthday).ToString("yyyyMMdd", CultureInfo.InvariantCulture)}\r\n";
-                if (!string.IsNullOrEmpty(_website))
-                    payload += $"URL:{_website}\r\n";
-                if (!string.IsNullOrEmpty(_email))
-                    payload += $"EMAIL:{_email}\r\n";
-                if (!string.IsNullOrEmpty(_note))
-                    payload += $"NOTE:{_note}\r\n";
-                if (_outputType != ContactOutputType.VCard21 && !string.IsNullOrEmpty(_nickname))
-                    payload += $"NICKNAME:{_nickname}\r\n";
-
-                payload += "END:VCARD";
+                payload.AppendInvariant($";;{(!string.IsNullOrEmpty(_houseNumber) ? $"{_houseNumber} " : "")}{(!string.IsNullOrEmpty(_street) ? _street : "")};{(!string.IsNullOrEmpty(_city) ? _city : "")};{(!string.IsNullOrEmpty(_stateRegion) ? _stateRegion : "")};{(!string.IsNullOrEmpty(_zipCode) ? _zipCode : "")};{(!string.IsNullOrEmpty(_country) ? _country : "")}\r\n");
             }
 
-            return payload;
+            if (_birthday != null)
+                payload.AppendInvariant($"BDAY:{((DateTime)_birthday).ToString("yyyyMMdd", CultureInfo.InvariantCulture)}\r\n");
+            if (!string.IsNullOrEmpty(_website))
+                payload.AppendInvariant($"URL:{_website}\r\n");
+            if (!string.IsNullOrEmpty(_email))
+                payload.AppendInvariant($"EMAIL:{_email}\r\n");
+            if (!string.IsNullOrEmpty(_note))
+                payload.AppendInvariant($"NOTE:{_note}\r\n");
+            if (_outputType != ContactOutputType.VCard21 && !string.IsNullOrEmpty(_nickname))
+                payload.AppendInvariant($"NICKNAME:{_nickname}\r\n");
+
+            payload.Append("END:VCARD");
+            return payload.ToString();
         }
 
         /// <summary>
