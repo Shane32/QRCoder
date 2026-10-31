@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 #endif
 
 namespace QRCoderTests.Helpers;
+
 public static class HelperFunctions
 {
 
