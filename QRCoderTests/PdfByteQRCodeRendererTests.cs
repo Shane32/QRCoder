@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading;
 
 namespace QRCoderTests;
 
@@ -29,6 +30,28 @@ public class PdfByteQRCodeRendererTests
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
         var pdfCodeGfx = new PdfByteQRCode(data).GetGraphic(5, "#000000", "#FFFFFF", 300);
         pdfCodeGfx.ShouldMatchApproved("pdf");
+    }
+
+    [Fact]
+    public void renders_identical_pdf_bytes_across_cultures()
+    {
+        var originalCulture = Thread.CurrentThread.CurrentCulture;
+        using var gen = new QRCodeGenerator();
+        using var data = gen.CreateQrCode("Culture-independent PDF", QRCodeGenerator.ECCLevel.L);
+        using var pdfCode = new PdfByteQRCode(data);
+
+        try
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            var invariantBytes = pdfCode.GetGraphic(3, "#123456", "#E7F0FA", 137);
+
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+            pdfCode.GetGraphic(3, "#123456", "#E7F0FA", 137).ShouldBe(invariantBytes);
+        }
+        finally
+        {
+            Thread.CurrentThread.CurrentCulture = originalCulture;
+        }
     }
 
     [Fact]

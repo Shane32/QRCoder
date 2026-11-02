@@ -65,10 +65,10 @@ internal sealed class CompilerFeatureRequiredAttribute : Attribute
     /// </summary>
     public bool IsOptional { get; set; }
 
+#pragma warning disable IDE1006 // Must match the BCL constant names
     /// <summary>
     /// The feature name used for ref structs.
     /// </summary>
-#pragma warning disable IDE1006 // Must match the BCL constant names
     public const string RefStructs = nameof(RefStructs);
 
     /// <summary>
