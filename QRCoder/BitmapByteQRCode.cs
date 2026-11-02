@@ -58,8 +58,9 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     public byte[] GetGraphic(int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex)
 #if HAS_SPAN
     {
-        Span<byte> darkColor = stackalloc byte[3];
-        Span<byte> lightColor = stackalloc byte[3];
+        Span<byte> scratch = stackalloc byte[8];
+        Span<byte> darkColor = scratch.Slice(0, 3);
+        Span<byte> lightColor = scratch.Slice(3, 3);
         darkColorHtmlHex.HexColorToBytes(darkColor, allowExtraBytes: true);
         lightColorHtmlHex.HexColorToBytes(lightColor, allowExtraBytes: true);
         return GetGraphicCore(pixelsPerModule, darkColor, lightColor);

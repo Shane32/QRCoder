@@ -49,8 +49,9 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
         // Parse colors
 #if HAS_SPAN
-        Span<byte> darkColor = stackalloc byte[3];
-        Span<byte> lightColor = stackalloc byte[3];
+        Span<byte> scratch = stackalloc byte[8];
+        Span<byte> darkColor = scratch.Slice(0, 3);
+        Span<byte> lightColor = scratch.Slice(3, 3);
         darkColorHtmlHex.HexColorToBytes(darkColor);
         lightColorHtmlHex.HexColorToBytes(lightColor);
 #else
