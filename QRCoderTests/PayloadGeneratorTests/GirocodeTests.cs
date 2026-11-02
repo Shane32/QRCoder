@@ -133,7 +133,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("The IBAN entered isn't valid.");
@@ -152,7 +152,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("The BIC entered isn't valid.");
@@ -171,7 +171,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("(Payee-)Name must be shorter than 71 chars.");
@@ -190,7 +190,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Amount must have less than 3 digits after decimal point.");
@@ -208,7 +208,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.");
@@ -228,7 +228,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Amount has to be at least 0.01 and must be smaller or equal to 999999999.99.");
@@ -247,7 +247,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Purpose of credit transfer can only have 4 chars at maximum.");
@@ -265,7 +265,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Unstructured reference texts have to be shorter than 141 chars.");
@@ -283,7 +283,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "Thanks for using Girocode";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Structured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Structured reference texts have to be shorter than 36 chars.");
@@ -301,7 +301,7 @@ public class GirocodeTests
         string messageToGirocodeUser = "The usermessage is shown to the user which scans the Girocode. It has to be shorter than 71 chars.";
 
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser));
 
         exception.Message.ShouldBe("Message to the Girocode-User reader texts have to be shorter than 71 chars.");
@@ -398,7 +398,7 @@ public class GirocodeTests
         string remittanceInformation = "some info";
         decimal amount = 1337.99m;
 
-        var exception = Record.Exception(() => new PayloadGenerator.Girocode(
+        Exception exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
             bic: bic,
             name: name,
@@ -420,7 +420,7 @@ public class GirocodeTests
         string remittanceInformation = "some info";
         decimal amount = 1337.99m;
 
-        var exception = Record.Exception(() => new PayloadGenerator.Girocode(
+        Exception exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
             bic: null,
             name: name,
@@ -442,7 +442,7 @@ public class GirocodeTests
         string remittanceInformation = "some info";
         decimal amount = 1337.99m;
 
-        var exception = Record.Exception(() => new PayloadGenerator.Girocode(
+        Exception exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
             bic: string.Empty,
             name: name,
@@ -465,7 +465,7 @@ public class GirocodeTests
         string bic = "BFSWDE33BER";
         string name = "Payee";
 
-        var generator = omitAmount
+        PayloadGenerator.Girocode generator = omitAmount
             ? new PayloadGenerator.Girocode(iban, bic, name)
             : new PayloadGenerator.Girocode(iban, bic, name, amount: null);
 
@@ -525,7 +525,7 @@ public class GirocodeTests
         string purposeOfCreditTransfer = "CHAR";
         string messageToGirocodeUser = "Thank you";
 
-        var generator = omitAmount
+        PayloadGenerator.Girocode generator = omitAmount
             ? new PayloadGenerator.Girocode(iban, bic, name, remittanceInformation: remittanceInformation,
                 typeOfRemittance: typeOfRemittance, purposeOfCreditTransfer: purposeOfCreditTransfer,
                 messageToGirocodeUser: messageToGirocodeUser, version: version)
@@ -589,8 +589,8 @@ public class GirocodeTests
         string name = "Payee";
         decimal amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
 
-        var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount));
-        var nullableException = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount));
+        PayloadGenerator.Girocode.GirocodeException exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount));
+        PayloadGenerator.Girocode.GirocodeException nullableException = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount));
 
         exception.Message.ShouldBe(expectedMessage);
         nullableException.Message.ShouldBe(expectedMessage);

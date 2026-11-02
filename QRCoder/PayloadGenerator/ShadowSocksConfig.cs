@@ -126,7 +126,7 @@ public static partial class PayloadGenerator
         private string UrlEncode(string i)
         {
             string j = i;
-            foreach (var kv in _urlEncodeTable)
+            foreach (KeyValuePair<string, string> kv in _urlEncodeTable)
             {
                 j = j.Replace(kv.Key, kv.Value);
             }

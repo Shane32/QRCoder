@@ -7,7 +7,7 @@ public class SMSTests
     {
         string number = "01601234567";
         string message = "A small SMS";
-        var encoding = PayloadGenerator.SMS.SMSEncoding.SMS;
+        PayloadGenerator.SMS.SMSEncoding encoding = PayloadGenerator.SMS.SMSEncoding.SMS;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
 
@@ -20,7 +20,7 @@ public class SMSTests
     {
         string number = "01601234567";
         string message = "A small SMS";
-        var encoding = PayloadGenerator.SMS.SMSEncoding.SMS_iOS;
+        PayloadGenerator.SMS.SMSEncoding encoding = PayloadGenerator.SMS.SMSEncoding.SMS_iOS;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
 
@@ -33,7 +33,7 @@ public class SMSTests
     {
         string number = "01601234567";
         string message = "A small SMS";
-        var encoding = PayloadGenerator.SMS.SMSEncoding.SMSTO;
+        PayloadGenerator.SMS.SMSEncoding encoding = PayloadGenerator.SMS.SMSEncoding.SMSTO;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
 

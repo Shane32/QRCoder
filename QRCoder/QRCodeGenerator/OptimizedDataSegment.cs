@@ -45,7 +45,7 @@ public partial class QRCodeGenerator
                 return 0;
 
             int totalBits = 0;
-            var mode = SelectInitialMode(Text, 0, version);
+            EncodingMode mode = SelectInitialMode(Text, 0, version);
             int startPos = 0;
 
             do
@@ -102,7 +102,7 @@ public partial class QRCodeGenerator
                 return startIndex;
 
             int bitIndex = startIndex;
-            var mode = SelectInitialMode(Text, 0, version);
+            EncodingMode mode = SelectInitialMode(Text, 0, version);
             int startPos = 0;
 
             do

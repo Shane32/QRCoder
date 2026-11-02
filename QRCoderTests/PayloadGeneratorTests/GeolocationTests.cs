@@ -7,7 +7,7 @@ public class GeolocationTests
     {
         string latitude = "51.227741";
         string longitude = "6.773456";
-        var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
+        PayloadGenerator.Geolocation.GeolocationEncoding encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
 
@@ -20,7 +20,7 @@ public class GeolocationTests
     {
         string latitude = "51.227741";
         string longitude = "6.773456";
-        var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GoogleMaps;
+        PayloadGenerator.Geolocation.GeolocationEncoding encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GoogleMaps;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
 
@@ -33,7 +33,7 @@ public class GeolocationTests
     {
         string latitude = "51,227741";
         string longitude = "6,773456";
-        var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
+        PayloadGenerator.Geolocation.GeolocationEncoding encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
 

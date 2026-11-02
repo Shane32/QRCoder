@@ -61,7 +61,7 @@ public class MoneroTransactionTests
         string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
         float amount = -1f;
 
-        var exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address, amount));
+        PayloadGenerator.MoneroTransaction.MoneroTransactionException exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address, amount));
 
         exception.Message.ShouldBe("Value of 'txAmount' must be greater than 0.");
     }
@@ -72,7 +72,7 @@ public class MoneroTransactionTests
     {
         string address = "";
 
-        var exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address));
+        PayloadGenerator.MoneroTransaction.MoneroTransactionException exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address));
 
         exception.Message.ShouldBe("The address is mandatory and has to be set.");
     }

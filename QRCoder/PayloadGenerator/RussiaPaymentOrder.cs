@@ -105,7 +105,7 @@ public static partial class PayloadGenerator
 
 
             //Add optional fields, if filled
-            var optionalFieldsList = GetOptionalFieldsAsList();
+            List<string> optionalFieldsList = GetOptionalFieldsAsList();
             if (optionalFieldsList.Count > 0)
                 ret += $"|{string.Join("|", optionalFieldsList.ToArray())}";
             ret += _separator;
@@ -122,8 +122,8 @@ public static partial class PayloadGenerator
         {
             // See chapter 5.2.1 of Standard (https://sbqr.ru/standard/files/standart.pdf)
 
-            var mandatoryValues = GetMandatoryFieldsAsList();
-            var optionalValues = GetOptionalFieldsAsList();
+            List<string> mandatoryValues = GetMandatoryFieldsAsList();
+            List<string> optionalValues = GetOptionalFieldsAsList();
 
             // Possible candidates for field separation
             string[] separatorCandidates = new string[] { "|", "#", ";", ":", "^", "_", "~", "{", "}", "!", "#", "$", "%", "&", "(", ")", "*", "+", ",", "/", "@" };

@@ -9,7 +9,7 @@ public class PdfByteQRCodeRendererTests
     public void can_render_pdfbyte_qrcode_blackwhite()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
         byte[] pdfCodeGfx = new PdfByteQRCode(data).GetGraphic(5);
         pdfCodeGfx.ShouldMatchApproved("pdf");
     }
@@ -18,7 +18,7 @@ public class PdfByteQRCodeRendererTests
     public void can_render_pdfbyte_qrcode_color()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
         byte[] pdfCodeGfx = new PdfByteQRCode(data).GetGraphic(5, "#FF0000", "#0000FF");
         pdfCodeGfx.ShouldMatchApproved("pdf");
     }
@@ -27,7 +27,7 @@ public class PdfByteQRCodeRendererTests
     public void can_render_pdfbyte_qrcode_custom_dpi()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
         byte[] pdfCodeGfx = new PdfByteQRCode(data).GetGraphic(5, "#000000", "#FFFFFF", 300);
         pdfCodeGfx.ShouldMatchApproved("pdf");
     }
@@ -35,9 +35,9 @@ public class PdfByteQRCodeRendererTests
     [Fact]
     public void renders_identical_pdf_bytes_across_cultures()
     {
-        var originalCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo originalCulture = Thread.CurrentThread.CurrentCulture;
         using var gen = new QRCodeGenerator();
-        using var data = gen.CreateQrCode("Culture-independent PDF", QRCodeGenerator.ECCLevel.L);
+        using QRCodeData data = gen.CreateQrCode("Culture-independent PDF", QRCodeGenerator.ECCLevel.L);
         using var pdfCode = new PdfByteQRCode(data);
 
         try
@@ -82,7 +82,7 @@ public class PdfByteQRCodeRendererTests
     public void pdf_xref_table_is_valid()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
         byte[] pdfBytes = new PdfByteQRCode(data).GetGraphic(5);
 
         // Parse from the end to find startxref
@@ -157,7 +157,7 @@ public class PdfByteQRCodeRendererTests
         objectOffsets.Count.ShouldBeGreaterThan(0, "No in-use objects found in xref table");
 
         // Verify each object: seek to its offset and confirm "N 0 obj" is present
-        foreach (var kvp in objectOffsets)
+        foreach (KeyValuePair<int, long> kvp in objectOffsets)
         {
             stream.Position = kvp.Value;
             int objNum = kvp.Key;

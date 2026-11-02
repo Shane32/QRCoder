@@ -66,7 +66,7 @@ public partial class QRCodeGenerator
             generatorPolynomial.Add(new PolynomItem(0, numEccWords));
 
 #if HAS_SPAN
-            var coefficients = _generatorPolynomCoefficients.Slice(startIndex, numEccWords);
+            ReadOnlySpan<byte> coefficients = _generatorPolynomCoefficients.Slice(startIndex, numEccWords);
             for (int i = coefficients.Length - 1; i >= 0; i--)
             {
                 generatorPolynomial.Add(new PolynomItem(coefficients[i], i));
@@ -164,7 +164,7 @@ public partial class QRCodeGenerator
 
             for (int i = 0; i < Count; i++)
             {
-                var polyItem = _polyItems[i];
+                PolynomItem polyItem = _polyItems[i];
                 sb.AppendInvariant($"a^{polyItem.Coefficient}*x^{polyItem.Exponent} + ");
             }
 
@@ -221,7 +221,7 @@ public partial class QRCodeGenerator
             {
                 for (int i = 0; i < _arrayPool.Count; i++)
                 {
-                    var array = _arrayPool[i];
+                    PolynomItem[] array = _arrayPool[i];
                     if (array.Length >= count)
                     {
                         _arrayPool.RemoveAt(i);

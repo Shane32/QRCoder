@@ -39,7 +39,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphic(1);
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
@@ -68,7 +68,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphicSmall();
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
@@ -93,7 +93,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphicSmall(drawQuietZones: false);
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -121,7 +121,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphicSmall(invert: true);
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -149,7 +149,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphicSmall(endOfLine: "\r\n");
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -183,7 +183,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphic(1, drawQuietZones: false);
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
@@ -255,7 +255,7 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A", QRCodeGenerator.ECCLevel.Q);
+        QRCodeData data = gen.CreateQrCode("A", QRCodeGenerator.ECCLevel.Q);
         string asciiCode = new AsciiQRCode(data).GetGraphic(2, "X", " ");
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);

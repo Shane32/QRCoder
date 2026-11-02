@@ -7,7 +7,7 @@ public class WiFiTests
     {
         string ssid = "MyWiFiSSID";
         string password = "7heP4assw0rd";
-        var authmode = PayloadGenerator.WiFi.Authentication.WEP;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WEP;
         bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -20,7 +20,7 @@ public class WiFiTests
     {
         string ssid = "MyWiFiSSID";
         string password = "7heP4assw0rd";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -33,7 +33,7 @@ public class WiFiTests
     {
         string ssid = "MyWiFiSSID";
         string password = "7heP4assw0rd";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA2;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA2;
         bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -46,7 +46,7 @@ public class WiFiTests
     {
         string ssid = "MyWiFiSSID";
         string password = "7heP4assw0rd";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode);
 
@@ -59,7 +59,7 @@ public class WiFiTests
     {
         string ssid = "M\\y;W,i:FiSSID";
         string password = "7heP4assw0rd\\;:,";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -73,7 +73,7 @@ public class WiFiTests
     {
         string ssid = "MyWiFiSSID";
         string password = "7heP4assw0rd";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -87,7 +87,7 @@ public class WiFiTests
     {
         string ssid = "A9B7F18CCE";
         string password = "00105F0E6";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -101,7 +101,7 @@ public class WiFiTests
     {
         string ssid = "a9b7f18cce";
         string password = "00105f0Ee6";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -115,7 +115,7 @@ public class WiFiTests
     {
         string ssid = "0xA9B7F18CCE";
         string password = "0x00105F0E6";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
@@ -129,7 +129,7 @@ public class WiFiTests
     {
         string ssid = "0XA9B7F18CCE";
         string password = "0X00105F0E6";
-        var authmode = PayloadGenerator.WiFi.Authentication.WPA;
+        PayloadGenerator.WiFi.Authentication authmode = PayloadGenerator.WiFi.Authentication.WPA;
         bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);

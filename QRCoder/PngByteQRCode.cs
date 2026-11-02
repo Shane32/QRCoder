@@ -37,7 +37,7 @@ public sealed class PngByteQRCode : AbstractQRCode, IDisposable
         using var png = new PngBuilder();
         int size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
         png.WriteHeader(size, size, 1, PngBuilder.ColorType.Greyscale);
-        var scanLines = DrawScanlines(pixelsPerModule, drawQuietZones);
+        ArraySegment<byte> scanLines = DrawScanlines(pixelsPerModule, drawQuietZones);
         png.WriteScanlines(scanLines);
 #if HAS_SPAN
         ArrayPool<byte>.Shared.Return(scanLines.Array!);
@@ -73,7 +73,7 @@ public sealed class PngByteQRCode : AbstractQRCode, IDisposable
         int size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
         png.WriteHeader(size, size, 1, PngBuilder.ColorType.Indexed);
         png.WritePalette(darkColorRgba, lightColorRgba);
-        var scanLines = DrawScanlines(pixelsPerModule, drawQuietZones);
+        ArraySegment<byte> scanLines = DrawScanlines(pixelsPerModule, drawQuietZones);
         png.WriteScanlines(scanLines);
 #if HAS_SPAN
         ArrayPool<byte>.Shared.Return(scanLines.Array!);
@@ -90,7 +90,7 @@ public sealed class PngByteQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the bitmap as a byte array.</returns>
     private ArraySegment<byte> DrawScanlines(int pixelsPerModule, bool drawQuietZones)
     {
-        var moduleMatrix = QrCodeData.ModuleMatrix;
+        List<BitArray> moduleMatrix = QrCodeData.ModuleMatrix;
         int matrixSize = moduleMatrix.Count - (drawQuietZones ? 0 : 8);
         int quietZoneOffset = (drawQuietZones ? 0 : 4);
         int bytesPerScanline = (matrixSize * pixelsPerModule + 7) / 8 + 1; // A monochrome scanline is one byte for filter type then one bit per pixel.
@@ -104,7 +104,7 @@ public sealed class PngByteQRCode : AbstractQRCode, IDisposable
 
         for (int y = 0; y < matrixSize; y++)
         {
-            var modules = moduleMatrix[y + quietZoneOffset];
+            BitArray modules = moduleMatrix[y + quietZoneOffset];
             int scanlineOffset = y * pixelsPerModule * bytesPerScanline;
 
             // Draw a scanline with the modules from the QR code.
@@ -374,7 +374,7 @@ public static class PngByteQRCodeHelper
     public static byte[] GetQRCode(string plainText, int pixelsPerModule, byte[] darkColorRgba, byte[] lightColorRgba, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, bool drawQuietZones = true)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new PngByteQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorRgba, lightColorRgba, drawQuietZones);
     }
@@ -392,7 +392,7 @@ public static class PngByteQRCodeHelper
     public static byte[] GetQRCode(string txt, QRCodeGenerator.ECCLevel eccLevel, int size, bool drawQuietZones = true)
     {
         using var qrGen = new QRCodeGenerator();
-        using var qrCode = qrGen.CreateQrCode(txt, eccLevel);
+        using QRCodeData qrCode = qrGen.CreateQrCode(txt, eccLevel);
         using var qrPng = new PngByteQRCode(qrCode);
         return qrPng.GetGraphic(size, drawQuietZones);
     }

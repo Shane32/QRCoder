@@ -26,7 +26,7 @@ public partial class Form1 : Form
         string level = comboBoxECC.SelectedItem?.ToString() ?? "L";
         var eccLevel = (QRCodeGenerator.ECCLevel)(level == "L" ? 0 : level == "M" ? 1 : level == "Q" ? 2 : 3);
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(textBoxQRCode.Text, eccLevel);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(textBoxQRCode.Text, eccLevel);
         using var qrCode = new QRCode(qrCodeData);
         pictureBoxQRCode.BackgroundImage = qrCode.GetGraphic(20, GetPrimaryColor(), GetBackgroundColor(),
             GetIconBitmap(), (int)iconSize.Value);
@@ -97,7 +97,7 @@ public partial class Form1 : Form
             // File type selected in the dialog box.
             // NOTE that the FilterIndex property is one-based.
 
-            var imageFormat = saveFileDialog1.FilterIndex switch
+            ImageFormat imageFormat = saveFileDialog1.FilterIndex switch
             {
                 1 => ImageFormat.Bmp,
                 2 => ImageFormat.Png,

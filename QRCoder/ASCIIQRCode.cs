@@ -59,7 +59,7 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
 #if HAS_SPAN
         if (darkColorString.Length == whiteSpaceString.Length && lineCapacity < 510)
         {
-            var row = stackalloc char[512].Slice(0, lineCapacity);
+            Span<char> row = stackalloc char[512].Slice(0, lineCapacity);
             for (int y = 0; y < sideLength; y++)
             {
                 int offset = 0;
@@ -68,8 +68,8 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
                     bool module = QrCodeData.ModuleMatrix[((y + verticalNumberOfRepeats) / verticalNumberOfRepeats - 1) + quietZonesOffset][x + quietZonesOffset];
                     for (int i = 0; i < repeatPerModule; i++)
                     {
-                        var sourceSpan = module ? darkColorString.AsSpan() : whiteSpaceString.AsSpan();
-                        var targetSpan = row.Slice(offset, darkColorString.Length);
+                        ReadOnlySpan<char> sourceSpan = module ? darkColorString.AsSpan() : whiteSpaceString.AsSpan();
+                        Span<char> targetSpan = row.Slice(offset, darkColorString.Length);
                         sourceSpan.CopyTo(targetSpan);
                         offset += darkColorString.Length;
                     }
@@ -115,7 +115,7 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
             BLACK_ALL = " ",
         };
 
-        var moduleData = QrCodeData.ModuleMatrix;
+        List<BitArray> moduleData = QrCodeData.ModuleMatrix;
         int sbSize = (moduleData.Count + endOfLine.Length) * (int)Math.Ceiling(moduleData.Count / 2.0) - 1;
         var lineBuilder = new StringBuilder(sbSize);
 
@@ -176,7 +176,7 @@ public static class AsciiQRCodeHelper
     public static string GetQRCode(string plainText, int pixelsPerModule, string darkColorString, string whiteSpaceString, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, string endOfLine = "\n", bool drawQuietZones = true)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new AsciiQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorString, whiteSpaceString, drawQuietZones, endOfLine);
     }
@@ -197,7 +197,7 @@ public static class AsciiQRCodeHelper
     public static string GetQRCode(string plainText, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, string endOfLine = "\n", bool drawQuietZones = true, bool invert = true)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new AsciiQRCode(qrCodeData);
         return qrCode.GetGraphicSmall(drawQuietZones, invert, endOfLine);
     }

@@ -203,7 +203,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
     /// <param name="pathCommands">The builder receiving the PDF path commands.</param>
     private void CreatePathFromModules(StringBuilder pathCommands)
     {
-        var matrix = QrCodeData.ModuleMatrix;
+        List<BitArray> matrix = QrCodeData.ModuleMatrix;
         int size = matrix.Count;
 
         for (int y = 0; y < size; y++)
@@ -271,7 +271,7 @@ public static class PdfByteQRCodeHelper
         EciMode eciMode = EciMode.Default, int requestedVersion = -1)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
                 requestedVersion);
         using var qrCode = new PdfByteQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex);
@@ -287,7 +287,7 @@ public static class PdfByteQRCodeHelper
     public static byte[] GetQRCode(string txt, ECCLevel eccLevel, int size)
     {
         using var qrGen = new QRCodeGenerator();
-        using var qrCode = qrGen.CreateQrCode(txt, eccLevel);
+        using QRCodeData qrCode = qrGen.CreateQrCode(txt, eccLevel);
         using var qrBmp = new PdfByteQRCode(qrCode);
         return qrBmp.GetGraphic(size);
     }

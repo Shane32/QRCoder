@@ -7,7 +7,7 @@ public class ContactDataTests
     {
         string firstname = "John";
         string lastname = "Doe";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname);
 
@@ -36,7 +36,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
 
@@ -65,7 +65,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, addressOrder: PayloadGenerator.ContactData.AddressOrder.Reversed, org: org, orgTitle: orgTitle);
 
@@ -94,7 +94,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard21;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard21;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
 
@@ -123,7 +123,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
 
@@ -152,7 +152,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
 
@@ -181,7 +181,7 @@ public class ContactDataTests
         string zipCode = "12345";
         string country = "Starlight Country";
         string note = "Badass programmer.";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, addressOrder: PayloadGenerator.ContactData.AddressOrder.Reversed, org: org, orgTitle: orgTitle);
 
@@ -200,7 +200,7 @@ public class ContactDataTests
         string city = "Business City";
         string zipCode = "54321";
         string country = "Workland";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
 
         var generator = new PayloadGenerator.ContactData(
             outputType, firstname, lastname,
@@ -227,7 +227,7 @@ public class ContactDataTests
         string city = "Metro City";
         string zipCode = "98765";
         string country = "Businessland";
-        var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
+        PayloadGenerator.ContactData.ContactOutputType outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(
             outputType, firstname, lastname,

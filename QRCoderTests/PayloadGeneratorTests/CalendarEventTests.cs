@@ -11,7 +11,7 @@ public class CalendarEventTests
         bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 00);
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 
@@ -28,7 +28,7 @@ public class CalendarEventTests
         bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 0);
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.iCalComplete;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.iCalComplete;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 
@@ -45,7 +45,7 @@ public class CalendarEventTests
         bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00, DateTimeKind.Utc);
         var end = new DateTime(2016, 01, 03, 14, 30, 00, DateTimeKind.Utc);
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 
@@ -62,7 +62,7 @@ public class CalendarEventTests
         bool alldayEvent = false;
         var begin = new DateTimeOffset(2016, 01, 03, 12, 00, 00, new TimeSpan(3, 0, 0));
         var end = new DateTimeOffset(2016, 01, 03, 14, 30, 00, new TimeSpan(3, 0, 0));
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 
@@ -79,7 +79,7 @@ public class CalendarEventTests
         bool alldayEvent = true;
         var begin = new DateTime(2016, 01, 03);
         var end = new DateTime(2016, 01, 03);
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 
@@ -96,7 +96,7 @@ public class CalendarEventTests
         bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 0);
-        var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
+        PayloadGenerator.CalendarEvent.EventEncoding encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
 
         var generator = new PayloadGenerator.CalendarEvent(subject, description, location, begin, end, alldayEvent, encoding);
 

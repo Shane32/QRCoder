@@ -67,7 +67,7 @@ public class BitcoinCashAddressTests
         var currentCulture = CultureInfo.DefaultThreadCurrentCulture;
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
 #else
-        var currentCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
         Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 #endif
 

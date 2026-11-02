@@ -8,7 +8,7 @@ public class MailTests
         string receiver = "john@doe.com";
         string subject = "A test mail";
         string message = "Just see if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, message, encoding);
 
@@ -20,7 +20,7 @@ public class MailTests
     public void mail_should_build_type_mailto_receiver_only()
     {
         string receiver = "john@doe.com";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
 
         var generator = new PayloadGenerator.Mail(mailReceiver: receiver, encoding: encoding);
 
@@ -33,7 +33,7 @@ public class MailTests
     {
         string receiver = "john@doe.com";
         string subject = "A test mail";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, encoding: encoding);
 
@@ -45,7 +45,7 @@ public class MailTests
     {
         string receiver = "john@doe.com";
         string message = "Just see if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
 
         var generator = new PayloadGenerator.Mail(receiver, message: message, encoding: encoding);
 
@@ -57,7 +57,7 @@ public class MailTests
     {
         string subject = "A test mail";
         string message = "Just see if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MAILTO;
 
         var generator = new PayloadGenerator.Mail(subject: subject, message: message, encoding: encoding);
 
@@ -70,7 +70,7 @@ public class MailTests
         string receiver = "john@doe.com";
         string subject = "A test mail";
         string message = "Just see if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MATMSG;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MATMSG;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, message, encoding);
 
@@ -84,7 +84,7 @@ public class MailTests
         string receiver = "john@doe.com";
         string subject = "A test mail";
         string message = "Just see if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.SMTP;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.SMTP;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, message, encoding);
 
@@ -98,7 +98,7 @@ public class MailTests
         string receiver = "john@doe.com";
         string subject = "A test mail";
         string message = "Just see if \\:;, it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.MATMSG;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.MATMSG;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, message, encoding);
 
@@ -111,7 +111,7 @@ public class MailTests
         string receiver = "john@doe.com";
         string subject = "A test mail";
         string message = "Just see: if it works!";
-        var encoding = PayloadGenerator.Mail.MailEncoding.SMTP;
+        PayloadGenerator.Mail.MailEncoding encoding = PayloadGenerator.Mail.MailEncoding.SMTP;
 
         var generator = new PayloadGenerator.Mail(receiver, subject, message, encoding);
 

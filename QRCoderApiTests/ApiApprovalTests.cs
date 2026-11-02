@@ -79,7 +79,7 @@ public class ApiApprovalTests
         }
         else
         {
-            foreach (var item in publicApi.ToLookup(item => item.content))
+            foreach (IGrouping<string, (string tfm, string content)> item in publicApi.ToLookup(item => item.content))
             {
                 AutoApproveOrFail(item.Key, string.Join("+", item.Select(x => x.tfm).OrderBy(x => x)));
             }

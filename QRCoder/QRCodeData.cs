@@ -156,7 +156,7 @@ public class QRCodeData : IDisposable
 
     private void WriteRawData(Stream output, Compression compressMode)
     {
-        var targetStream = output;
+        Stream targetStream = output;
         DeflateStream? deflateStream = null;
         GZipStream? gzipStream = null;
 
@@ -188,7 +188,7 @@ public class QRCodeData : IDisposable
             int data = 0;
             int bits = 0;
 
-            foreach (var row in ModuleMatrix)
+            foreach (BitArray row in ModuleMatrix)
             {
                 for (int i = 0; i < row.Length; i++)
                 {

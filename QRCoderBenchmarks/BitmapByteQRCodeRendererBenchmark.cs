@@ -10,7 +10,7 @@ public class BitmapByteQRCodeRendererBenchmark
 
     public BitmapByteQRCodeRendererBenchmark()
     {
-        var eccLvl = QRCoder.QRCodeGenerator.ECCLevel.L;
+        QRCodeGenerator.ECCLevel eccLvl = QRCoder.QRCodeGenerator.ECCLevel.L;
         _samples = new Dictionary<string, QRCodeData>()
         {
             { "small", QRCoder.QRCodeGenerator.GenerateQrCode("ABCD", eccLvl) },

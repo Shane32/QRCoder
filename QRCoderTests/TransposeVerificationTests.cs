@@ -44,7 +44,7 @@ public class TransposeVerificationTests
     private byte[] GetQRCodeBytes()
     {
         var qrCode = new QRCode(_sharedQrCodeData);
-        using var bitmap = qrCode.GetGraphic(10);
+        using Bitmap bitmap = qrCode.GetGraphic(10);
         using var ms = new MemoryStream();
         bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
         return ms.ToArray();
@@ -76,7 +76,7 @@ public class TransposeVerificationTests
         int bitmapSize = _sharedQrCodeData.ModuleMatrix.Count * 10;
         // use Svg.Net to render SVG to bitmap for comparison
         var svgDoc = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(svgString);
-        using var bitmap = svgDoc.Draw(bitmapSize, bitmapSize);
+        using Bitmap bitmap = svgDoc.Draw(bitmapSize, bitmapSize);
         using var ms = new MemoryStream();
         bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
         return ms.ToArray();
@@ -86,7 +86,7 @@ public class TransposeVerificationTests
     public void artqrcode_renderer()
     {
         var qrCode = new ArtQRCode(_sharedQrCodeData);
-        using var bitmap = qrCode.GetGraphic(10, Color.Black, Color.White, Color.White, null, 1, true, ArtQRCode.QuietZoneStyle.Flat, ArtQRCode.BackgroundImageStyle.Fill, null);
+        using Bitmap bitmap = qrCode.GetGraphic(10, Color.Black, Color.White, Color.White, null, 1, true, ArtQRCode.QuietZoneStyle.Flat, ArtQRCode.BackgroundImageStyle.Fill, null);
         bitmap.ShouldMatchApproved();
     }
 #endif
@@ -164,7 +164,7 @@ public class TransposeVerificationTests
 
         // Render this reference image for human verification
         var qrCode = new QRCode(referenceData);
-        using var bitmap = qrCode.GetGraphic(10);
+        using Bitmap bitmap = qrCode.GetGraphic(10);
         bitmap.ShouldMatchApproved();
     }
 #endif

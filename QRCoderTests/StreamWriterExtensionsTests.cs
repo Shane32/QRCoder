@@ -8,7 +8,7 @@ public class StreamWriterExtensionsTests
     [Fact]
     public void can_write_numbers_using_invariant_culture()
     {
-        var originalCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo originalCulture = Thread.CurrentThread.CurrentCulture;
         var culture = new CultureInfo("de-DE");
         culture.NumberFormat.NegativeSign = "~";
         culture.NumberFormat.PositiveSign = "^";

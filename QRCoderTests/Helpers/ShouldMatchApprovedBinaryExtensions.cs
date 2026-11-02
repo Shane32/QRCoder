@@ -21,7 +21,7 @@ public static partial class ShouldMatchApprovedExtensions
     public static void ShouldMatchApproved(this Bitmap image, string? discriminator = null, string? customMessage = null, bool asMonochrome = false)
     {
         // encode to gif first for easier visual verification, and using a third party lib to avoid platform-specific compression differences
-        var readableBitmapData = image.GetReadableBitmapData();
+        IReadableBitmapData readableBitmapData = image.GetReadableBitmapData();
         if (asMonochrome)
             readableBitmapData = readableBitmapData.Clone(KnownPixelFormat.Format1bppIndexed);
         using var ms = new MemoryStream();
@@ -40,9 +40,9 @@ public static partial class ShouldMatchApprovedExtensions
 
         for (int i = 1; i < stackTrace.FrameCount; i++)
         {
-            var currentFrame = stackTrace.GetFrame(i);
-            var currentMethod = currentFrame?.GetMethod();
-            var declaringType = currentMethod?.DeclaringType;
+            StackFrame? currentFrame = stackTrace.GetFrame(i);
+            MethodBase? currentMethod = currentFrame?.GetMethod();
+            Type? declaringType = currentMethod?.DeclaringType;
 
             // Check if the declaring type has the ShouldlyMethods attribute
             bool hasShouldlyAttribute = declaringType?.GetCustomAttributes(typeof(ShouldlyMethodsAttribute), false).Length > 0;

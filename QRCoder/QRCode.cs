@@ -88,7 +88,7 @@ public class QRCode : AbstractQRCode, IDisposable
             bool drawIconFlag = icon != null && iconSizePercent > 0 && iconSizePercent <= 100;
 
             // Create path for all dark modules using RLE
-            using (var darkPath = CreatePathFromModules(pixelsPerModule, offset, drawQuietZones))
+            using (GraphicsPath darkPath = CreatePathFromModules(pixelsPerModule, offset, drawQuietZones))
             {
                 gfx.FillPath(darkBrush, darkPath);
             }
@@ -104,11 +104,11 @@ public class QRCode : AbstractQRCode, IDisposable
                 float iconY = (bmp.Height - iconDestHeight) / 2;
                 var centerDest = new RectangleF(iconX - iconBorderWidth, iconY - iconBorderWidth, iconDestWidth + iconBorderWidth * 2, iconDestHeight + iconBorderWidth * 2);
                 var iconDestRect = new RectangleF(iconX, iconY, iconDestWidth, iconDestHeight);
-                var iconBgBrush = iconBackgroundColor != null ? new SolidBrush((Color)iconBackgroundColor) : lightBrush;
+                SolidBrush iconBgBrush = iconBackgroundColor != null ? new SolidBrush((Color)iconBackgroundColor) : lightBrush;
                 //Only render icon/logo background, if iconBorderWith is set > 0
                 if (iconBorderWidth > 0)
                 {
-                    using var iconPath = CreateRoundedRectanglePath(centerDest, iconBorderWidth * 2);
+                    using GraphicsPath iconPath = CreateRoundedRectanglePath(centerDest, iconBorderWidth * 2);
                     gfx.FillPath(iconBgBrush, iconPath);
                 }
                 gfx.DrawImage(icon!, iconDestRect, new RectangleF(0, 0, icon!.Width, icon.Height), GraphicsUnit.Pixel);
@@ -131,7 +131,7 @@ public class QRCode : AbstractQRCode, IDisposable
     private GraphicsPath CreatePathFromModules(int pixelsPerModule, int offset, bool drawQuietZones)
     {
         var path = new GraphicsPath();
-        var matrix = QrCodeData.ModuleMatrix;
+        List<BitArray> matrix = QrCodeData.ModuleMatrix;
         int size = matrix.Count;
         int startIdx = drawQuietZones ? 0 : 4;
         int endIdx = drawQuietZones ? size : size - 4;
@@ -218,7 +218,7 @@ public static class QRCodeHelper
     public static Bitmap GetQRCode(string plainText, int pixelsPerModule, Color darkColor, Color lightColor, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, Bitmap? icon = null, int iconSizePercent = 15, int iconBorderWidth = 0, bool drawQuietZones = true)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new QRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColor, lightColor, icon, iconSizePercent, iconBorderWidth, drawQuietZones);
     }

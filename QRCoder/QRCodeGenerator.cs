@@ -109,7 +109,7 @@ public partial class QRCodeGenerator : IDisposable
     {
         eccLevel = ValidateECCLevel(eccLevel);
         // Create data segment from plain text
-        var segment = CreateDataSegment(plainText, forceUtf8, utf8BOM, eciMode);
+        DataSegment segment = CreateDataSegment(plainText, forceUtf8, utf8BOM, eciMode);
         // Determine the appropriate version based on segment bit length
         int version = DetermineVersion(segment, eccLevel, requestedVersion);
         // Build the complete bit array for the determined version
@@ -126,7 +126,7 @@ public partial class QRCodeGenerator : IDisposable
         if (!forceUtf8 && !utf8BOM && eciMode == EciMode.Default && OptimizedLatin1DataSegment.CanEncode(plainText))
             return new OptimizedLatin1DataSegment(plainText);
 
-        var encoding = GetEncodingFromPlaintext(plainText, forceUtf8);
+        EncodingMode encoding = GetEncodingFromPlaintext(plainText, forceUtf8);
 
         // Use specialized segment classes based on encoding mode
         return encoding switch
@@ -194,8 +194,8 @@ public partial class QRCodeGenerator : IDisposable
         if (plainText == null)
             throw new ArgumentNullException(nameof(plainText));
 
-        var encoding = GetEncodingFromPlaintext(plainText, false);
-        var codedText = PlainTextToBinary(plainText, encoding, EciMode.Default, false, false);
+        EncodingMode encoding = GetEncodingFromPlaintext(plainText, false);
+        BitArray codedText = PlainTextToBinary(plainText, encoding, EciMode.Default, false, false);
         int dataInputLength = GetDataLength(encoding, plainText, codedText, false);
         int version = requestedVersion;
         int minVersion = CapacityTables.CalculateMinimumMicroVersion(dataInputLength, encoding, eccLevel);
@@ -265,7 +265,7 @@ public partial class QRCodeGenerator : IDisposable
 
         int countIndicatorLen = GetCountIndicatorLength(version, EncodingMode.Byte);
         // Convert byte array to bit array, with prefix padding for mode indicator and count indicator
-        var bitArray = ToBitArray(binaryData, prefixZeros: 4 + countIndicatorLen);
+        BitArray bitArray = ToBitArray(binaryData, prefixZeros: 4 + countIndicatorLen);
         // Add mode indicator and count indicator
         int index = DecToBin((int)EncodingMode.Byte, 4, bitArray, 0);
         DecToBin(binaryData.Length, countIndicatorLen, bitArray, index);
@@ -301,22 +301,22 @@ public partial class QRCodeGenerator : IDisposable
     /// <returns>A QRCodeData structure containing the full QR code matrix, which can be used for rendering or analysis.</returns>
     private static QRCodeData GenerateQrCode(BitArray bitArray, ECCLevel eccLevel, int version)
     {
-        var eccInfo = CapacityTables.GetEccInfo(version, eccLevel);
+        ECCInfo eccInfo = CapacityTables.GetEccInfo(version, eccLevel);
 
         // Fill up data code word
         PadData();
 
         // Calculate error correction blocks
-        var codeWordWithECC = CalculateECCBlocks();
+        List<CodewordBlock> codeWordWithECC = CalculateECCBlocks();
 
         // Calculate interleaved code word lengths
         int interleavedLength = CalculateInterleavedLength();
 
         // Interleave code words
-        var interleavedData = InterleaveData();
+        BitArray interleavedData = InterleaveData();
 
         // Place interleaved data on module matrix
-        var qrData = PlaceModules();
+        QRCodeData qrData = PlaceModules();
 
         CodewordBlock.ReturnList(codeWordWithECC);
 
@@ -382,7 +382,7 @@ public partial class QRCodeGenerator : IDisposable
                 groupLength = groupLength > count ? count : groupLength;
                 for (int i = 0; i < blocksInGroup; i++)
                 {
-                    var eccWordList = CalculateECCWords(bitArray, offset2, groupLength, eccInfo, generatorPolynom);
+                    ArraySegment<byte> eccWordList = CalculateECCWords(bitArray, offset2, groupLength, eccInfo, generatorPolynom);
                     codewordBlocks.Add(new CodewordBlock(offset2, groupLength, eccWordList));
                     offset2 += groupLength;
                 }
@@ -401,13 +401,13 @@ public partial class QRCodeGenerator : IDisposable
             }
             for (int i = 0; i < codewords; i++)
             {
-                foreach (var codeBlock in codeWordWithECC)
+                foreach (CodewordBlock codeBlock in codeWordWithECC)
                     if ((uint)codeBlock.CodeWordsLength / 8 > i)
                         length += 8;
             }
             for (int i = 0; i < eccInfo.ECCPerBlock; i++)
             {
-                foreach (var codeBlock in codeWordWithECC)
+                foreach (CodewordBlock codeBlock in codeWordWithECC)
                     if (codeBlock.ECCWords.Count > i)
                         length += 8;
             }
@@ -425,7 +425,7 @@ public partial class QRCodeGenerator : IDisposable
                 codewords--;
             for (int i = 0; i < Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2); i++)
             {
-                foreach (var codeBlock in codeWordWithECC)
+                foreach (CodewordBlock codeBlock in codeWordWithECC)
                 {
                     if ((uint)codeBlock.CodeWordsLength / 8 > i)
                         pos = bitArray.CopyTo(data, (int)((uint)i * 8) + codeBlock.CodeWordsOffset, pos, 8);
@@ -437,7 +437,7 @@ public partial class QRCodeGenerator : IDisposable
             }
             for (int i = 0; i < eccInfo.ECCPerBlock; i++)
             {
-                foreach (var codeBlock in codeWordWithECC)
+                foreach (CodewordBlock codeBlock in codeWordWithECC)
                     if (codeBlock.ECCWords.Count > i)
                         pos = DecToBin(codeBlock.ECCWords.Array![i], 8, data, pos);
             }
@@ -669,8 +669,8 @@ public partial class QRCodeGenerator : IDisposable
     {
         int eccWords = eccInfo.ECCPerBlock;
         // Calculate the message polynomial from the bit array data.
-        var messagePolynom = CalculateMessagePolynom(bitArray, offset, count);
-        var generatorPolynom = generatorPolynomBase.Clone();
+        Polynom messagePolynom = CalculateMessagePolynom(bitArray, offset, count);
+        Polynom generatorPolynom = generatorPolynomBase.Clone();
 
         // Adjust the exponents in the message polynomial to account for ECC length.
         for (int i = 0; i < messagePolynom.Count; i++)
@@ -683,7 +683,7 @@ public partial class QRCodeGenerator : IDisposable
                 generatorPolynom[i].Exponent + (messagePolynom.Count - 1));
 
         // Divide the message polynomial by the generator polynomial to find the remainder.
-        var leadTermSource = messagePolynom;
+        Polynom leadTermSource = messagePolynom;
         for (int i = 0; (leadTermSource.Count > 0 && leadTermSource[leadTermSource.Count - 1].Exponent > 0); i++)
         {
             if (leadTermSource[0].Coefficient == 0)  // Simplify the polynomial if the leading coefficient is zero.
@@ -698,9 +698,9 @@ public partial class QRCodeGenerator : IDisposable
                 int index0Coefficient = leadTermSource[0].Coefficient;
                 index0Coefficient = GaloisField.GetAlphaExpFromIntVal((byte)index0Coefficient);
                 var alphaNotation = new PolynomItem(index0Coefficient, leadTermSource[0].Exponent);
-                var resPoly = MultiplyGeneratorPolynomByLeadterm(generatorPolynom, alphaNotation, i);
+                Polynom resPoly = MultiplyGeneratorPolynomByLeadterm(generatorPolynom, alphaNotation, i);
                 ConvertToDecNotationInPlace(resPoly);
-                var newPoly = XORPolynoms(leadTermSource, resPoly);
+                Polynom newPoly = XORPolynoms(leadTermSource, resPoly);
                 // Free memory used by the previous polynomials.
                 resPoly.Dispose();
                 leadTermSource.Dispose();
@@ -751,7 +751,7 @@ public partial class QRCodeGenerator : IDisposable
     {
         if (forceUtf8)
             return EncodingMode.Byte;
-        var result = EncodingMode.Numeric; // assume numeric
+        EncodingMode result = EncodingMode.Numeric; // assume numeric
         foreach (char c in plainText)
         {
             if (IsInRange(c, '0', '9'))
@@ -1066,7 +1066,7 @@ public partial class QRCodeGenerator : IDisposable
     private static Polynom MultiplyGeneratorPolynomByLeadterm(Polynom genPolynom, PolynomItem leadTerm, int lowerExponentBy)
     {
         var resultPolynom = new Polynom(genPolynom.Count);
-        foreach (var polItemBase in genPolynom)
+        foreach (PolynomItem polItemBase in genPolynom)
         {
             var polItemRes = new PolynomItem(
                 (polItemBase.Coefficient + leadTerm.Coefficient) % 255,

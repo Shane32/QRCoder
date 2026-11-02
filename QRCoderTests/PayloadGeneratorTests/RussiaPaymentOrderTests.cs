@@ -66,7 +66,7 @@ public class RussiaPaymentOrderTests
         string correspAcc = "30101810400000000225";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
         exception.Message.ShouldBe("No valid separator found.");
     }
 
@@ -82,7 +82,7 @@ public class RussiaPaymentOrderTests
         string correspAcc = "30101810400000000225";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
         exception.Message.ShouldStartWith("Data too long");
     }
 
@@ -117,7 +117,7 @@ public class RussiaPaymentOrderTests
         string name = "|@;:^_~{}!#$%&()*+,/";
         string correspAcc = "30101810400000000225";
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account!, bankName, bic, correspAcc));
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account!, bankName, bic, correspAcc));
         exception.Message.ShouldBe($"The input for 'PersonalAcc' must not be null.");
     }
 
@@ -130,7 +130,7 @@ public class RussiaPaymentOrderTests
         string name = "|@;:^_~{}!#$%&()*+,/";
         string correspAcc = "30101810400000000225";
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc));
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc));
         exception.Message.ShouldBe("The input for 'BIC' (abcd) doesn't match the pattern ^\\d{9}$");
     }
 

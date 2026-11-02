@@ -22,7 +22,7 @@ public static class ReadmeSamples
     public static void QuickStart_SimpleSvg()
     {
         // Generate a scalable black and white SVG QR code
-        using var qrCodeData = QRCodeGenerator.GenerateQrCode("Hello World", QRCodeGenerator.ECCLevel.Q);
+        using QRCodeData qrCodeData = QRCodeGenerator.GenerateQrCode("Hello World", QRCodeGenerator.ECCLevel.Q);
         using var svgRenderer = new SvgQRCode(qrCodeData);
         string svg = svgRenderer.GetGraphic();
     }
@@ -36,10 +36,10 @@ public static class ReadmeSamples
         var bookmarkPayload = new PayloadGenerator.Bookmark("https://github.com/Shane32/QRCoder", "QRCoder Repository");
 
         // Generate the QR code data from the payload
-        using var qrCodeData = QRCodeGenerator.GenerateQrCode(bookmarkPayload);
+        using QRCodeData qrCodeData = QRCodeGenerator.GenerateQrCode(bookmarkPayload);
 
         // Or override the ECC level
-        using var qrCodeData2 = QRCodeGenerator.GenerateQrCode(bookmarkPayload, QRCodeGenerator.ECCLevel.H);
+        using QRCodeData qrCodeData2 = QRCodeGenerator.GenerateQrCode(bookmarkPayload, QRCodeGenerator.ECCLevel.H);
 
         // Render the QR code
         using var pngRenderer = new PngByteQRCode(qrCodeData);
@@ -52,7 +52,7 @@ public static class ReadmeSamples
     public static void MicroQRCode_Simple()
     {
         // Generate a Micro QR code (versions M1-M4, represented as -1 to -4)
-        using var qrCodeData = QRCodeGenerator.GenerateMicroQrCode("Hello", QRCodeGenerator.ECCLevel.L, requestedVersion: -2);
+        using QRCodeData qrCodeData = QRCodeGenerator.GenerateMicroQrCode("Hello", QRCodeGenerator.ECCLevel.L, requestedVersion: -2);
         using var qrCode = new PngByteQRCode(qrCodeData);
         byte[] qrCodeImage = qrCode.GetGraphic(20);
     }
@@ -63,10 +63,10 @@ public static class ReadmeSamples
     public static void QRCodeData_ModuleMatrix()
     {
         // Generate QR code data
-        using var qrCodeData = QRCodeGenerator.GenerateQrCode("Hello World", QRCodeGenerator.ECCLevel.Q);
+        using QRCodeData qrCodeData = QRCodeGenerator.GenerateQrCode("Hello World", QRCodeGenerator.ECCLevel.Q);
 
         // Access the module matrix
-        var moduleMatrix = qrCodeData.ModuleMatrix;
+        List<BitArray> moduleMatrix = qrCodeData.ModuleMatrix;
         int size = moduleMatrix.Count; // Size of the QR code (includes quiet zone)
 
         // Manually render as ASCII (versus the included ASCII renderer)

@@ -84,20 +84,20 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             {
                 if (backgroundImageStyle == BackgroundImageStyle.Fill)
                 {
-                    using var resizedBg = Resize(backgroundImage, size);
+                    using Bitmap resizedBg = Resize(backgroundImage, size);
                     graphics.DrawImage(resizedBg, 0, 0);
                 }
                 else if (backgroundImageStyle == BackgroundImageStyle.DataAreaOnly)
                 {
                     int bgOffset = 4 - offset;
-                    using var resizedBg = Resize(backgroundImage, size - (2 * bgOffset * pixelsPerModule));
+                    using Bitmap resizedBg = Resize(backgroundImage, size - (2 * bgOffset * pixelsPerModule));
                     graphics.DrawImage(resizedBg, 0 + (bgOffset * pixelsPerModule), (bgOffset * pixelsPerModule));
                 }
             }
 
 
-            using var darkModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, darkBrush);
-            using var lightModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, lightBrush);
+            using Bitmap darkModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, darkBrush);
+            using Bitmap lightModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, lightBrush);
 
             for (int x = 0; x < numModules; x += 1)
             {
@@ -106,8 +106,8 @@ public class ArtQRCode : AbstractQRCode, IDisposable
                     var rectangleF = new Rectangle(x * pixelsPerModule, y * pixelsPerModule, pixelsPerModule, pixelsPerModule);
 
                     bool pixelIsDark = QrCodeData.ModuleMatrix[offset + y][offset + x];
-                    var solidBrush = pixelIsDark ? darkBrush : lightBrush;
-                    var pixelImage = pixelIsDark ? darkModulePixel : lightModulePixel;
+                    SolidBrush solidBrush = pixelIsDark ? darkBrush : lightBrush;
+                    Bitmap pixelImage = pixelIsDark ? darkModulePixel : lightModulePixel;
 
                     if (!IsPartOfFinderPattern(x, y, numModules, offset))
                         if (drawQuietZones && quietZoneRenderingStyle == QuietZoneStyle.Flat && IsPartOfQuietZone(x, y, numModules))
@@ -301,7 +301,7 @@ public static class ArtQRCodeHelper
                                    BackgroundImageStyle backgroundImageStyle = BackgroundImageStyle.DataAreaOnly, Bitmap? finderPatternImage = null)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new ArtQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColor, lightColor, backgroundColor, backgroundImage, pixelSizeFactor, drawQuietZones, quietZoneRenderingStyle, backgroundImageStyle, finderPatternImage);
     }

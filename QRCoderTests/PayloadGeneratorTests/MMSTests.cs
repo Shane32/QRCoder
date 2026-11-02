@@ -7,7 +7,7 @@ public class MMSTests
     {
         string number = "01601234567";
         string message = "A tiny MMS";
-        var encoding = PayloadGenerator.MMS.MMSEncoding.MMS;
+        PayloadGenerator.MMS.MMSEncoding encoding = PayloadGenerator.MMS.MMSEncoding.MMS;
 
         var generator = new PayloadGenerator.MMS(number, message, encoding);
 
@@ -20,7 +20,7 @@ public class MMSTests
     {
         string number = "01601234567";
         string message = "A tiny SMS";
-        var encoding = PayloadGenerator.MMS.MMSEncoding.MMSTO;
+        PayloadGenerator.MMS.MMSEncoding encoding = PayloadGenerator.MMS.MMSEncoding.MMSTO;
 
         var generator = new PayloadGenerator.MMS(number, message, encoding);
 

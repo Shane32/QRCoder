@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Markup;
@@ -19,8 +20,8 @@ internal sealed class MainClass
 
         string? fileName = null, outputFileName = null, payload = null;
 
-        var eccLevel = QRCodeGenerator.ECCLevel.L;
-        var imageFormat = SupportedImageFormat.Png;
+        QRCodeGenerator.ECCLevel eccLevel = QRCodeGenerator.ECCLevel.L;
+        SupportedImageFormat imageFormat = SupportedImageFormat.Png;
 
         int pixelsPerModule = 20;
         string foregroundColor = "#000000";
@@ -113,7 +114,7 @@ internal sealed class MainClass
             }
             else
             {
-                var stdin = Console.OpenStandardInput();
+                Stream stdin = Console.OpenStandardInput();
 
                 text = GetTextFromStream(stdin);
             }
@@ -134,7 +135,7 @@ internal sealed class MainClass
     private static void GenerateQRCode(string payloadString, QRCodeGenerator.ECCLevel eccLevel, string outputFileName, SupportedImageFormat imgFormat, int pixelsPerModule, string foreground, string background)
     {
         using var generator = new QRCodeGenerator();
-        using var data = generator.CreateQrCode(payloadString, eccLevel);
+        using QRCodeData data = generator.CreateQrCode(payloadString, eccLevel);
         switch (imgFormat)
         {
             case SupportedImageFormat.Png:
@@ -144,8 +145,8 @@ internal sealed class MainClass
             case SupportedImageFormat.Tiff:
                 using (var code = new QRCode(data))
                 {
-                    using var bitmap = code.GetGraphic(pixelsPerModule, foreground, background, true);
-                    var actualFormat = OptionSetter.GetImageFormat(imgFormat.ToString());
+                    using Bitmap bitmap = code.GetGraphic(pixelsPerModule, foreground, background, true);
+                    ImageFormat actualFormat = OptionSetter.GetImageFormat(imgFormat.ToString());
                     bitmap.Save(outputFileName, actualFormat);
                 }
                 break;
@@ -153,7 +154,7 @@ internal sealed class MainClass
                 using (var code = new SvgQRCode(data))
                 {
                     string test = code.GetGraphic(pixelsPerModule, foreground, background, true);
-                    using var f = File.CreateText(outputFileName);
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }
@@ -163,7 +164,7 @@ internal sealed class MainClass
                 using (var code = new QRCoder.Xaml.XamlQRCode(data))
                 {
                     string test = XamlWriter.Save(code.GetGraphic(pixelsPerModule, foreground, background, true));
-                    using var f = File.CreateText(outputFileName);
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }
@@ -175,7 +176,7 @@ internal sealed class MainClass
                 {
                     string test = code.GetGraphic(pixelsPerModule, foreground, background, true,
                         imgFormat == SupportedImageFormat.Eps);
-                    using var f = File.CreateText(outputFileName);
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }

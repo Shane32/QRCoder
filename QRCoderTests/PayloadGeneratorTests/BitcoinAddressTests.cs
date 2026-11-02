@@ -63,7 +63,7 @@ public class BitcoinAddressTests
     [Fact]
     public void bitcoin_address_generator_disregards_current_culture()
     {
-        var currentCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
         Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 
         string address = "175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W";

@@ -92,7 +92,7 @@ public class Base64QRCode : AbstractQRCode, IDisposable
 #pragma warning disable CA1416 // Validate platform compatibility
         var qr = new QRCode(QrCodeData);
         string base64 = string.Empty;
-        using (var bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, drawQuietZones))
+        using (Bitmap bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, drawQuietZones))
         {
             base64 = BitmapToBase64(bmp, imgType);
         }
@@ -123,7 +123,7 @@ public class Base64QRCode : AbstractQRCode, IDisposable
     {
         var qr = new QRCode(QrCodeData);
         string base64 = string.Empty;
-        using (var bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, icon, iconSizePercent, iconBorderWidth, drawQuietZones))
+        using (Bitmap bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, icon, iconSizePercent, iconBorderWidth, drawQuietZones))
         {
             base64 = BitmapToBase64(bmp, imgType);
         }
@@ -143,7 +143,7 @@ public class Base64QRCode : AbstractQRCode, IDisposable
 #endif
     private static string BitmapToBase64(Bitmap bmp, ImageType imgType)
     {
-        var iFormat = imgType switch
+        ImageFormat iFormat = imgType switch
         {
             ImageType.Png => ImageFormat.Png,
             ImageType.Jpeg => ImageFormat.Jpeg,
@@ -206,7 +206,7 @@ public static class Base64QRCodeHelper
     public static string GetQRCode(string plainText, int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, bool drawQuietZones = true, ImageType imgType = ImageType.Png)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new Base64QRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex, drawQuietZones, imgType);
     }
