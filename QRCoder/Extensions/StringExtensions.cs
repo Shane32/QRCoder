@@ -49,7 +49,7 @@ internal static class StringExtensions
     /// <returns>Returns the color as a byte array.</returns>
     internal static byte[] HexColorToByteArray(this string colorString)
     {
-        var offset = 0;
+        int offset = 0;
         if (colorString.StartsWith('#'))
             offset = 1;
         byte[] byteColor = new byte[(colorString.Length - offset) / 2];

@@ -17,32 +17,32 @@ public static partial class PayloadGenerator
     internal static bool IsValidIban(string iban)
     {
         //Clean IBAN
-        var ibanCleared = iban.ToUpperInvariant().Replace(" ", "").Replace("-", "");
+        string ibanCleared = iban.ToUpperInvariant().Replace(" ", "").Replace("-", "");
 
         //Check for general structure
-        var structurallyValid = Regex.IsMatch(ibanCleared, @"^[a-zA-Z]{2}[0-9]{2}([a-zA-Z0-9]?){16,30}$");
+        bool structurallyValid = Regex.IsMatch(ibanCleared, @"^[a-zA-Z]{2}[0-9]{2}([a-zA-Z0-9]?){16,30}$");
 
         //Check IBAN checksum
-        var checksumValid = false;
-        var reorderedIban = $"{ibanCleared.Substring(4)}{ibanCleared.Substring(0, 4)}";
+        bool checksumValid = false;
+        string reorderedIban = $"{ibanCleared.Substring(4)}{ibanCleared.Substring(0, 4)}";
         var sumBuilder = new StringBuilder(reorderedIban.Length * 2);
-        foreach (var c in reorderedIban)
+        foreach (char c in reorderedIban)
         {
             if (char.IsLetter(c))
                 sumBuilder.Append((c - 55).ToString(CultureInfo.InvariantCulture));
             else
                 sumBuilder.Append(c);
         }
-        var sum = sumBuilder.ToString();
+        string sum = sumBuilder.ToString();
         int m = 0;
         for (int i = 0; i < (int)Math.Ceiling((sum.Length - 2) / 7d); i++)
         {
-            var offset = (i == 0 ? 0 : 2);
-            var start = i * 7 + offset;
+            int offset = (i == 0 ? 0 : 2);
+            int start = i * 7 + offset;
 #if NET5_0_OR_GREATER
-            var n = string.Concat(i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture), sum.AsSpan(start, Math.Min(9 - offset, sum.Length - start)));
+            string n = string.Concat(i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture), sum.AsSpan(start, Math.Min(9 - offset, sum.Length - start)));
 #else
-            var n = (i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture)) + sum.Substring(start, Math.Min(9 - offset, sum.Length - start));
+            string n = (i == 0 ? "" : m.ToString(CultureInfo.InvariantCulture)) + sum.Substring(start, Math.Min(9 - offset, sum.Length - start));
 #endif
             if (!int.TryParse(n, NumberStyles.Any, CultureInfo.InvariantCulture, out m))
                 break;
@@ -59,11 +59,11 @@ public static partial class PayloadGenerator
     /// <returns>True if the QR IBAN is valid; otherwise, false.</returns>
     internal static bool IsValidQRIban(string iban)
     {
-        var foundQrIid = false;
+        bool foundQrIid = false;
         try
         {
-            var ibanCleared = iban.ToUpperInvariant().Replace(" ", "").Replace("-", "");
-            var possibleQrIid = Convert.ToInt32(ibanCleared.Substring(4, 5), CultureInfo.InvariantCulture);
+            string ibanCleared = iban.ToUpperInvariant().Replace(" ", "").Replace("-", "");
+            int possibleQrIid = Convert.ToInt32(ibanCleared.Substring(4, 5), CultureInfo.InvariantCulture);
             foundQrIid = possibleQrIid >= 30000 && possibleQrIid <= 31999;
         }
         catch { }
@@ -119,7 +119,7 @@ public static partial class PayloadGenerator
         {
             forbiddenChars = new char[1] { ':' };
         }
-        foreach (var c in forbiddenChars)
+        foreach (char c in forbiddenChars)
         {
             inp = inp.Replace(c.ToString(), "\\" + c);
         }
@@ -142,10 +142,10 @@ public static partial class PayloadGenerator
         int remainder = 0;
         for (int i = 0; i < digits.Length - 1; i++)
         {
-            var num = Convert.ToInt32(digits[i]) - 48;
+            int num = Convert.ToInt32(digits[i]) - 48;
             remainder = mods[(num + remainder) % 10];
         }
-        var checksum = (10 - remainder) % 10;
+        int checksum = (10 - remainder) % 10;
         return checksum == Convert.ToInt32(digits[digits.Length - 1]) - 48;
     }
 

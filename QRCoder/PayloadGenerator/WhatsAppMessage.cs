@@ -40,7 +40,7 @@ public static partial class PayloadGenerator
         /// <returns>The WhatsApp message URL as a string.</returns>
         public override string ToString()
         {
-            var cleanedPhone = Regex.Replace(_number, @"^[0+]+|[ ()-]", string.Empty);
+            string cleanedPhone = Regex.Replace(_number, @"^[0+]+|[ ()-]", string.Empty);
             return ($"https://wa.me/{cleanedPhone}?text={Uri.EscapeDataString(_message)}");
         }
     }

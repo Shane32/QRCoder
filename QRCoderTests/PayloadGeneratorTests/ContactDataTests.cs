@@ -5,8 +5,8 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_simple_mecard()
     {
-        var firstname = "John";
-        var lastname = "Doe";
+        string firstname = "John";
+        string lastname = "Doe";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname);
@@ -19,23 +19,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_mecard()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
@@ -48,23 +48,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_mecard_reversed()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.MeCard;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, addressOrder: PayloadGenerator.ContactData.AddressOrder.Reversed, org: org, orgTitle: orgTitle);
@@ -77,23 +77,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_vcard21()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard21;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
@@ -106,23 +106,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_vcard3()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
@@ -135,23 +135,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_vcard4()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, org: org, orgTitle: orgTitle);
@@ -164,23 +164,23 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_payload_full_vcard4_reverse()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var nickname = "Johnny";
-        var org = "Johnny's Badass Programming";
-        var orgTitle = "Badass Manager";
-        var phone = "+4253212222";
-        var mobilePhone = "+421701234567";
-        var workPhone = "+4253211337";
-        var email = "me@john.doe";
+        string firstname = "John";
+        string lastname = "Doe";
+        string nickname = "Johnny";
+        string org = "Johnny's Badass Programming";
+        string orgTitle = "Badass Manager";
+        string phone = "+4253212222";
+        string mobilePhone = "+421701234567";
+        string workPhone = "+4253211337";
+        string email = "me@john.doe";
         var birthday = new DateTime(1970, 02, 01);
-        var website = "http://john.doe";
-        var street = "Long street";
-        var houseNumber = "42";
-        var city = "Super-Town";
-        var zipCode = "12345";
-        var country = "Starlight Country";
-        var note = "Badass programmer.";
+        string website = "http://john.doe";
+        string street = "Long street";
+        string houseNumber = "42";
+        string city = "Super-Town";
+        string zipCode = "12345";
+        string country = "Starlight Country";
+        string note = "Badass programmer.";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(outputType, firstname, lastname, nickname, phone, mobilePhone, workPhone, email, birthday, website, street, houseNumber, city, zipCode, country, note, addressOrder: PayloadGenerator.ContactData.AddressOrder.Reversed, org: org, orgTitle: orgTitle);
@@ -193,13 +193,13 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_work_address_vcard3()
     {
-        var firstname = "John";
-        var lastname = "Doe";
-        var street = "Office Boulevard";
-        var houseNumber = "100";
-        var city = "Business City";
-        var zipCode = "54321";
-        var country = "Workland";
+        string firstname = "John";
+        string lastname = "Doe";
+        string street = "Office Boulevard";
+        string houseNumber = "100";
+        string city = "Business City";
+        string zipCode = "54321";
+        string country = "Workland";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard3;
 
         var generator = new PayloadGenerator.ContactData(
@@ -220,13 +220,13 @@ public class ContactDataTests
     [Fact]
     public void contactdata_generator_can_generate_work_preferred_address_vcard4()
     {
-        var firstname = "Jane";
-        var lastname = "Smith";
-        var street = "Corporate Street";
-        var houseNumber = "200";
-        var city = "Metro City";
-        var zipCode = "98765";
-        var country = "Businessland";
+        string firstname = "Jane";
+        string lastname = "Smith";
+        string street = "Corporate Street";
+        string houseNumber = "200";
+        string city = "Metro City";
+        string zipCode = "98765";
+        string country = "Businessland";
         var outputType = PayloadGenerator.ContactData.ContactOutputType.VCard4;
 
         var generator = new PayloadGenerator.ContactData(

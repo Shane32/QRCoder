@@ -62,8 +62,8 @@ public static partial class PayloadGenerator
         /// <returns>The payload as a string.</returns>
         public override string ToString()
         {
-            var cp = _characterSet.ToString().Replace("_", "-");
-            var bytes = ToBytes();
+            string cp = _characterSet.ToString().Replace("_", "-");
+            byte[] bytes = ToBytes();
 
 #if !NETFRAMEWORK
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -84,7 +84,7 @@ public static partial class PayloadGenerator
 #if !NETFRAMEWORK
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-            var cp = _characterSet.ToString().Replace("_", "-");
+            string cp = _characterSet.ToString().Replace("_", "-");
 
             //Calculate the seperator
             _separator = DetermineSeparator();
@@ -96,7 +96,7 @@ public static partial class PayloadGenerator
             retBuilder.AppendInvariant($"{_separator}BankName={_mFields.BankName}");
             retBuilder.AppendInvariant($"{_separator}BIC={_mFields.BIC}");
             retBuilder.AppendInvariant($"{_separator}CorrespAcc={_mFields.CorrespAcc}");
-            var ret = retBuilder.ToString();
+            string ret = retBuilder.ToString();
 
             //Check length of mandatory field block (-8 => Removing service data block bytes from ret length)
             int bytesMandatoryLen = Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(cp), Encoding.UTF8.GetBytes(ret)).Length - 8;
@@ -126,8 +126,8 @@ public static partial class PayloadGenerator
             var optionalValues = GetOptionalFieldsAsList();
 
             // Possible candidates for field separation
-            var separatorCandidates = new string[] { "|", "#", ";", ":", "^", "_", "~", "{", "}", "!", "#", "$", "%", "&", "(", ")", "*", "+", ",", "/", "@" };
-            foreach (var sepCandidate in separatorCandidates)
+            string[] separatorCandidates = new string[] { "|", "#", ";", ":", "^", "_", "~", "{", "}", "!", "#", "$", "%", "&", "(", ")", "*", "+", ",", "/", "@" };
+            foreach (string sepCandidate in separatorCandidates)
             {
                 if (!mandatoryValues.Any(x => x.Contains(sepCandidate)) && !optionalValues.Any(x => x.Contains(sepCandidate)))
                     return sepCandidate;
@@ -146,8 +146,8 @@ public static partial class PayloadGenerator
                     .Where(field => field.GetValue(_oFields) != null)
                     .Select(field =>
                     {
-                        var objValue = field.GetValue(_oFields, null);
-                        var value = field.PropertyType.Equals(typeof(DateTime?)) ? ((DateTime)objValue).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue.ToString();
+                        object objValue = field.GetValue(_oFields, null);
+                        string value = field.PropertyType.Equals(typeof(DateTime?)) ? ((DateTime)objValue).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue.ToString();
                         return $"{field.Name}={value}";
                     })
                     .ToList();
@@ -156,8 +156,8 @@ public static partial class PayloadGenerator
                     .Where(field => field.GetValue(_oFields, null) != null)
                     .Select(field =>
                     {
-                        var objValue = field.GetValue(_oFields, null);
-                        var value = field.PropertyType.Equals(typeof(DateTime?)) ? ((DateTime)objValue!).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue!.ToString();
+                        object? objValue = field.GetValue(_oFields, null);
+                        string? value = field.PropertyType.Equals(typeof(DateTime?)) ? ((DateTime)objValue!).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue!.ToString();
                         return $"{field.Name}={value}";
                     })
                     .ToList();
@@ -176,8 +176,8 @@ public static partial class PayloadGenerator
                     .Where(field => field.GetValue(_mFields) != null)
                     .Select(field =>
                     {
-                        var objValue = field.GetValue(_mFields);
-                        var value = field.FieldType.Equals(typeof(DateTime?)) ? ((DateTime)objValue).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue.ToString();
+                        object objValue = field.GetValue(_mFields);
+                        string value = field.FieldType.Equals(typeof(DateTime?)) ? ((DateTime)objValue).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue.ToString();
                         return $"{field.Name}={value}";
                     })
                     .ToList();
@@ -186,8 +186,8 @@ public static partial class PayloadGenerator
                     .Where(field => field.GetValue(_mFields) != null)
                     .Select(field =>
                     {
-                        var objValue = field.GetValue(_mFields);
-                        var value = field.FieldType.Equals(typeof(DateTime?)) ? ((DateTime)objValue!).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue!.ToString();
+                        object? objValue = field.GetValue(_mFields);
+                        string? value = field.FieldType.Equals(typeof(DateTime?)) ? ((DateTime)objValue!).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture) : objValue!.ToString();
                         return $"{field.Name}={value}";
                     })
                     .ToList();
@@ -217,7 +217,7 @@ public static partial class PayloadGenerator
         {
             if (input == null)
                 throw new RussiaPaymentOrderException($"The input for '{fieldname}' must not be null.");
-            foreach (var pattern in patterns)
+            foreach (string pattern in patterns)
             {
                 if (!Regex.IsMatch(input, pattern))
                     throw new RussiaPaymentOrderException(errorText ?? $"The input for '{fieldname}' ({input}) doesn't match the pattern {pattern}");

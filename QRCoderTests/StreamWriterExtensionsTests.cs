@@ -39,8 +39,8 @@ public class StreamWriterExtensionsTests
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, encoding, 128, true);
         string? missing = null;
-        var text = "Grüße 漢字 😀";
-        var longText = new string('é', 4095) + "😀" + new string('界', 4097);
+        string text = "Grüße 漢字 😀";
+        string longText = new string('é', 4095) + "😀" + new string('界', 4097);
 
         writer.WriteInvariant($"prefix|");
         writer.WriteInvariant($"{text}|{missing}|{longText}|suffix");

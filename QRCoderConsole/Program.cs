@@ -14,8 +14,8 @@ internal sealed class MainClass
 {
     public static void Main(string[] args)
     {
-        var friendlyName = AppDomain.CurrentDomain.FriendlyName;
-        var newLine = Environment.NewLine;
+        string friendlyName = AppDomain.CurrentDomain.FriendlyName;
+        string newLine = Environment.NewLine;
 
         string? fileName = null, outputFileName = null, payload = null;
 
@@ -27,7 +27,7 @@ internal sealed class MainClass
         string backgroundColor = "#FFFFFF";
 
 
-        var showHelp = false;
+        bool showHelp = false;
 
         var optionSet = new OptionSet {
             {    "e|ecc-level=",
@@ -152,7 +152,7 @@ internal sealed class MainClass
             case SupportedImageFormat.Svg:
                 using (var code = new SvgQRCode(data))
                 {
-                    var test = code.GetGraphic(pixelsPerModule, foreground, background, true);
+                    string test = code.GetGraphic(pixelsPerModule, foreground, background, true);
                     using var f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
@@ -162,7 +162,7 @@ internal sealed class MainClass
             case SupportedImageFormat.Xaml:
                 using (var code = new QRCoder.Xaml.XamlQRCode(data))
                 {
-                    var test = XamlWriter.Save(code.GetGraphic(pixelsPerModule, foreground, background, true));
+                    string test = XamlWriter.Save(code.GetGraphic(pixelsPerModule, foreground, background, true));
                     using var f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
@@ -173,7 +173,7 @@ internal sealed class MainClass
             case SupportedImageFormat.Eps:
                 using (var code = new PostscriptQRCode(data))
                 {
-                    var test = code.GetGraphic(pixelsPerModule, foreground, background, true,
+                    string test = code.GetGraphic(pixelsPerModule, foreground, background, true,
                         imgFormat == SupportedImageFormat.Eps);
                     using var f = File.CreateText(outputFileName);
                     f.Write(test);
@@ -187,7 +187,7 @@ internal sealed class MainClass
 
     private static string GetTextFromFile(FileInfo fileInfo)
     {
-        var buffer = new byte[fileInfo.Length];
+        byte[] buffer = new byte[fileInfo.Length];
 
         using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open))
         {
@@ -199,8 +199,8 @@ internal sealed class MainClass
 
     private static string GetTextFromStream(Stream stream)
     {
-        var buffer = new byte[256];
-        var bytesRead = 0;
+        byte[] buffer = new byte[256];
+        int bytesRead = 0;
 
         using var memoryStream = new MemoryStream();
         while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
@@ -208,7 +208,7 @@ internal sealed class MainClass
             memoryStream.Write(buffer, 0, bytesRead);
         }
 
-        var text = Encoding.UTF8.GetString(memoryStream.ToArray());
+        string text = Encoding.UTF8.GetString(memoryStream.ToArray());
 
         Console.WriteLine($"text retrieved from input stream: {text}");
 

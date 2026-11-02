@@ -97,15 +97,15 @@ public class PostscriptQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a PostScript string.</returns>
     public string GetGraphic(Size viewBox, Color darkColor, Color lightColor, bool drawQuietZones = true, bool epsFormat = false)
     {
-        var offset = drawQuietZones ? 0 : 4;
-        var drawableModulesCount = QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : offset * 2);
-        var pointsPerModule = (double)Math.Min(viewBox.Width, viewBox.Height) / (double)drawableModulesCount;
+        int offset = drawQuietZones ? 0 : 4;
+        int drawableModulesCount = QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : offset * 2);
+        double pointsPerModule = (double)Math.Min(viewBox.Width, viewBox.Height) / (double)drawableModulesCount;
 
-        var header = epsFormat ? EPS_HEADER : PS_HEADER;
-        var functions = epsFormat ? EPS_FUNCTIONS : PS_FUNCTIONS;
-        var footer = epsFormat ? EPS_FOOTER : PS_FOOTER;
+        string header = epsFormat ? EPS_HEADER : PS_HEADER;
+        string functions = epsFormat ? EPS_FUNCTIONS : PS_FUNCTIONS;
+        string footer = epsFormat ? EPS_FOOTER : PS_FOOTER;
 
-        var estimatedCapacity = header.Length + functions.Length + footer.Length +
+        int estimatedCapacity = header.Length + functions.Length + footer.Length +
             (drawableModulesCount * drawableModulesCount * 2) + // modules (either "f " or "b ")
             drawableModulesCount * 3 + // newlines ("nl\n")
             200; // embedded numbers

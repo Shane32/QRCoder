@@ -66,9 +66,9 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             throw new ArgumentOutOfRangeException(nameof(pixelSizeFactor), "The parameter pixelSizeFactor must be between 0 and 1. (0-100%)");
         int pixelSize = (int)Math.Min(pixelsPerModule, Math.Floor(pixelsPerModule * pixelSizeFactor));
 
-        var numModules = QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8);
-        var offset = (drawQuietZones ? 0 : 4);
-        var size = numModules * pixelsPerModule;
+        int numModules = QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8);
+        int offset = (drawQuietZones ? 0 : 4);
+        int size = numModules * pixelsPerModule;
 
         var bitmap = new Bitmap(size, size);
 
@@ -89,7 +89,7 @@ public class ArtQRCode : AbstractQRCode, IDisposable
                 }
                 else if (backgroundImageStyle == BackgroundImageStyle.DataAreaOnly)
                 {
-                    var bgOffset = 4 - offset;
+                    int bgOffset = 4 - offset;
                     using var resizedBg = Resize(backgroundImage, size - (2 * bgOffset * pixelsPerModule));
                     graphics.DrawImage(resizedBg, 0 + (bgOffset * pixelsPerModule), (bgOffset * pixelsPerModule));
                 }
@@ -99,13 +99,13 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             using var darkModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, darkBrush);
             using var lightModulePixel = MakeDotPixel(pixelsPerModule, pixelSize, lightBrush);
 
-            for (var x = 0; x < numModules; x += 1)
+            for (int x = 0; x < numModules; x += 1)
             {
-                for (var y = 0; y < numModules; y += 1)
+                for (int y = 0; y < numModules; y += 1)
                 {
                     var rectangleF = new Rectangle(x * pixelsPerModule, y * pixelsPerModule, pixelsPerModule, pixelsPerModule);
 
-                    var pixelIsDark = QrCodeData.ModuleMatrix[offset + y][offset + x];
+                    bool pixelIsDark = QrCodeData.ModuleMatrix[offset + y][offset + x];
                     var solidBrush = pixelIsDark ? darkBrush : lightBrush;
                     var pixelImage = pixelIsDark ? darkModulePixel : lightModulePixel;
 
@@ -120,8 +120,8 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             }
             if (finderPatternImage != null)
             {
-                var finderPatternSize = 7 * pixelsPerModule;
-                var finderPatternOffset = drawQuietZones ? 4 * pixelsPerModule : 0;
+                int finderPatternSize = 7 * pixelsPerModule;
+                int finderPatternOffset = drawQuietZones ? 4 * pixelsPerModule : 0;
                 graphics.DrawImage(finderPatternImage, new Rectangle(finderPatternOffset, finderPatternOffset, finderPatternSize, finderPatternSize));
                 graphics.DrawImage(finderPatternImage, new Rectangle(size - finderPatternOffset - finderPatternSize, finderPatternOffset, finderPatternSize, finderPatternSize));
                 graphics.DrawImage(finderPatternImage, new Rectangle(finderPatternOffset, size - finderPatternOffset - finderPatternSize, finderPatternSize, finderPatternSize));
@@ -148,8 +148,8 @@ public class ArtQRCode : AbstractQRCode, IDisposable
             graphics.Save();
         }
 
-        var pixelWidth = Math.Min(pixelsPerModule, pixelSize);
-        var margin = Math.Max((pixelsPerModule - pixelWidth) / 2, 0);
+        int pixelWidth = Math.Min(pixelsPerModule, pixelSize);
+        int margin = Math.Max((pixelsPerModule - pixelWidth) / 2, 0);
 
         // center the dot in the module and crop to stay the right size.
         var cropped = new Bitmap(pixelsPerModule, pixelsPerModule);
@@ -192,10 +192,10 @@ public class ArtQRCode : AbstractQRCode, IDisposable
     /// <returns>true, if position is part of any finder pattern</returns>
     private static bool IsPartOfFinderPattern(int x, int y, int numModules, int offset)
     {
-        var cornerSize = 11 - offset;
-        var outerLimitLow = (numModules - cornerSize - 1);
-        var outerLimitHigh = outerLimitLow + 8;
-        var invertedOffset = 4 - offset;
+        int cornerSize = 11 - offset;
+        int outerLimitLow = (numModules - cornerSize - 1);
+        int outerLimitHigh = outerLimitLow + 8;
+        int invertedOffset = 4 - offset;
         return
             (x >= invertedOffset && x < cornerSize && y >= invertedOffset && y < cornerSize) || //Top-left finder pattern
             (x > outerLimitLow && x < outerLimitHigh && y >= invertedOffset && y < cornerSize) || //Top-right finder pattern
@@ -211,10 +211,10 @@ public class ArtQRCode : AbstractQRCode, IDisposable
     private static Bitmap Resize(Bitmap image, int newSize)
     {
         float scale = Math.Min((float)newSize / image.Width, (float)newSize / image.Height);
-        var scaledWidth = (int)(image.Width * scale);
-        var scaledHeight = (int)(image.Height * scale);
-        var offsetX = (newSize - scaledWidth) / 2;
-        var offsetY = (newSize - scaledHeight) / 2;
+        int scaledWidth = (int)(image.Width * scale);
+        int scaledHeight = (int)(image.Height * scale);
+        int offsetX = (newSize - scaledWidth) / 2;
+        int offsetY = (newSize - scaledHeight) / 2;
 
         using var scaledImage = new Bitmap(image, new Size(scaledWidth, scaledHeight));
 

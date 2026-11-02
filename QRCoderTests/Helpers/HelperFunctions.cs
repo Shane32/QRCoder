@@ -49,7 +49,7 @@ public static class HelperFunctions
     public static Bitmap GetIconBitmap()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
+        string resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
         using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         return new Bitmap(stream);
     }
@@ -60,7 +60,7 @@ public static class HelperFunctions
     public static byte[] GetIconBytes()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
+        string resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
         using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         using var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);
@@ -73,7 +73,7 @@ public static class HelperFunctions
     public static string GetIconSvg()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_Scientist_2909361.svg";
+        string resourceName = "QRCoderTests.assets.noun_Scientist_2909361.svg";
         using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();

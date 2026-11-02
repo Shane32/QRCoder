@@ -49,24 +49,24 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
         //We need to adjust the repeatPerModule based on number of characters in darkColorString
         //(we assume whiteSpaceString has the same number of characters)
         //to keep the QR code as square as possible.
-        var quietZonesModifier = (drawQuietZones ? 0 : 8);
-        var quietZonesOffset = (int)(quietZonesModifier * 0.5);
-        var adjustmentValueForNumberOfCharacters = darkColorString.Length / 2 != 1 ? darkColorString.Length / 2 : 0;
-        var verticalNumberOfRepeats = repeatPerModule + adjustmentValueForNumberOfCharacters;
-        var sideLength = (QrCodeData.ModuleMatrix.Count - quietZonesModifier) * verticalNumberOfRepeats;
-        var qrCode = new string[sideLength];
-        var lineCapacity = (QrCodeData.ModuleMatrix.Count - quietZonesModifier) * repeatPerModule * darkColorString.Length;
+        int quietZonesModifier = (drawQuietZones ? 0 : 8);
+        int quietZonesOffset = (int)(quietZonesModifier * 0.5);
+        int adjustmentValueForNumberOfCharacters = darkColorString.Length / 2 != 1 ? darkColorString.Length / 2 : 0;
+        int verticalNumberOfRepeats = repeatPerModule + adjustmentValueForNumberOfCharacters;
+        int sideLength = (QrCodeData.ModuleMatrix.Count - quietZonesModifier) * verticalNumberOfRepeats;
+        string[] qrCode = new string[sideLength];
+        int lineCapacity = (QrCodeData.ModuleMatrix.Count - quietZonesModifier) * repeatPerModule * darkColorString.Length;
 #if HAS_SPAN
         if (darkColorString.Length == whiteSpaceString.Length && lineCapacity < 510)
         {
-            Span<char> row = stackalloc char[512].Slice(0, lineCapacity);
-            for (var y = 0; y < sideLength; y++)
+            var row = stackalloc char[512].Slice(0, lineCapacity);
+            for (int y = 0; y < sideLength; y++)
             {
-                var offset = 0;
-                for (var x = 0; x < QrCodeData.ModuleMatrix.Count - quietZonesModifier; x++)
+                int offset = 0;
+                for (int x = 0; x < QrCodeData.ModuleMatrix.Count - quietZonesModifier; x++)
                 {
-                    var module = QrCodeData.ModuleMatrix[((y + verticalNumberOfRepeats) / verticalNumberOfRepeats - 1) + quietZonesOffset][x + quietZonesOffset];
-                    for (var i = 0; i < repeatPerModule; i++)
+                    bool module = QrCodeData.ModuleMatrix[((y + verticalNumberOfRepeats) / verticalNumberOfRepeats - 1) + quietZonesOffset][x + quietZonesOffset];
+                    for (int i = 0; i < repeatPerModule; i++)
                     {
                         var sourceSpan = module ? darkColorString.AsSpan() : whiteSpaceString.AsSpan();
                         var targetSpan = row.Slice(offset, darkColorString.Length);
@@ -80,12 +80,12 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
         }
 #endif
         var lineBuilder = new StringBuilder(lineCapacity);
-        for (var y = 0; y < sideLength; y++)
+        for (int y = 0; y < sideLength; y++)
         {
-            for (var x = 0; x < QrCodeData.ModuleMatrix.Count - quietZonesModifier; x++)
+            for (int x = 0; x < QrCodeData.ModuleMatrix.Count - quietZonesModifier; x++)
             {
-                var module = QrCodeData.ModuleMatrix[((y + verticalNumberOfRepeats) / verticalNumberOfRepeats - 1) + quietZonesOffset][x + quietZonesOffset];
-                for (var i = 0; i < repeatPerModule; i++)
+                bool module = QrCodeData.ModuleMatrix[((y + verticalNumberOfRepeats) / verticalNumberOfRepeats - 1) + quietZonesOffset][x + quietZonesOffset];
+                for (int i = 0; i < repeatPerModule; i++)
                 {
                     lineBuilder.Append(module ? darkColorString : whiteSpaceString);
                 }
@@ -116,22 +116,22 @@ public class AsciiQRCode : AbstractQRCode, IDisposable
         };
 
         var moduleData = QrCodeData.ModuleMatrix;
-        var sbSize = (moduleData.Count + endOfLine.Length) * (int)Math.Ceiling(moduleData.Count / 2.0) - 1;
+        int sbSize = (moduleData.Count + endOfLine.Length) * (int)Math.Ceiling(moduleData.Count / 2.0) - 1;
         var lineBuilder = new StringBuilder(sbSize);
 
-        var quietZonesModifier = (drawQuietZones ? 0 : 8);
-        var quietZonesOffset = (int)(quietZonesModifier * 0.5);
-        var sideLength = (moduleData.Count - quietZonesModifier);
+        int quietZonesModifier = (drawQuietZones ? 0 : 8);
+        int quietZonesOffset = (int)(quietZonesModifier * 0.5);
+        int sideLength = (moduleData.Count - quietZonesModifier);
 
-        for (var row = 0; row < sideLength; row += 2)
+        for (int row = 0; row < sideLength; row += 2)
         {
-            for (var col = 0; col < sideLength; col++)
+            for (int col = 0; col < sideLength; col++)
             {
-                var current = moduleData[row + quietZonesOffset][col + quietZonesOffset] ^ invert;
-                var nextRowId = row + quietZonesOffset + 1;
+                bool current = moduleData[row + quietZonesOffset][col + quietZonesOffset] ^ invert;
+                int nextRowId = row + quietZonesOffset + 1;
 
                 // Set next to whitespace "color"
-                var next = BLACK;
+                bool next = BLACK;
                 // Fill next with value, if in data range
                 if (nextRowId < QrCodeData.ModuleMatrix.Count)
                     next = moduleData[nextRowId][col + quietZonesOffset] ^ invert;

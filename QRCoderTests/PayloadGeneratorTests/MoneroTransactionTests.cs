@@ -5,7 +5,7 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_can_generate_payload_simple()
     {
-        var address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+        string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
         var generator = new PayloadGenerator.MoneroTransaction(address);
 
         generator
@@ -16,8 +16,8 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_can_generate_payload_first_param()
     {
-        var address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
-        var amount = 1.3f;
+        string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+        float amount = 1.3f;
         var generator = new PayloadGenerator.MoneroTransaction(address, amount);
 
         generator
@@ -29,8 +29,8 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_can_generate_payload_named_param()
     {
-        var address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
-        var recipient = "Raffael Herrmann";
+        string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+        string recipient = "Raffael Herrmann";
         var generator = new PayloadGenerator.MoneroTransaction(address, recipientName: recipient);
 
         generator
@@ -42,11 +42,11 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_can_generate_payload_full_param()
     {
-        var address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
-        var amount = 1.3f;
-        var paymentId = "1234567890123456789012345678901234567890123456789012345678901234";
-        var recipient = "Raffael Herrmann";
-        var description = "Monero transaction via QrCoder.NET.";
+        string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+        float amount = 1.3f;
+        string paymentId = "1234567890123456789012345678901234567890123456789012345678901234";
+        string recipient = "Raffael Herrmann";
+        string description = "Monero transaction via QrCoder.NET.";
         var generator = new PayloadGenerator.MoneroTransaction(address, amount, paymentId, recipient, description);
 
         generator
@@ -58,8 +58,8 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_should_throw_wrong_amount_exception()
     {
-        var address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
-        var amount = -1f;
+        string address = "46BeWrHpwXmHDpDEUmZBWZfoQpdc6HaERCNmx1pEYL2rAcuwufPN9rXHHtyUA4QVy66qeFQkn6sfK8aHYjA3jk3o1Bv16em";
+        float amount = -1f;
 
         var exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address, amount));
 
@@ -70,7 +70,7 @@ public class MoneroTransactionTests
     [Fact]
     public void monero_generator_should_throw_no_address_exception()
     {
-        var address = "";
+        string address = "";
 
         var exception = Should.Throw<PayloadGenerator.MoneroTransaction.MoneroTransactionException>(() => new PayloadGenerator.MoneroTransaction(address));
 

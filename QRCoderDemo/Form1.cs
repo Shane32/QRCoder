@@ -97,7 +97,7 @@ public partial class Form1 : Form
             // File type selected in the dialog box.
             // NOTE that the FilterIndex property is one-based.
 
-            ImageFormat? imageFormat = saveFileDialog1.FilterIndex switch
+            var imageFormat = saveFileDialog1.FilterIndex switch
             {
                 1 => ImageFormat.Bmp,
                 2 => ImageFormat.Png,

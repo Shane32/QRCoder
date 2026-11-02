@@ -59,7 +59,7 @@ public class TransposeVerificationTests
     private byte[] GetBase64QRCodeBytes()
     {
         var qrCode = new Base64QRCode(_sharedQrCodeData);
-        var base64String = qrCode.GetGraphic(10);
+        string base64String = qrCode.GetGraphic(10);
         return Convert.FromBase64String(base64String);
     }
 
@@ -72,8 +72,8 @@ public class TransposeVerificationTests
     private byte[] GetSvgQRCodeBytes()
     {
         var qrCode = new SvgQRCode(_sharedQrCodeData);
-        var svgString = qrCode.GetGraphic(10);
-        var bitmapSize = _sharedQrCodeData.ModuleMatrix.Count * 10;
+        string svgString = qrCode.GetGraphic(10);
+        int bitmapSize = _sharedQrCodeData.ModuleMatrix.Count * 10;
         // use Svg.Net to render SVG to bitmap for comparison
         var svgDoc = Svg.SvgDocument.FromSvg<Svg.SvgDocument>(svgString);
         using var bitmap = svgDoc.Draw(bitmapSize, bitmapSize);
@@ -97,7 +97,7 @@ public class TransposeVerificationTests
     public void ascii_renderer(string sizeType)
     {
         var qrCode = new AsciiQRCode(_sharedQrCodeData);
-        var asciiArt = sizeType switch
+        string asciiArt = sizeType switch
         {
             "FullSize" => qrCode.GetGraphic(1),
             "Small" => qrCode.GetGraphicSmall(invert: true),
@@ -110,7 +110,7 @@ public class TransposeVerificationTests
     public void pdf_renderer()
     {
         var qrCode = new PdfByteQRCode(_sharedQrCodeData);
-        var pdfBytes = qrCode.GetGraphic(10);
+        byte[] pdfBytes = qrCode.GetGraphic(10);
         pdfBytes.ShouldMatchApproved("pdf");
     }
 
@@ -118,7 +118,7 @@ public class TransposeVerificationTests
     public void postscript_renderer()
     {
         var qrCode = new PostscriptQRCode(_sharedQrCodeData);
-        var postscript = qrCode.GetGraphic(10);
+        string postscript = qrCode.GetGraphic(10);
         postscript.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("ps"));
     }
 
@@ -128,11 +128,11 @@ public class TransposeVerificationTests
         // The black module in a QR code is always at position (4*version + 9, 8) + (4,4) due to the quiet zone
         // For our test QR code (version 1), it should be at (13, 8)
         // If transposed, it would be at (8, 13)
-        var version = _sharedQrCodeData.Version;
-        var expectedRow = 4 * version + 9 + 4;
-        var expectedCol = 8 + 4;
-        var transposedRow = expectedCol;
-        var transposedCol = expectedRow;
+        int version = _sharedQrCodeData.Version;
+        int expectedRow = 4 * version + 9 + 4;
+        int expectedCol = 8 + 4;
+        int transposedRow = expectedCol;
+        int transposedCol = expectedRow;
 
         // Verify the black module is at the expected position
         _sharedQrCodeData.ModuleMatrix[expectedRow][expectedCol].ShouldBeTrue(
@@ -152,9 +152,9 @@ public class TransposeVerificationTests
     {
         // Create a QR code data with the same size as our test matrix
         // but with only a single black module at the expected black module position
-        var version = _sharedQrCodeData.Version;
-        var blackModuleRow = 4 * version + 9 + 4;
-        var blackModuleCol = 8 + 4;
+        int version = _sharedQrCodeData.Version;
+        int blackModuleRow = 4 * version + 9 + 4;
+        int blackModuleCol = 8 + 4;
 
         // Create a minimal QRCodeData with just the black module
         var referenceData = new QRCodeData(version, addPadding: true);

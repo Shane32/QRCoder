@@ -36,7 +36,7 @@ public class XamlQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a XAML DrawingImage.</returns>
     public DrawingImage GetGraphic(int pixelsPerModule, bool drawQuietZones)
     {
-        var drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
+        int drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
         var viewBox = new Size(pixelsPerModule * drawableModulesCount, pixelsPerModule * drawableModulesCount);
         return GetGraphic(viewBox, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.White), drawQuietZones);
     }
@@ -60,7 +60,7 @@ public class XamlQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a XAML DrawingImage.</returns>
     public DrawingImage GetGraphic(int pixelsPerModule, string darkColorHex, string lightColorHex, bool drawQuietZones = true)
     {
-        var drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
+        int drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
         var viewBox = new Size(pixelsPerModule * drawableModulesCount, pixelsPerModule * drawableModulesCount);
         return GetGraphic(viewBox, new SolidColorBrush((Color)ColorConverter.ConvertFromString(darkColorHex)), new SolidColorBrush((Color)ColorConverter.ConvertFromString(lightColorHex)), drawQuietZones);
     }
@@ -75,10 +75,10 @@ public class XamlQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a XAML DrawingImage.</returns>
     public DrawingImage GetGraphic(Size viewBox, Brush darkBrush, Brush lightBrush, bool drawQuietZones = true)
     {
-        var drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
-        var qrSize = Math.Min(viewBox.Width, viewBox.Height);
-        var unitsPerModule = qrSize / drawableModulesCount;
-        var offsetModules = drawQuietZones ? 0 : 4;
+        int drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
+        double qrSize = Math.Min(viewBox.Width, viewBox.Height);
+        double unitsPerModule = qrSize / drawableModulesCount;
+        int offsetModules = drawQuietZones ? 0 : 4;
 
         var drawing = new DrawingGroup();
         drawing.Children.Add(new GeometryDrawing(lightBrush, null, new RectangleGeometry(new Rect(new Point(0, 0), new Size(qrSize, qrSize)))));
@@ -114,8 +114,8 @@ public class XamlQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the number of units per module.</returns>
     public double GetUnitsPerModule(Size viewBox, bool drawQuietZones = true)
     {
-        var drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
-        var qrSize = Math.Min(viewBox.Width, viewBox.Height);
+        int drawableModulesCount = GetDrawableModulesCount(drawQuietZones);
+        double qrSize = Math.Min(viewBox.Width, viewBox.Height);
         return qrSize / drawableModulesCount;
     }
 }

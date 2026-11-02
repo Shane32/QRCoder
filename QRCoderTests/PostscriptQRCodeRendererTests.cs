@@ -8,7 +8,7 @@ public class PostscriptQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var ps = new PostscriptQRCode(data).GetGraphic(5);
+        string ps = new PostscriptQRCode(data).GetGraphic(5);
         ps.ShouldMatchApproved(x => x.NoDiff());
     }
 
@@ -18,7 +18,7 @@ public class PostscriptQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var ps = new PostscriptQRCode(data).GetGraphic(5, true);
+        string ps = new PostscriptQRCode(data).GetGraphic(5, true);
         ps.ShouldMatchApproved(x => x.NoDiff());
     }
 
@@ -28,7 +28,7 @@ public class PostscriptQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var ps = new PostscriptQRCode(data).GetGraphic(new Size(33, 33));
+        string ps = new PostscriptQRCode(data).GetGraphic(new Size(33, 33));
         ps.ShouldMatchApproved(x => x.NoDiff());
     }
 
@@ -38,7 +38,7 @@ public class PostscriptQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var ps = new PostscriptQRCode(data).GetGraphic(new Size(50, 50), false);
+        string ps = new PostscriptQRCode(data).GetGraphic(new Size(50, 50), false);
         ps.ShouldMatchApproved(x => x.NoDiff());
     }
 
@@ -48,7 +48,7 @@ public class PostscriptQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var ps = new PostscriptQRCode(data).GetGraphic(5, Color.Red, Color.Blue);
+        string ps = new PostscriptQRCode(data).GetGraphic(5, Color.Red, Color.Blue);
         ps.ShouldMatchApproved(x => x.NoDiff());
     }
 }

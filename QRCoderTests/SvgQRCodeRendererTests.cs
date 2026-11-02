@@ -8,7 +8,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var svg = new SvgQRCode(data).GetGraphic();
+        string svg = new SvgQRCode(data).GetGraphic();
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -18,7 +18,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var svg = new SvgQRCode(data).GetGraphic(5);
+        string svg = new SvgQRCode(data).GetGraphic(5);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -28,7 +28,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.Red, Color.White);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.Red, Color.White);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -38,7 +38,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = new SvgQRCode(data).GetGraphic(new Size(128, 128));
+        string svg = new SvgQRCode(data).GetGraphic(new Size(128, 128));
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -48,7 +48,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = new SvgQRCode(data).GetGraphic(new Size(128, 128), sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
+        string svg = new SvgQRCode(data).GetGraphic(new Size(128, 128), sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -58,7 +58,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.Red, Color.White, false);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.Red, Color.White, false);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -68,7 +68,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = new SvgQRCode(data).GetGraphic(10, "#000000", "#ffffff", false);
+        string svg = new SvgQRCode(data).GetGraphic(10, "#000000", "#ffffff", false);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -85,7 +85,7 @@ public class SvgQRCodeRendererTests
         var logoObj = new SvgQRCode.SvgLogo(iconRasterized: logoBitmap, 15);
         logoObj.GetMediaType().ShouldBe(SvgQRCode.SvgLogo.MediaType.PNG);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
 
         // remove PNG encoded bitmap from SVG and verify it separately (to avoid diffs due to different encoding settings of System.Drawing)
         var regex = new Regex(
@@ -94,8 +94,8 @@ public class SvgQRCodeRendererTests
         var match = regex.Match(svg);
         if (!match.Success || match.Groups.Count < 2)
             throw new InvalidOperationException("Could not find embedded image data in SVG output.");
-        var base64Data = match.Groups[1].Value;
-        var imageData = Convert.FromBase64String(base64Data);
+        string base64Data = match.Groups[1].Value;
+        byte[] imageData = Convert.FromBase64String(base64Data);
         imageData.ShouldMatchApprovedImage(discriminator: "embeddedLogo");
         svg = svg.Replace(base64Data, "=====BASE64DATA=====");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -113,7 +113,7 @@ public class SvgQRCodeRendererTests
         var logoObj = new SvgQRCode.SvgLogo(iconRasterized: logoBitmap, 15, false);
         logoObj.GetMediaType().ShouldBe(SvgQRCode.SvgLogo.MediaType.PNG);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
 
         // remove PNG encoded bitmap from SVG and verify it separately (to avoid diffs due to different encoding settings of System.Drawing)
         var regex = new Regex(
@@ -122,8 +122,8 @@ public class SvgQRCodeRendererTests
         var match = regex.Match(svg);
         if (!match.Success || match.Groups.Count < 2)
             throw new InvalidOperationException("Could not find embedded image data in SVG output.");
-        var base64Data = match.Groups[1].Value;
-        var imageData = Convert.FromBase64String(base64Data);
+        string base64Data = match.Groups[1].Value;
+        byte[] imageData = Convert.FromBase64String(base64Data);
         imageData.ShouldMatchApprovedImage(discriminator: "embeddedLogo");
         svg = svg.Replace(base64Data, "=====BASE64DATA=====");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -141,7 +141,7 @@ public class SvgQRCodeRendererTests
         var logoObj = new SvgQRCode.SvgLogo(iconRasterized: logoBitmap, 15);
         logoObj.GetMediaType().ShouldBe(SvgQRCode.SvgLogo.MediaType.PNG);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.Black, Color.White, drawQuietZones: false, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.Black, Color.White, drawQuietZones: false, logo: logoObj);
 
         // remove PNG encoded bitmap from SVG and verify it separately (to avoid diffs due to different encoding settings of System.Drawing)
         var regex = new Regex(
@@ -150,8 +150,8 @@ public class SvgQRCodeRendererTests
         var match = regex.Match(svg);
         if (!match.Success || match.Groups.Count < 2)
             throw new InvalidOperationException("Could not find embedded image data in SVG output.");
-        var base64Data = match.Groups[1].Value;
-        var imageData = Convert.FromBase64String(base64Data);
+        string base64Data = match.Groups[1].Value;
+        byte[] imageData = Convert.FromBase64String(base64Data);
         imageData.ShouldMatchApprovedImage(discriminator: "embeddedLogo");
         svg = svg.Replace(base64Data, "=====BASE64DATA=====");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -166,11 +166,11 @@ public class SvgQRCodeRendererTests
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
-        var logoBitmap = HelperFunctions.GetIconBytes();
+        byte[] logoBitmap = HelperFunctions.GetIconBytes();
         var logoObj = new SvgQRCode.SvgLogo(iconRasterized: logoBitmap, 15);
         logoObj.GetMediaType().ShouldBe(SvgQRCode.SvgLogo.MediaType.PNG);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -182,11 +182,11 @@ public class SvgQRCodeRendererTests
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909361
-        var logoSvg = HelperFunctions.GetIconSvg();
+        string logoSvg = HelperFunctions.GetIconSvg();
         var logoObj = new SvgQRCode.SvgLogo(logoSvg, 20);
         logoObj.GetMediaType().ShouldBe(SvgQRCode.SvgLogo.MediaType.SVG);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -198,10 +198,10 @@ public class SvgQRCodeRendererTests
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909361
-        var logoSvg = HelperFunctions.GetIconSvg();
+        string logoSvg = HelperFunctions.GetIconSvg();
         var logoObj = new SvgQRCode.SvgLogo(logoSvg, 20, iconEmbedded: false);
 
-        var svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
+        string svg = new SvgQRCode(data).GetGraphic(10, Color.DarkGray, Color.White, logo: logoObj);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
 
@@ -220,7 +220,7 @@ public class SvgQRCodeRendererTests
             using var qrCode = new SvgQRCode(data);
             var logo = new SvgQRCode.SvgLogo("<svg xmlns=\"http://www.w3.org/2000/svg\"/>", 20, iconEmbedded: false);
 
-            var svg = qrCode.GetGraphic(10, "#000000", "#ffffff", logo: logo);
+            string svg = qrCode.GetGraphic(10, "#000000", "#ffffff", logo: logo);
 
             // Version 1 includes 29 modules with quiet zones, giving a 5.8-module logo centered at 11.6.
             svg.ShouldContain("<image x=\"11.6\" y=\"11.6\" width=\"5.8\" height=\"5.8\"");
@@ -243,7 +243,7 @@ public class SvgQRCodeRendererTests
     public void can_render_svg_qrcode_from_helper()
     {
         //Create QR code                   
-        var svg = SvgQRCodeHelper.GetQRCode("A", 2, "#000000", "#ffffff", QRCodeGenerator.ECCLevel.Q);
+        string svg = SvgQRCodeHelper.GetQRCode("A", 2, "#000000", "#ffffff", QRCodeGenerator.ECCLevel.Q);
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
     }
     [Theory]
@@ -254,7 +254,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var svg = useColor
+        string svg = useColor
             ? new SvgQRCode(data).GetGraphic(10, Color.FromArgb(128, 255, 0, 0), Color.Blue)
             : new SvgQRCode(data).GetGraphic(10, "#FF000080", "#0000FF");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -268,7 +268,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var svg = useColor
+        string svg = useColor
             ? new SvgQRCode(data).GetGraphic(10, Color.Black, Color.Transparent)
             : new SvgQRCode(data).GetGraphic(10, "#000", "transparent");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -282,7 +282,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var svg = useColor
+        string svg = useColor
             ? new SvgQRCode(data).GetGraphic(10, Color.FromArgb(128, 255, 0, 0), Color.Transparent)
             : new SvgQRCode(data).GetGraphic(10, "#FF000080", "transparent");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));
@@ -296,7 +296,7 @@ public class SvgQRCodeRendererTests
         //Create QR code
         var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var svg = useColor
+        string svg = useColor
             ? new SvgQRCode(data).GetGraphic(10, Color.Transparent, Color.Black)
             : new SvgQRCode(data).GetGraphic(10, "transparent", "#000");
         svg.ShouldMatchApproved(x => x.NoDiff().WithFileExtension("svg"));

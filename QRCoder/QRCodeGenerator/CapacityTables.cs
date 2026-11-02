@@ -107,7 +107,7 @@ public partial class QRCodeGenerator
 
             static void Throw(EncodingMode encMode, ECCLevel eccLevel)
             {
-                var maxSizeByte = _capacityTable.Where(
+                int maxSizeByte = _capacityTable.Where(
                     x => x.Details.Any(
                         y => (y.ErrorCorrectionLevel == eccLevel))
                     ).Max(x => x.Details.Single(y => y.ErrorCorrectionLevel == eccLevel).CapacityDict[encMode]);
@@ -127,7 +127,7 @@ public partial class QRCodeGenerator
         public static bool TryCalculateMinimumVersion(DataSegment segment, ECCLevel eccLevel, out int version)
         {
             // Versions 1-9: Count indicator length is constant within this range
-            var segmentBitLength = segment.GetBitLength(1);
+            int segmentBitLength = segment.GetBitLength(1);
             for (version = 1; version <= 9; version++)
             {
                 var eccInfo = GetEccInfo(version, eccLevel);
@@ -200,7 +200,7 @@ public partial class QRCodeGenerator
             }
 
             // if no version was found, throw an exception
-            var maxSizeByte = _microCapacityTable
+            int maxSizeByte = _microCapacityTable
                 .SelectMany(x => x.Details)
                 .Where(y => (y.ErrorCorrectionLevel == eccLevel || (eccLevel == ECCLevel.Default && y.ErrorCorrectionLevel == ECCLevel.L))
                     && y.CapacityDict.ContainsKey(encMode))
@@ -218,7 +218,7 @@ public partial class QRCodeGenerator
         private static List<ECCInfo> CreateCapacityECCTable(int[] capacityECCBaseValues)
         {
             var localCapacityECCTable = new List<ECCInfo>(160 + 8);
-            for (var i = 0; i < (4 * 6 * 40); i += (4 * 6))
+            for (int i = 0; i < (4 * 6 * 40); i += (4 * 6))
             {
                 localCapacityECCTable.AddRange(new[]
                 {
@@ -300,7 +300,7 @@ public partial class QRCodeGenerator
         private static List<VersionInfo> CreateCapacityTable(int[] capacityBaseValues)
         {
             var localCapacityTable = new List<VersionInfo>(40);
-            for (var i = 0; i < (16 * 40); i += 16)
+            for (int i = 0; i < (16 * 40); i += 16)
             {
                 localCapacityTable.Add(new VersionInfo(
                     version: (i + 16) / 16,

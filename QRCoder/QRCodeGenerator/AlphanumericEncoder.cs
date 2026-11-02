@@ -77,7 +77,7 @@ public partial class QRCodeGenerator
             while (count >= 2)
             {
                 // Convert each pair of characters to a number by looking them up in the alphanumeric dictionary and calculating.
-                var dec = _map[plainText[index++]] * 45 + _map[plainText[index++]];
+                int dec = _map[plainText[index++]] * 45 + _map[plainText[index++]];
                 // Convert the number to binary and store it in the BitArray.
                 codeIndex = DecToBin(dec, 11, codeText, codeIndex);
                 count -= 2;

@@ -84,9 +84,9 @@ dotnet_code_quality_unused_parameters = all:warning
 
 # C# code style settings - Implicit and explicit types
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#implicit-and-explicit-types
-csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_for_built_in_types = false:warning
 csharp_style_var_when_type_is_apparent = true:warning
-csharp_style_var_elsewhere = true:suggestion
+csharp_style_var_elsewhere = true:warning
 
 # C# code style settings - Expression-bodied members
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019#expression-bodied-members

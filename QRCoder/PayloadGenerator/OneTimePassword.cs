@@ -140,7 +140,7 @@ public static partial class PayloadGenerator
         {
             var sb = new StringBuilder("otpauth://hotp/");
             ProcessCommonFields(sb);
-            var actualCounter = Counter ?? 1;
+            int actualCounter = Counter ?? 1;
             sb.AppendInvariant($"&counter={actualCounter}");
             return sb.ToString();
         }

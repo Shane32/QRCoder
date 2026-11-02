@@ -5,8 +5,8 @@ public class WhatsAppMessageTests
     [Fact]
     public void whatsapp_generator_can_generate_payload_simple()
     {
-        var number = "491601234567";
-        var msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
+        string number = "491601234567";
+        string msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
         var generator = new PayloadGenerator.WhatsAppMessage(number, msg);
 
         generator
@@ -17,7 +17,7 @@ public class WhatsAppMessageTests
     [Fact]
     public void whatsapp_should_add_unused_params()
     {
-        var msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
+        string msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
         var generator = new PayloadGenerator.WhatsAppMessage(msg);
 
         generator
@@ -28,8 +28,8 @@ public class WhatsAppMessageTests
     [Fact]
     public void whatsapp_should_cleanup_phonenumber_1()
     {
-        var number = "+49(160)1234567";
-        var msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
+        string number = "+49(160)1234567";
+        string msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
         var generator = new PayloadGenerator.WhatsAppMessage(number, msg);
 
         generator
@@ -40,8 +40,8 @@ public class WhatsAppMessageTests
     [Fact]
     public void whatsapp_should_cleanup_phonenumber_2()
     {
-        var number = "0049-160-1234 567";
-        var msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
+        string number = "0049-160-1234 567";
+        string msg = "This is a sample message with Umlauts: Ä,ö, ü and ß.";
         var generator = new PayloadGenerator.WhatsAppMessage(number, msg);
 
         generator

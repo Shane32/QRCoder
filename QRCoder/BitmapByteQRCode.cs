@@ -83,7 +83,7 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
         }
 
         var moduleMatrix = QrCodeData.ModuleMatrix;
-        var sideLength = moduleMatrix.Count * pixelsPerModule;
+        int sideLength = moduleMatrix.Count * pixelsPerModule;
 
         // The size of each row must be rounded up to a multiple of 4 bytes by padding.
         // Pre-calculate padding bytes

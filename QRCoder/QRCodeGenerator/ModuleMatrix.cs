@@ -56,7 +56,7 @@ public partial class QRCodeGenerator
 
             Bytes = new byte[ByteLength];
 #else
-            var bytes = Interlocked.Exchange(ref _pooledBytes, null);
+            byte[]? bytes = Interlocked.Exchange(ref _pooledBytes, null);
             if (bytes != null)
             {
                 if (bytes.Length >= ByteLength)
@@ -113,7 +113,7 @@ public partial class QRCodeGenerator
             Debug.Assert(Size == data.ModuleMatrix.Count - 8);
 
             var source = data.ModuleMatrix;
-            var target = Bytes;
+            byte[] target = Bytes;
 
 #if NETSTANDARD1_3
             Array.Clear(target, 0, target.Length);

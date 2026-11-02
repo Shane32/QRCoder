@@ -91,7 +91,7 @@ public class Base64QRCode : AbstractQRCode, IDisposable
 #if SYSTEM_DRAWING
 #pragma warning disable CA1416 // Validate platform compatibility
         var qr = new QRCode(QrCodeData);
-        var base64 = string.Empty;
+        string base64 = string.Empty;
         using (var bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, drawQuietZones))
         {
             base64 = BitmapToBase64(bmp, imgType);
@@ -122,7 +122,7 @@ public class Base64QRCode : AbstractQRCode, IDisposable
     public string GetGraphic(int pixelsPerModule, Color darkColor, Color lightColor, Bitmap icon, int iconSizePercent = 15, int iconBorderWidth = 6, bool drawQuietZones = true, ImageType imgType = ImageType.Png)
     {
         var qr = new QRCode(QrCodeData);
-        var base64 = string.Empty;
+        string base64 = string.Empty;
         using (var bmp = qr.GetGraphic(pixelsPerModule, darkColor, lightColor, icon, iconSizePercent, iconBorderWidth, drawQuietZones))
         {
             base64 = BitmapToBase64(bmp, imgType);

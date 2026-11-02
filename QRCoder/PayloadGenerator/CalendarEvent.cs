@@ -60,7 +60,7 @@ public static partial class PayloadGenerator
         /// <returns>A string representation of the calendar event in the VEVENT format.</returns>
         public override string ToString()
         {
-            var vEvent = $"BEGIN:VEVENT{Environment.NewLine}";
+            string vEvent = $"BEGIN:VEVENT{Environment.NewLine}";
             vEvent += $"SUMMARY:{_subject}{Environment.NewLine}";
             vEvent += !string.IsNullOrEmpty(_description) ? $"DESCRIPTION:{_description}{Environment.NewLine}" : "";
             vEvent += !string.IsNullOrEmpty(_location) ? $"LOCATION:{_location}{Environment.NewLine}" : "";

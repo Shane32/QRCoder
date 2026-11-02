@@ -45,7 +45,7 @@ public static partial class ShouldMatchApprovedExtensions
             var declaringType = currentMethod?.DeclaringType;
 
             // Check if the declaring type has the ShouldlyMethods attribute
-            var hasShouldlyAttribute = declaringType?.GetCustomAttributes(typeof(ShouldlyMethodsAttribute), false).Length > 0;
+            bool hasShouldlyAttribute = declaringType?.GetCustomAttributes(typeof(ShouldlyMethodsAttribute), false).Length > 0;
 
             // If this method is NOT in a ShouldlyMethods class, use it
             if (!hasShouldlyAttribute)
@@ -61,20 +61,20 @@ public static partial class ShouldMatchApprovedExtensions
         if (method == null)
             throw new ShouldAssertException("Unable to get method information from stack frame");
 
-        var fileName = frame.GetFileName();
+        string? fileName = frame.GetFileName();
         if (string.IsNullOrEmpty(fileName))
             throw new ShouldAssertException($"Source information not available, make sure you are compiling with full debug information. Method: {method.DeclaringType?.Name}.{method.Name}");
 
-        var outputFolder = Path.GetDirectoryName(fileName);
+        string? outputFolder = Path.GetDirectoryName(fileName);
         if (string.IsNullOrEmpty(outputFolder))
             throw new ShouldAssertException($"Unable to determine output folder from file: {fileName}");
 
-        var className = method.DeclaringType?.Name ?? throw new ShouldAssertException("Unable to get class name from method information");
-        var testMethodName = method.Name;
-        var discriminatorPart = string.IsNullOrEmpty(discriminator) ? "" : $".{discriminator}";
+        string className = method.DeclaringType?.Name ?? throw new ShouldAssertException("Unable to get class name from method information");
+        string testMethodName = method.Name;
+        string discriminatorPart = string.IsNullOrEmpty(discriminator) ? "" : $".{discriminator}";
 
-        var approvedFile = Path.Combine(outputFolder, $"{className}.{testMethodName}{discriminatorPart}.approved.{fileExtension}");
-        var receivedFile = Path.Combine(outputFolder, $"{className}.{testMethodName}{discriminatorPart}.received.{fileExtension}");
+        string approvedFile = Path.Combine(outputFolder, $"{className}.{testMethodName}{discriminatorPart}.approved.{fileExtension}");
+        string receivedFile = Path.Combine(outputFolder, $"{className}.{testMethodName}{discriminatorPart}.received.{fileExtension}");
 
         File.WriteAllBytes(receivedFile, actual);
 
@@ -91,15 +91,15 @@ public static partial class ShouldMatchApprovedExtensions
                 """);
         }
 
-        var approvedFileContents = File.ReadAllBytes(approvedFile);
-        var receivedFileContents = File.ReadAllBytes(receivedFile);
+        byte[] approvedFileContents = File.ReadAllBytes(approvedFile);
+        byte[] receivedFileContents = File.ReadAllBytes(receivedFile);
 
-        var contentsMatch = approvedFileContents.AsSpan().SequenceEqual(receivedFileContents.AsSpan());
+        bool contentsMatch = approvedFileContents.AsSpan().SequenceEqual(receivedFileContents.AsSpan());
 
         if (!contentsMatch)
         {
-            var baseMessage = $"Binary files do not match. Expected length: {approvedFileContents.Length}, Actual length: {receivedFileContents.Length}";
-            var copyCommand = $"""
+            string baseMessage = $"Binary files do not match. Expected length: {approvedFileContents.Length}, Actual length: {receivedFileContents.Length}";
+            string copyCommand = $"""
 
 
                 To approve the received file, run:
@@ -108,7 +108,7 @@ public static partial class ShouldMatchApprovedExtensions
 
                 """;
 
-            var message = customMessage != null
+            string message = customMessage != null
                 ? $"{customMessage}\n\n{baseMessage}{copyCommand}"
                 : $"{baseMessage}{copyCommand}";
 

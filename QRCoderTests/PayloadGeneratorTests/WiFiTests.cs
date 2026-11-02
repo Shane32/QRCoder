@@ -5,10 +5,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_build_wep()
     {
-        var ssid = "MyWiFiSSID";
-        var password = "7heP4assw0rd";
+        string ssid = "MyWiFiSSID";
+        string password = "7heP4assw0rd";
         var authmode = PayloadGenerator.WiFi.Authentication.WEP;
-        var hideSSID = false;
+        bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -18,10 +18,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_build_wpa()
     {
-        var ssid = "MyWiFiSSID";
-        var password = "7heP4assw0rd";
+        string ssid = "MyWiFiSSID";
+        string password = "7heP4assw0rd";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = false;
+        bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -31,10 +31,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_build_wpa2()
     {
-        var ssid = "MyWiFiSSID";
-        var password = "7heP4assw0rd";
+        string ssid = "MyWiFiSSID";
+        string password = "7heP4assw0rd";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA2;
-        var hideSSID = false;
+        bool hideSSID = false;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -44,8 +44,8 @@ public class WiFiTests
     [Fact]
     public void wifi_should_ignore_hiddenSSID_param()
     {
-        var ssid = "MyWiFiSSID";
-        var password = "7heP4assw0rd";
+        string ssid = "MyWiFiSSID";
+        string password = "7heP4assw0rd";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode);
@@ -57,10 +57,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_add_hiddenSSID_param()
     {
-        var ssid = "M\\y;W,i:FiSSID";
-        var password = "7heP4assw0rd\\;:,";
+        string ssid = "M\\y;W,i:FiSSID";
+        string password = "7heP4assw0rd\\;:,";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -71,10 +71,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_escape_input()
     {
-        var ssid = "MyWiFiSSID";
-        var password = "7heP4assw0rd";
+        string ssid = "MyWiFiSSID";
+        string password = "7heP4assw0rd";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -85,10 +85,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_escape_hex_style1()
     {
-        var ssid = "A9B7F18CCE";
-        var password = "00105F0E6";
+        string ssid = "A9B7F18CCE";
+        string password = "00105F0E6";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -99,10 +99,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_escape_hex_style2()
     {
-        var ssid = "a9b7f18cce";
-        var password = "00105f0Ee6";
+        string ssid = "a9b7f18cce";
+        string password = "00105f0Ee6";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -113,10 +113,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_escape_hex_style3()
     {
-        var ssid = "0xA9B7F18CCE";
-        var password = "0x00105F0E6";
+        string ssid = "0xA9B7F18CCE";
+        string password = "0x00105F0E6";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 
@@ -127,10 +127,10 @@ public class WiFiTests
     [Fact]
     public void wifi_should_escape_hex_style4()
     {
-        var ssid = "0XA9B7F18CCE";
-        var password = "0X00105F0E6";
+        string ssid = "0XA9B7F18CCE";
+        string password = "0X00105F0E6";
         var authmode = PayloadGenerator.WiFi.Authentication.WPA;
-        var hideSSID = true;
+        bool hideSSID = true;
 
         var generator = new PayloadGenerator.WiFi(ssid, password, authmode, hideSSID);
 

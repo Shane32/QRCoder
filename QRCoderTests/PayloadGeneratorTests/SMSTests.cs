@@ -5,8 +5,8 @@ public class SMSTests
     [Fact]
     public void sms_should_build_type_SMS()
     {
-        var number = "01601234567";
-        var message = "A small SMS";
+        string number = "01601234567";
+        string message = "A small SMS";
         var encoding = PayloadGenerator.SMS.SMSEncoding.SMS;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
@@ -18,8 +18,8 @@ public class SMSTests
     [Fact]
     public void sms_should_build_type_SMS_iOS()
     {
-        var number = "01601234567";
-        var message = "A small SMS";
+        string number = "01601234567";
+        string message = "A small SMS";
         var encoding = PayloadGenerator.SMS.SMSEncoding.SMS_iOS;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
@@ -31,8 +31,8 @@ public class SMSTests
     [Fact]
     public void sms_should_build_type_SMSTO()
     {
-        var number = "01601234567";
-        var message = "A small SMS";
+        string number = "01601234567";
+        string message = "A small SMS";
         var encoding = PayloadGenerator.SMS.SMSEncoding.SMSTO;
 
         var generator = new PayloadGenerator.SMS(number, message, encoding);
@@ -44,7 +44,7 @@ public class SMSTests
     [Fact]
     public void sms_should_not_add_unused_params()
     {
-        var number = "01601234567";
+        string number = "01601234567";
 
         var generator = new PayloadGenerator.SMS(number);
 

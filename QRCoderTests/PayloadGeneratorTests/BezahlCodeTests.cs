@@ -7,10 +7,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singlepayment_minimal()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount);
 #pragma warning restore CS0618
@@ -23,12 +23,12 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singlepayment_full()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var amount = 10.00m;
-        var postingKey = 69;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        decimal amount = 10.00m;
+        int postingKey = 69;
         var currency = Currency.USD;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account, bnc, amount, "", 0, null, null, reason, postingKey, currency, DateTime.Now);
@@ -42,12 +42,12 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singledirectdebit()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var amount = 10.00m;
-        var postingKey = 69;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        decimal amount = 10.00m;
+        int postingKey = 69;
         var currency = Currency.USD;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singledirectdebit, name, account, bnc, amount, "", 0, null, null, reason, postingKey, currency, DateTime.Now);
@@ -61,14 +61,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_periodicsinglepayment()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var amount = 10.00m;
-        var postingKey = 69;
-        var periodicTimeunit = "W";
-        var periodicTimeunitRotation = 2;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        decimal amount = 10.00m;
+        int postingKey = 69;
+        string periodicTimeunit = "W";
+        int periodicTimeunitRotation = 2;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;
@@ -84,10 +84,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singlepaymentsepa_minimal()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount);
 
@@ -100,12 +100,12 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singlepaymentsepa_full()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
         var currency = Currency.USD;
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban, bic, amount, "", 0, null, null, "", "", new DateTime(2017, 03, 01), reason, sepaReference, currency, DateTime.Now);
@@ -119,14 +119,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_singledirectdebitsepa()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var creditorId = "DE 02 TSV 01234567890";
-        var mandateId = "987543CB2";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string creditorId = "DE 02 TSV 01234567890";
+        string mandateId = "987543CB2";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
         var currency = Currency.USD;
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singledirectdebitsepa, name, iban, bic, amount, "", 0, null, null, creditorId, mandateId, new DateTime(2017, 03, 01), reason, sepaReference, currency, DateTime.Now);
@@ -140,14 +140,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_periodicsinglepaymentsepa()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
-        var periodicTimeunit = "M";
-        var periodicTimeunitRotation = 1;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
+        string periodicTimeunit = "M";
+        int periodicTimeunitRotation = 1;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;
@@ -163,9 +163,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_contact()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.contact, name, account: account, bnc: bnc);
 
@@ -178,9 +178,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_contact_full()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.contact, name, account, bnc, "", "", "New business contact.");
 
@@ -194,9 +194,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_contactv2_classic()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.contact_v2, name, account: account, bnc: bnc);
 
@@ -209,9 +209,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_contactv2_sepa()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.contact_v2, name, iban: iban, bic: bic);
 
@@ -225,9 +225,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_can_generate_payload_contactv2_sepa_full()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.contact_v2, name, "", "", iban, bic, "A new v2 contact.");
 
@@ -241,10 +241,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_handle_account_whitespaces()
     {
-        var account = "01 194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string account = "01 194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount);
 #pragma warning restore CS0618
@@ -257,10 +257,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_handle_bnc_whitespaces()
     {
-        var account = "001194700";
-        var bnc = "10020 5000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string account = "001194700";
+        string bnc = "10020 5000";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount);
 #pragma warning restore CS0618
@@ -273,10 +273,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_handle_iban_whitespaces()
     {
-        var iban = "DE33 100205000 0011947 00";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33 100205000 0011947 00";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount);
 
@@ -289,10 +289,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_handle_bic_whitespaces()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BF SWDE3 3BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BF SWDE3 3BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount);
 
@@ -305,10 +305,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_add_decimals()
     {
-        var account = "001194700";
-        var bnc = "10020 5000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10;
+        string account = "001194700";
+        string bnc = "10020 5000";
+        string name = "Wikimedia Fördergesellschaft";
+        int amount = 10;
 #pragma warning disable CS0618
         var generator = new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount);
 #pragma warning restore CS0618
@@ -321,9 +321,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_contact_constructor_exception()
     {
-        var account = "0001194700";
-        var bnc = "10020 5000";
-        var name = "Wikimedia Fördergesellschaft";
+        string account = "0001194700";
+        string bnc = "10020 5000";
+        string name = "Wikimedia Fördergesellschaft";
 #pragma warning disable CS0618
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account, bnc, "", "", "New business contact."));
 #pragma warning restore CS0618
@@ -334,9 +334,9 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_contact_v2_constructor_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.periodicsinglepaymentsepa, name, iban: iban, bic: bic));
 
@@ -347,10 +347,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_nonsepa_constructor_exception()
     {
-        var account = "0001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10;
+        string account = "0001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        int amount = 10;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, account: account, bnc: bnc, amount: amount));
 
@@ -360,14 +360,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_nonsepa_constructor_periodic_exception()
     {
-        var account = "0001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var amount = 10.00m;
-        var postingKey = 69;
-        var periodicTimeunit = "";
-        var periodicTimeunitRotation = 2;
+        string account = "0001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        decimal amount = 10.00m;
+        int postingKey = 69;
+        string periodicTimeunit = "";
+        int periodicTimeunitRotation = 2;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;
@@ -381,10 +381,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_sepa_constructor_exception()
     {
-        var iban = "DE33 100205000 0011947 00";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33 100205000 0011947 00";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, iban: iban, bic: bic, amount: amount));
 #pragma warning restore CS0618
@@ -395,14 +395,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_wrong_sepa_constructor_periodic_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
-        var periodicTimeunit = "M";
-        var periodicTimeunitRotation = 0;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
+        string periodicTimeunit = "M";
+        int periodicTimeunitRotation = 0;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;
@@ -417,10 +417,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_name_too_long_exception()
     {
-        var iban = "DE33 100205000 0011947 00";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft has really really really long name, over 71 chars";
-        var amount = 10.00m;
+        string iban = "DE33 100205000 0011947 00";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft has really really really long name, over 71 chars";
+        decimal amount = 10.00m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount));
 
@@ -432,11 +432,11 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_reason_too_long_exception()
     {
-        var iban = "DE33 100205000 0011947 00";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "A long long long reason text which may resolve in an exception" + new string('.', 200);
-        var amount = 10.00m;
+        string iban = "DE33 100205000 0011947 00";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "A long long long reason text which may resolve in an exception" + new string('.', 200);
+        decimal amount = 10.00m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount, reason: reason));
 
@@ -448,10 +448,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_account_exception()
     {
-        var account = "1194700AD";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string account = "1194700AD";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount));
 #pragma warning restore CS0618
@@ -462,10 +462,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_bnc_exception()
     {
-        var account = "001194700";
-        var bnc = "10020500023545626226262";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string account = "001194700";
+        string bnc = "10020500023545626226262";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount));
 #pragma warning restore CS0618
@@ -476,11 +476,11 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_postingkey_exception()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var postingKey = 101;
-        var amount = 10.00m;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        int postingKey = 101;
+        decimal amount = 10.00m;
 #pragma warning disable CS0618
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepayment, name, account: account, bnc: bnc, amount: amount, postingKey: postingKey));
 #pragma warning restore CS0618
@@ -491,10 +491,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_iban_exception()
     {
-        var iban = "DE33100205AZB000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205AZB000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount));
 
@@ -506,10 +506,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_bic_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "B2FSWDE33BER99871ABC99998";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "B2FSWDE33BER99871ABC99998";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount));
 
@@ -521,14 +521,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_separeference_too_long_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var creditorId = "DE 02 TSV 01234567890";
-        var mandateId = "987543CB2";
-        var sepaReference = "Fake SEPA reference which is also much to long for the reference field.";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string creditorId = "DE 02 TSV 01234567890";
+        string mandateId = "987543CB2";
+        string sepaReference = "Fake SEPA reference which is also much to long for the reference field.";
+        decimal amount = 10.00m;
         var currency = Currency.USD;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singledirectdebitsepa, name, iban, bic, amount, "", 0, null, null, creditorId, mandateId, new DateTime(2017, 03, 01), reason, sepaReference, currency, DateTime.Now));
@@ -541,14 +541,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_creditorid_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var creditorId = "12DE 02 TSV 01234567890";
-        var mandateId = "987543CB2";
-        var sepaReference = "Fake SEPA reference.";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string creditorId = "12DE 02 TSV 01234567890";
+        string mandateId = "987543CB2";
+        string sepaReference = "Fake SEPA reference.";
+        decimal amount = 10.00m;
         var currency = Currency.USD;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singledirectdebitsepa, name, iban, bic, amount, "", 0, null, null, creditorId, mandateId, new DateTime(2017, 03, 01), reason, sepaReference, currency, DateTime.Now));
@@ -560,14 +560,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_mandateid_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var creditorId = "DE 02 TSV 01234567890";
-        var mandateId = "ÄÖ987543CB2 1990 2017";
-        var sepaReference = "Fake SEPA reference.";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string creditorId = "DE 02 TSV 01234567890";
+        string mandateId = "ÄÖ987543CB2 1990 2017";
+        string sepaReference = "Fake SEPA reference.";
+        decimal amount = 10.00m;
         var currency = Currency.USD;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singledirectdebitsepa, name, iban, bic, amount, "", 0, null, null, creditorId, mandateId, new DateTime(2017, 03, 01), reason, sepaReference, currency, DateTime.Now));
@@ -578,10 +578,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_amount_too_much_digits_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.001m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.001m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount));
 
@@ -593,10 +593,10 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_amount_too_big_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 1000000000m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 1000000000m;
 
         var exception = Should.Throw<BezahlCodeException>(() => new PayloadGenerator.BezahlCode(AuthorityType.singlepaymentsepa, name, iban: iban, bic: bic, amount: amount));
 
@@ -608,12 +608,12 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_executiondate_exception()
     {
-        var account = "001194700";
-        var bnc = "100205000";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var amount = 10.00m;
-        var postingKey = 69;
+        string account = "001194700";
+        string bnc = "100205000";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        decimal amount = 10.00m;
+        int postingKey = 69;
         var executionDate = new DateTime(2017, 1, 1);
         var currency = Currency.USD;
 #pragma warning disable CS0618
@@ -626,14 +626,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_periodictimeunit_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
-        var periodicTimeunit = "Z";
-        var periodicTimeunitRotation = 1;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
+        string periodicTimeunit = "Z";
+        int periodicTimeunitRotation = 1;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;
@@ -647,14 +647,14 @@ public class BezahlCodeTests
     [Fact]
     public void bezahlcode_generator_should_throw_invalid_periodictimeunitrotation_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var reason = "Thanks for all your efforts";
-        var sepaReference = "Fake SEPA reference";
-        var amount = 10.00m;
-        var periodicTimeunit = "M";
-        var periodicTimeunitRotation = 128;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        string reason = "Thanks for all your efforts";
+        string sepaReference = "Fake SEPA reference";
+        decimal amount = 10.00m;
+        string periodicTimeunit = "M";
+        int periodicTimeunitRotation = 128;
         var periodicFirstExecutionDate = DateTime.Now;
         var periodicLastExecutionDate = DateTime.Now.AddMonths(3);
         var currency = Currency.USD;

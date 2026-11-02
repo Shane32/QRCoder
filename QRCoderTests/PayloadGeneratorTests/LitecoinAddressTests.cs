@@ -5,10 +5,10 @@ public class LitecoinAddressTests
     [Fact]
     public void litecoin_address_generator_can_generate_address()
     {
-        var address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
-        var amount = .123;
-        var label = "Some Label to Encode";
-        var message = "Some Message to Encode";
+        string address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
+        double amount = .123;
+        string label = "Some Label to Encode";
+        string message = "Some Message to Encode";
 
         var generator = new PayloadGenerator.LitecoinAddress(address, amount, label, message);
 
@@ -20,9 +20,9 @@ public class LitecoinAddressTests
     [Fact]
     public void litecoin_address_generator_should_skip_missing_label()
     {
-        var address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
-        var amount = .123;
-        var message = "Some Message to Encode";
+        string address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
+        double amount = .123;
+        string message = "Some Message to Encode";
 
 
         var generator = new PayloadGenerator.LitecoinAddress(address, amount, null, message);
@@ -35,8 +35,8 @@ public class LitecoinAddressTests
     [Fact]
     public void litecoin_address_generator_should_skip_missing_message()
     {
-        var address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
-        var amount = .123;
+        string address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
+        double amount = .123;
 
 
         var generator = new PayloadGenerator.LitecoinAddress(address, amount);
@@ -49,8 +49,8 @@ public class LitecoinAddressTests
     [Fact]
     public void litecoin_address_generator_should_round_to_satoshi()
     {
-        var address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
-        var amount = .123456789;
+        string address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
+        double amount = .123456789;
 
 
         var generator = new PayloadGenerator.LitecoinAddress(address, amount);
@@ -71,8 +71,8 @@ public class LitecoinAddressTests
         Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 #endif
 
-        var address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
-        var amount = .123;
+        string address = "LY1t7iLnwtPCb1DPZP38FA835XzFqXBq54";
+        double amount = .123;
 
 
         var generator = new PayloadGenerator.LitecoinAddress(address, amount);

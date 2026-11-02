@@ -5,8 +5,8 @@ public class GeolocationTests
     [Fact]
     public void geolocation_should_build_type_GEO()
     {
-        var latitude = "51.227741";
-        var longitude = "6.773456";
+        string latitude = "51.227741";
+        string longitude = "6.773456";
         var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
@@ -18,8 +18,8 @@ public class GeolocationTests
     [Fact]
     public void geolocation_should_build_type_GoogleMaps()
     {
-        var latitude = "51.227741";
-        var longitude = "6.773456";
+        string latitude = "51.227741";
+        string longitude = "6.773456";
         var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GoogleMaps;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
@@ -31,8 +31,8 @@ public class GeolocationTests
     [Fact]
     public void geolocation_should_escape_input()
     {
-        var latitude = "51,227741";
-        var longitude = "6,773456";
+        string latitude = "51,227741";
+        string longitude = "6,773456";
         var encoding = PayloadGenerator.Geolocation.GeolocationEncoding.GEO;
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude, encoding);
@@ -44,8 +44,8 @@ public class GeolocationTests
     [Fact]
     public void geolocation_should_add_unused_params()
     {
-        var latitude = "51.227741";
-        var longitude = "6.773456";
+        string latitude = "51.227741";
+        string longitude = "6.773456";
 
         var generator = new PayloadGenerator.Geolocation(latitude, longitude);
 

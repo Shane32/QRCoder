@@ -5,10 +5,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_build_universal()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 00);
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
@@ -22,10 +22,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_build_ical()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 0);
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.iCalComplete;
@@ -39,10 +39,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_build_with_utc_datetime()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00, DateTimeKind.Utc);
         var end = new DateTime(2016, 01, 03, 14, 30, 00, DateTimeKind.Utc);
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
@@ -56,10 +56,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_build_with_utc_offset()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = false;
         var begin = new DateTimeOffset(2016, 01, 03, 12, 00, 00, new TimeSpan(3, 0, 0));
         var end = new DateTimeOffset(2016, 01, 03, 14, 30, 00, new TimeSpan(3, 0, 0));
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
@@ -73,10 +73,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_build_allday()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = true;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = true;
         var begin = new DateTime(2016, 01, 03);
         var end = new DateTime(2016, 01, 03);
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
@@ -90,10 +90,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_care_empty_fields()
     {
-        var subject = "Release party";
-        var description = "";
-        var location = string.Empty;
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "";
+        string location = string.Empty;
+        bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 0);
         var encoding = PayloadGenerator.CalendarEvent.EventEncoding.Universal;
@@ -107,10 +107,10 @@ public class CalendarEventTests
     [Fact]
     public void calendarevent_should_add_unused_params()
     {
-        var subject = "Release party";
-        var description = "A small party for the new QRCoder. Bring some beer!";
-        var location = "Programmer's paradise, Beachtown, Paradise";
-        var alldayEvent = false;
+        string subject = "Release party";
+        string description = "A small party for the new QRCoder. Bring some beer!";
+        string location = "Programmer's paradise, Beachtown, Paradise";
+        bool alldayEvent = false;
         var begin = new DateTime(2016, 01, 03, 12, 00, 00);
         var end = new DateTime(2016, 01, 03, 14, 30, 0);
 

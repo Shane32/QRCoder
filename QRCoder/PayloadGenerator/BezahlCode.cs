@@ -115,8 +115,8 @@ public static partial class PayloadGenerator
 
                 if (authority != AuthorityType.contact_v2)
                 {
-                    var oldFilled = (!string.IsNullOrEmpty(account) && !string.IsNullOrEmpty(bnc));
-                    var newFilled = (!string.IsNullOrEmpty(iban) && !string.IsNullOrEmpty(bic));
+                    bool oldFilled = (!string.IsNullOrEmpty(account) && !string.IsNullOrEmpty(bnc));
+                    bool newFilled = (!string.IsNullOrEmpty(iban) && !string.IsNullOrEmpty(bic));
                     if ((!oldFilled && !newFilled) || (oldFilled && newFilled))
                         throw new BezahlCodeException("When using authority type 'contact_v2' either the parameters 'account' and 'bnc' or the parameters 'iban' and 'bic' must be set. Leave the other parameter pair empty.");
                 }
@@ -140,8 +140,8 @@ public static partial class PayloadGenerator
 
             _authority = authority;
 
-            var oldWayFilled = (!string.IsNullOrEmpty(account) && !string.IsNullOrEmpty(bnc));
-            var newWayFilled = (!string.IsNullOrEmpty(iban) && !string.IsNullOrEmpty(bic));
+            bool oldWayFilled = (!string.IsNullOrEmpty(account) && !string.IsNullOrEmpty(bnc));
+            bool newWayFilled = (!string.IsNullOrEmpty(iban) && !string.IsNullOrEmpty(bic));
 
             if (name.Length > 70)
                 throw new BezahlCodeException("(Payee-)Name must be shorter than 71 chars.");
@@ -149,7 +149,7 @@ public static partial class PayloadGenerator
 
             //Limit reason length depending on payment type
             //140 chars for SEPA payments and 27 chars for others
-            var reasonLength = authority == AuthorityType.periodicsinglepaymentsepa || authority == AuthorityType.singledirectdebitsepa || authority == AuthorityType.singlepaymentsepa || (authority == AuthorityType.contact_v2 && newWayFilled) ? 140 : 27;
+            int reasonLength = authority == AuthorityType.periodicsinglepaymentsepa || authority == AuthorityType.singledirectdebitsepa || authority == AuthorityType.singlepaymentsepa || (authority == AuthorityType.contact_v2 && newWayFilled) ? 140 : 27;
             if (reason.Length > reasonLength)
                 throw new BezahlCodeException($"Reasons texts have to be shorter than {reasonLength + 1} chars.");
             _reason = reason;

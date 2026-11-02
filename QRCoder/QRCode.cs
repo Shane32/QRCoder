@@ -69,8 +69,8 @@ public class QRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as a bitmap.</returns>
     public Bitmap GetGraphic(int pixelsPerModule, Color darkColor, Color lightColor, Bitmap? icon = null, int iconSizePercent = 15, int iconBorderWidth = 0, bool drawQuietZones = true, Color? iconBackgroundColor = null)
     {
-        var size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
-        var offset = drawQuietZones ? 0 : 4 * pixelsPerModule;
+        int size = (QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8)) * pixelsPerModule;
+        int offset = drawQuietZones ? 0 : 4 * pixelsPerModule;
 
         var bmp = new Bitmap(size, size, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
@@ -85,7 +85,7 @@ public class QRCode : AbstractQRCode, IDisposable
             // Fill background with light color
             gfx.Clear(lightColor);
 
-            var drawIconFlag = icon != null && iconSizePercent > 0 && iconSizePercent <= 100;
+            bool drawIconFlag = icon != null && iconSizePercent > 0 && iconSizePercent <= 100;
 
             // Create path for all dark modules using RLE
             using (var darkPath = CreatePathFromModules(pixelsPerModule, offset, drawQuietZones))
@@ -132,9 +132,9 @@ public class QRCode : AbstractQRCode, IDisposable
     {
         var path = new GraphicsPath();
         var matrix = QrCodeData.ModuleMatrix;
-        var size = matrix.Count;
-        var startIdx = drawQuietZones ? 0 : 4;
-        var endIdx = drawQuietZones ? size : size - 4;
+        int size = matrix.Count;
+        int startIdx = drawQuietZones ? 0 : 4;
+        int endIdx = drawQuietZones ? size : size - 4;
 
         for (int y = startIdx; y < endIdx; y++)
         {
@@ -156,10 +156,10 @@ public class QRCode : AbstractQRCode, IDisposable
                 }
 
                 // Create a single rectangle for the entire run of dark modules
-                var rectX = startX * pixelsPerModule - offset;
-                var rectY = y * pixelsPerModule - offset;
-                var rectWidth = (x - startX) * pixelsPerModule;
-                var rectHeight = pixelsPerModule;
+                int rectX = startX * pixelsPerModule - offset;
+                int rectY = y * pixelsPerModule - offset;
+                int rectWidth = (x - startX) * pixelsPerModule;
+                int rectHeight = pixelsPerModule;
 
                 path.AddRectangle(new Rectangle(rectX, rectY, rectWidth, rectHeight));
             }

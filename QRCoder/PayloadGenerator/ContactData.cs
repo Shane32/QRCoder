@@ -154,7 +154,7 @@ public static partial class PayloadGenerator
                 return payload.ToString().Trim(_trimChars);
             }
 
-            var version = _outputType.ToString().Substring(5);
+            string version = _outputType.ToString().Substring(5);
             if (version.Length > 1)
                 version = version.Insert(1, ".");
             else

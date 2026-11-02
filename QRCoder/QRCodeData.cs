@@ -20,9 +20,9 @@ public class QRCodeData : IDisposable
     public QRCodeData(int version)
     {
         Version = version;
-        var size = ModulesPerSideFromVersion(version);
+        int size = ModulesPerSideFromVersion(version);
         ModuleMatrix = new List<BitArray>(size);
-        for (var i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
             ModuleMatrix.Add(new BitArray(size));
     }
 
@@ -34,9 +34,9 @@ public class QRCodeData : IDisposable
     public QRCodeData(int version, bool addPadding)
     {
         Version = version;
-        var size = ModulesPerSideFromVersion(version) + (addPadding ? 8 : 0);
+        int size = ModulesPerSideFromVersion(version) + (addPadding ? 8 : 0);
         ModuleMatrix = new List<BitArray>(size);
-        for (var i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
             ModuleMatrix.Add(new BitArray(size));
     }
 
@@ -156,7 +156,7 @@ public class QRCodeData : IDisposable
 
     private void WriteRawData(Stream output, Compression compressMode)
     {
-        Stream targetStream = output;
+        var targetStream = output;
         DeflateStream? deflateStream = null;
         GZipStream? gzipStream = null;
 

@@ -7,10 +7,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_can_generate_payload_minimal()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount);
 
@@ -22,13 +22,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_can_generate_payload_full()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser,
@@ -43,13 +43,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_handle_version()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser,
@@ -65,13 +65,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_handle_iban_whitespaces()
     {
-        var iban = "DE33 1002 0500 0001 1947 00";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33 1002 0500 0001 1947 00";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser);
@@ -84,13 +84,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_handle_bic_whitespaces()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSW DE 33 BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSW DE 33 BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser);
@@ -104,13 +104,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_fill_amount_decimals()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSW DE 33 BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 12m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSW DE 33 BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 12m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
             PayloadGenerator.Girocode.TypeOfRemittance.Unstructured, purposeOfCreditTransfer, messageToGirocodeUser);
@@ -124,13 +124,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_iban_exception()
     {
-        var iban = "33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -143,13 +143,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_bic_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "DWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "DWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -162,13 +162,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_name_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "A company with a name which is exactly 71 chars - and for that to long.";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "A company with a name which is exactly 71 chars - and for that to long.";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -181,13 +181,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_amount_decimals_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.521m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.521m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -199,13 +199,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_amount_min_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 0.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 0.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -219,13 +219,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_amount_max_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 1999999999.99m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 1999999999.99m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -238,13 +238,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_purpose_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "12345";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "12345";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -256,13 +256,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_remittance_unstructured_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "An unstructured remittance information which is longer than a tweet. This means that this unstructures remittance info has more than 140 chars.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "An unstructured remittance information which is longer than a tweet. This means that this unstructures remittance info has more than 140 chars.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -274,13 +274,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_remittance_structured_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Structured remittance infos have to be shorter than 36 chars.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "Thanks for using Girocode";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Structured remittance infos have to be shorter than 36 chars.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "Thanks for using Girocode";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -292,13 +292,13 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_should_throw_usermessage_exception()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
-        var remittanceInformation = "Donation to Wikipedia.";
-        var purposeOfCreditTransfer = "1234";
-        var messageToGirocodeUser = "The usermessage is shown to the user which scans the Girocode. It has to be shorter than 71 chars.";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
+        string remittanceInformation = "Donation to Wikipedia.";
+        string purposeOfCreditTransfer = "1234";
+        string messageToGirocodeUser = "The usermessage is shown to the user which scans the Girocode. It has to be shorter than 71 chars.";
 
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount, remittanceInformation,
@@ -310,10 +310,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_sets_encoding_parameters()
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Wikimedia Fördergesellschaft";
-        var amount = 10.00m;
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Wikimedia Fördergesellschaft";
+        decimal amount = 10.00m;
 
         var payload = new PayloadGenerator.Girocode(iban, bic, name, amount);
 
@@ -325,10 +325,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version2_with_null_bic_should_succeed()
     {
-        var iban = "NL86INGB0002445588";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var payload = new PayloadGenerator.Girocode(
             iban: iban,
@@ -347,10 +347,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version2_with_empty_bic_should_succeed()
     {
-        var iban = "NL86INGB0002445588";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var payload = new PayloadGenerator.Girocode(
             iban: iban,
@@ -369,11 +369,11 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version2_with_valid_bic_should_succeed()
     {
-        var iban = "NL86INGB0002445588";
-        var bic = "INGBNL2A";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string bic = "INGBNL2A";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var payload = new PayloadGenerator.Girocode(
             iban: iban,
@@ -392,11 +392,11 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version2_with_invalid_bic_should_throw_exception()
     {
-        var iban = "NL86INGB0002445588";
-        var bic = "INVALID";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string bic = "INVALID";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
@@ -415,10 +415,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version1_with_null_bic_should_throw_exception()
     {
-        var iban = "NL86INGB0002445588";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
@@ -437,10 +437,10 @@ public class GirocodeTests
     [Fact]
     public void girocode_generator_version1_with_empty_bic_should_throw_exception()
     {
-        var iban = "NL86INGB0002445588";
-        var name = "a name";
-        var remittanceInformation = "some info";
-        var amount = 1337.99m;
+        string iban = "NL86INGB0002445588";
+        string name = "a name";
+        string remittanceInformation = "some info";
+        decimal amount = 1337.99m;
 
         var exception = Record.Exception(() => new PayloadGenerator.Girocode(
             iban: iban,
@@ -461,9 +461,9 @@ public class GirocodeTests
     [InlineData(true)]
     public void girocode_generator_can_generate_payload_without_amount(bool omitAmount)
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Payee";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Payee";
 
         var generator = omitAmount
             ? new PayloadGenerator.Girocode(iban, bic, name)
@@ -491,9 +491,9 @@ public class GirocodeTests
         string messageToGirocodeUser,
         string expectedSuffix)
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Payee";
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Payee";
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount: hasAmount ? 10m : (decimal?)null,
             remittanceInformation: remittanceInformation, typeOfRemittance: typeOfRemittance,
@@ -518,12 +518,12 @@ public class GirocodeTests
         PayloadGenerator.Girocode.GirocodeVersion version,
         PayloadGenerator.Girocode.TypeOfRemittance typeOfRemittance)
     {
-        var iban = "DE33100205000001194700";
-        var bic = version == PayloadGenerator.Girocode.GirocodeVersion.Version1 ? "BFSWDE33BER" : null;
-        var name = "Payee";
-        var remittanceInformation = "Reference";
-        var purposeOfCreditTransfer = "CHAR";
-        var messageToGirocodeUser = "Thank you";
+        string iban = "DE33100205000001194700";
+        string? bic = version == PayloadGenerator.Girocode.GirocodeVersion.Version1 ? "BFSWDE33BER" : null;
+        string name = "Payee";
+        string remittanceInformation = "Reference";
+        string purposeOfCreditTransfer = "CHAR";
+        string messageToGirocodeUser = "Thank you";
 
         var generator = omitAmount
             ? new PayloadGenerator.Girocode(iban, bic, name, remittanceInformation: remittanceInformation,
@@ -560,10 +560,10 @@ public class GirocodeTests
     [InlineData("12.3400", "EUR12.34")]
     public void girocode_generator_should_format_specified_amount(string amountText, string expectedAmount)
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Payee";
-        var amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Payee";
+        decimal amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
 
         var generator = new PayloadGenerator.Girocode(iban, bic, name, amount);
         var nullableGenerator = new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount);
@@ -584,10 +584,10 @@ public class GirocodeTests
     [InlineData("10.521", "Amount must have less than 3 digits after decimal point.")]
     public void girocode_generator_should_throw_invalid_amount_exception(string amountText, string expectedMessage)
     {
-        var iban = "DE33100205000001194700";
-        var bic = "BFSWDE33BER";
-        var name = "Payee";
-        var amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
+        string iban = "DE33100205000001194700";
+        string bic = "BFSWDE33BER";
+        string name = "Payee";
+        decimal amount = decimal.Parse(amountText, CultureInfo.InvariantCulture);
 
         var exception = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, amount));
         var nullableException = Should.Throw<PayloadGenerator.Girocode.GirocodeException>(() => new PayloadGenerator.Girocode(iban, bic, name, (decimal?)amount));
