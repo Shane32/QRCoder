@@ -39,7 +39,7 @@ public static partial class PayloadGenerator
         /// <returns>The Monero transaction payload as a URI string.</returns>
         public override string ToString()
         {
-            var moneroUri = $"monero://{_address}{(!string.IsNullOrEmpty(_txPaymentId) || !string.IsNullOrEmpty(_recipientName) || !string.IsNullOrEmpty(_txDescription) || _txAmount != null ? "?" : string.Empty)}";
+            string moneroUri = $"monero://{_address}{(!string.IsNullOrEmpty(_txPaymentId) || !string.IsNullOrEmpty(_recipientName) || !string.IsNullOrEmpty(_txDescription) || _txAmount != null ? "?" : string.Empty)}";
             moneroUri += (!string.IsNullOrEmpty(_txPaymentId) ? $"tx_payment_id={Uri.EscapeDataString(_txPaymentId)}&" : string.Empty);
             moneroUri += (!string.IsNullOrEmpty(_recipientName) ? $"recipient_name={Uri.EscapeDataString(_recipientName)}&" : string.Empty);
             moneroUri += (_txAmount != null ? $"tx_amount={_txAmount.Value.ToString(CultureInfo.InvariantCulture)}&" : string.Empty);

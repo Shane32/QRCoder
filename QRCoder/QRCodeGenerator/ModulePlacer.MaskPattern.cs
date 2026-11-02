@@ -76,7 +76,7 @@ public partial class QRCodeGenerator
             {
                 Generator = generator;
 
-                var bytes = new byte[2 * PATTERN_SIZE * PATTERN_SIZE / 8];
+                byte[] bytes = new byte[2 * PATTERN_SIZE * PATTERN_SIZE / 8];
                 for (int x = 0; x < PATTERN_SIZE; x++)
                 {
                     int byteIndex1 = x >> 3;
@@ -103,9 +103,9 @@ public partial class QRCodeGenerator
                 Debug.Assert(moduleMatrix.Size == blockedModules.Size);
                 Debug.Assert(moduleMatrix.Stride == blockedModules.Stride);
 
-                var pattern = _bytes;
-                var target = moduleMatrix.Bytes;
-                var blocked = blockedModules.Bytes;
+                byte[] pattern = _bytes;
+                byte[] target = moduleMatrix.Bytes;
+                byte[] blocked = blockedModules.Bytes;
 
                 for (int y = 0; y < moduleMatrix.Size; y++)
                 {

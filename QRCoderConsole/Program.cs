@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Markup;
@@ -14,20 +15,20 @@ internal sealed class MainClass
 {
     public static void Main(string[] args)
     {
-        var friendlyName = AppDomain.CurrentDomain.FriendlyName;
-        var newLine = Environment.NewLine;
+        string friendlyName = AppDomain.CurrentDomain.FriendlyName;
+        string newLine = Environment.NewLine;
 
         string? fileName = null, outputFileName = null, payload = null;
 
-        var eccLevel = QRCodeGenerator.ECCLevel.L;
-        var imageFormat = SupportedImageFormat.Png;
+        QRCodeGenerator.ECCLevel eccLevel = QRCodeGenerator.ECCLevel.L;
+        SupportedImageFormat imageFormat = SupportedImageFormat.Png;
 
         int pixelsPerModule = 20;
         string foregroundColor = "#000000";
         string backgroundColor = "#FFFFFF";
 
 
-        var showHelp = false;
+        bool showHelp = false;
 
         var optionSet = new OptionSet {
             {    "e|ecc-level=",
@@ -113,7 +114,7 @@ internal sealed class MainClass
             }
             else
             {
-                var stdin = Console.OpenStandardInput();
+                Stream stdin = Console.OpenStandardInput();
 
                 text = GetTextFromStream(stdin);
             }
@@ -134,7 +135,7 @@ internal sealed class MainClass
     private static void GenerateQRCode(string payloadString, QRCodeGenerator.ECCLevel eccLevel, string outputFileName, SupportedImageFormat imgFormat, int pixelsPerModule, string foreground, string background)
     {
         using var generator = new QRCodeGenerator();
-        using var data = generator.CreateQrCode(payloadString, eccLevel);
+        using QRCodeData data = generator.CreateQrCode(payloadString, eccLevel);
         switch (imgFormat)
         {
             case SupportedImageFormat.Png:
@@ -144,16 +145,16 @@ internal sealed class MainClass
             case SupportedImageFormat.Tiff:
                 using (var code = new QRCode(data))
                 {
-                    using var bitmap = code.GetGraphic(pixelsPerModule, foreground, background, true);
-                    var actualFormat = OptionSetter.GetImageFormat(imgFormat.ToString());
+                    using Bitmap bitmap = code.GetGraphic(pixelsPerModule, foreground, background, true);
+                    ImageFormat actualFormat = OptionSetter.GetImageFormat(imgFormat.ToString());
                     bitmap.Save(outputFileName, actualFormat);
                 }
                 break;
             case SupportedImageFormat.Svg:
                 using (var code = new SvgQRCode(data))
                 {
-                    var test = code.GetGraphic(pixelsPerModule, foreground, background, true);
-                    using var f = File.CreateText(outputFileName);
+                    string test = code.GetGraphic(pixelsPerModule, foreground, background, true);
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }
@@ -162,8 +163,8 @@ internal sealed class MainClass
             case SupportedImageFormat.Xaml:
                 using (var code = new QRCoder.Xaml.XamlQRCode(data))
                 {
-                    var test = XamlWriter.Save(code.GetGraphic(pixelsPerModule, foreground, background, true));
-                    using var f = File.CreateText(outputFileName);
+                    string test = XamlWriter.Save(code.GetGraphic(pixelsPerModule, foreground, background, true));
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }
@@ -173,9 +174,9 @@ internal sealed class MainClass
             case SupportedImageFormat.Eps:
                 using (var code = new PostscriptQRCode(data))
                 {
-                    var test = code.GetGraphic(pixelsPerModule, foreground, background, true,
+                    string test = code.GetGraphic(pixelsPerModule, foreground, background, true,
                         imgFormat == SupportedImageFormat.Eps);
-                    using var f = File.CreateText(outputFileName);
+                    using StreamWriter f = File.CreateText(outputFileName);
                     f.Write(test);
                     f.Flush();
                 }
@@ -187,7 +188,7 @@ internal sealed class MainClass
 
     private static string GetTextFromFile(FileInfo fileInfo)
     {
-        var buffer = new byte[fileInfo.Length];
+        byte[] buffer = new byte[fileInfo.Length];
 
         using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open))
         {
@@ -199,8 +200,8 @@ internal sealed class MainClass
 
     private static string GetTextFromStream(Stream stream)
     {
-        var buffer = new byte[256];
-        var bytesRead = 0;
+        byte[] buffer = new byte[256];
+        int bytesRead = 0;
 
         using var memoryStream = new MemoryStream();
         while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
@@ -208,7 +209,7 @@ internal sealed class MainClass
             memoryStream.Write(buffer, 0, bytesRead);
         }
 
-        var text = Encoding.UTF8.GetString(memoryStream.ToArray());
+        string text = Encoding.UTF8.GetString(memoryStream.ToArray());
 
         Console.WriteLine($"text retrieved from input stream: {text}");
 

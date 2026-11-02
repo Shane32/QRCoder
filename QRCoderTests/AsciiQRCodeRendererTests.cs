@@ -5,7 +5,7 @@ public class AsciiQRCodeRendererTests
     [Fact]
     public void can_render_ascii_qrcode()
     {
-        var targetCode = """
+        string targetCode = """
                                                                       
                                                                       
                                                                       
@@ -39,8 +39,8 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphic(1);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphic(1);
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -48,7 +48,7 @@ public class AsciiQRCodeRendererTests
     [Fact]
     public void can_render_small_ascii_qrcode()
     {
-        var targetCode = """
+        string targetCode = """
             █████████████████████████████
             █████████████████████████████
             ████ ▄▄▄▄▄ █  █▄▀█ ▄▄▄▄▄ ████
@@ -68,8 +68,8 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphicSmall();
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphicSmall();
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -77,7 +77,7 @@ public class AsciiQRCodeRendererTests
     [Fact]
     public void can_render_small_ascii_qrcode_without_quietzones()
     {
-        var targetCode = """
+        string targetCode = """
              ▄▄▄▄▄ █  █▄▀█ ▄▄▄▄▄ 
              █   █ █ █▄█ █ █   █ 
              █▄▄▄█ █▄▄▄▄▄█ █▄▄▄█ 
@@ -93,15 +93,15 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphicSmall(drawQuietZones: false);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphicSmall(drawQuietZones: false);
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
 
     [Fact]
     public void can_render_small_ascii_qrcode_inverted()
     {
-        var targetCode = """
+        string targetCode = """
                                          
                                          
                 █▀▀▀▀▀█ ██ ▀▄ █▀▀▀▀▀█    
@@ -121,15 +121,15 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphicSmall(invert: true);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphicSmall(invert: true);
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
 
     [Fact]
     public void can_render_small_ascii_qrcode_with_custom_eol()
     {
-        var targetCode = """
+        string targetCode = """
             █████████████████████████████
             █████████████████████████████
             ████ ▄▄▄▄▄ █  █▄▀█ ▄▄▄▄▄ ████
@@ -149,15 +149,15 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphicSmall(endOfLine: "\r\n");
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphicSmall(endOfLine: "\r\n");
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
 
     [Fact]
     public void can_render_ascii_qrcode_without_quietzones()
     {
-        var targetCode = """
+        string targetCode = """
             ██████████████  ████  ██    ██████████████
             ██          ██  ████    ██  ██          ██
             ██  ██████  ██  ██  ██  ██  ██  ██████  ██
@@ -183,8 +183,8 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphic(1, drawQuietZones: false);
+        QRCodeData data = gen.CreateQrCode("A05", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphic(1, drawQuietZones: false);
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -192,7 +192,7 @@ public class AsciiQRCodeRendererTests
     [Fact]
     public void can_render_ascii_qrcode_with_custom_symbols()
     {
-        var targetCode = """
+        string targetCode = """
                                                                       
                                                                       
                                                                       
@@ -255,8 +255,8 @@ public class AsciiQRCodeRendererTests
 
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("A", QRCodeGenerator.ECCLevel.Q);
-        var asciiCode = new AsciiQRCode(data).GetGraphic(2, "X", " ");
+        QRCodeData data = gen.CreateQrCode("A", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = new AsciiQRCode(data).GetGraphic(2, "X", " ");
 
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
@@ -272,7 +272,7 @@ public class AsciiQRCodeRendererTests
     [Fact]
     public void can_render_ascii_qrcode_from_helper()
     {
-        var targetCode = """
+        string targetCode = """
                                                                       
                                                                       
                                                                       
@@ -334,7 +334,7 @@ public class AsciiQRCodeRendererTests
             """;
 
         //Create QR code                   
-        var asciiCode = AsciiQRCodeHelper.GetQRCode("A", 2, "X", " ", QRCodeGenerator.ECCLevel.Q);
+        string asciiCode = AsciiQRCodeHelper.GetQRCode("A", 2, "X", " ", QRCodeGenerator.ECCLevel.Q);
         asciiCode.ShouldBe(targetCode, StringCompareShould.IgnoreLineEndings);
     }
 }

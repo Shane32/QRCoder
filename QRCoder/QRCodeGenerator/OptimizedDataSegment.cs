@@ -44,15 +44,15 @@ public partial class QRCodeGenerator
             if (string.IsNullOrEmpty(Text))
                 return 0;
 
-            var totalBits = 0;
-            var mode = SelectInitialMode(Text, 0, version);
-            var startPos = 0;
+            int totalBits = 0;
+            EncodingMode mode = SelectInitialMode(Text, 0, version);
+            int startPos = 0;
 
             do
             {
                 // Find the extent of the current mode
                 EncodingMode nextMode;
-                var segmentEnd = mode switch
+                int segmentEnd = mode switch
                 {
                     EncodingMode.Byte => ProcessByteMode(Text, startPos, version, out nextMode),
                     EncodingMode.Alphanumeric => ProcessAlphanumericMode(Text, startPos, version, out nextMode),
@@ -60,7 +60,7 @@ public partial class QRCodeGenerator
                     _ => throw new InvalidOperationException("Unsupported encoding mode")
                 };
 
-                var segmentLength = segmentEnd - startPos;
+                int segmentLength = segmentEnd - startPos;
                 totalBits += mode switch
                 {
                     EncodingMode.Numeric => NumericDataSegment.GetBitLength(segmentLength, version),
@@ -101,15 +101,15 @@ public partial class QRCodeGenerator
             if (string.IsNullOrEmpty(Text))
                 return startIndex;
 
-            var bitIndex = startIndex;
-            var mode = SelectInitialMode(Text, 0, version);
-            var startPos = 0;
+            int bitIndex = startIndex;
+            EncodingMode mode = SelectInitialMode(Text, 0, version);
+            int startPos = 0;
 
             do
             {
                 // Find the extent of the current mode
                 EncodingMode nextMode;
-                var segmentEnd = mode switch
+                int segmentEnd = mode switch
                 {
                     EncodingMode.Byte => ProcessByteMode(Text, startPos, version, out nextMode),
                     EncodingMode.Alphanumeric => ProcessAlphanumericMode(Text, startPos, version, out nextMode),
@@ -117,7 +117,7 @@ public partial class QRCodeGenerator
                     _ => throw new InvalidOperationException("Unsupported encoding mode")
                 };
 
-                var segmentLength = segmentEnd - startPos;
+                int segmentLength = segmentEnd - startPos;
                 bitIndex = mode switch
                 {
                     EncodingMode.Numeric => NumericDataSegment.WriteTo(Text, startPos, segmentLength, bitArray, bitIndex, version),
@@ -160,7 +160,7 @@ public partial class QRCodeGenerator
         // Implements rules from ISO/IEC 18004:2015 Annex J.2 section a.
         private static EncodingMode SelectInitialMode(string text, int startPos, int version)
         {
-            var c = text[startPos];
+            char c = text[startPos];
 
             // Rule a.1: If initial input data is in the exclusive subset of the Byte character set, select Byte mode
             if (!IsAlphanumeric(c))
@@ -170,11 +170,11 @@ public partial class QRCodeGenerator
             // exclusive subset of the Byte character set, THEN select Byte mode
             if (IsNumeric(c))
             {
-                var numericCount = CountConsecutive(text, startPos, IsNumeric);
-                var threshold = GetBreakpoint(version, 4, 4, 5);
+                int numericCount = CountConsecutive(text, startPos, IsNumeric);
+                int threshold = GetBreakpoint(version, 4, 4, 5);
                 if (numericCount < threshold)
                 {
-                    var nextPos = startPos + numericCount;
+                    int nextPos = startPos + numericCount;
                     if (nextPos < text.Length && !IsAlphanumeric(text[nextPos]))
                         return EncodingMode.Byte;
                 }
@@ -183,7 +183,7 @@ public partial class QRCodeGenerator
                 threshold = GetBreakpoint(version, 7, 8, 9);
                 if (numericCount < threshold)
                 {
-                    var nextPos = startPos + numericCount;
+                    int nextPos = startPos + numericCount;
                     if (nextPos < text.Length && IsAlphanumeric(text[nextPos]))
                         return EncodingMode.Alphanumeric;
                 }
@@ -192,11 +192,11 @@ public partial class QRCodeGenerator
 
             // Rule a.3: If initial input data is in the exclusive subset of the Alphanumeric character set AND if there are
             // less than [6-8] characters followed by data from the remainder of the Byte character set, THEN select Byte mode
-            var alphanumericCount = CountConsecutive(text, startPos, IsAlphanumeric);
-            var alphaThreshold = GetBreakpoint(version, 6, 7, 8);
+            int alphanumericCount = CountConsecutive(text, startPos, IsAlphanumeric);
+            int alphaThreshold = GetBreakpoint(version, 6, 7, 8);
             if (alphanumericCount < alphaThreshold)
             {
-                var nextPos = startPos + alphanumericCount;
+                int nextPos = startPos + alphanumericCount;
                 if (nextPos < text.Length && !IsAlphanumeric(text[nextPos]))
                     return EncodingMode.Byte;
             }
@@ -207,16 +207,16 @@ public partial class QRCodeGenerator
         // Implements rules from ISO/IEC 18004:2015 Annex J.2 section b.
         private static int ProcessByteMode(string text, int startPos, int version, out EncodingMode nextMode)
         {
-            var pos = startPos;
+            int pos = startPos;
 
-            var numericThreshold = GetBreakpoint(version, 6, 8, 9);
-            var alphaThreshold = GetBreakpoint(version, 11, 15, 16);
+            int numericThreshold = GetBreakpoint(version, 6, 8, 9);
+            int alphaThreshold = GetBreakpoint(version, 11, 15, 16);
             while (pos < text.Length)
             {
-                var c = text[pos];
+                char c = text[pos];
 
                 // Rule b.3: If a sequence of at least [6,8,9] Numeric characters occurs before more data from the exclusive subset of the Byte character set, switch to Numeric mode
-                var numericCount = CountConsecutive(text, pos, IsNumeric);
+                int numericCount = CountConsecutive(text, pos, IsNumeric);
                 if (numericCount >= numericThreshold)
                 {
                     nextMode = EncodingMode.Numeric;
@@ -224,7 +224,7 @@ public partial class QRCodeGenerator
                 }
 
                 // Rule b.2: If a sequence of at least [11,15,16] character from the exclusive subset of the Alphanumeric character set occurs before more data from the exclusive subset of the Byte character set, switch to Alphanumeric mode
-                var alphanumericCount = CountConsecutive(text, pos, IsAlphanumeric);
+                int alphanumericCount = CountConsecutive(text, pos, IsAlphanumeric);
                 if (alphanumericCount >= alphaThreshold)
                 {
                     nextMode = EncodingMode.Alphanumeric;
@@ -243,12 +243,12 @@ public partial class QRCodeGenerator
         // Implements rules from ISO/IEC 18004:2015 Annex J.2 section c.
         private static int ProcessAlphanumericMode(string text, int startPos, int version, out EncodingMode nextMode)
         {
-            var pos = startPos;
+            int pos = startPos;
 
-            var threshold = GetBreakpoint(version, 13, 15, 17);
+            int threshold = GetBreakpoint(version, 13, 15, 17);
             while (pos < text.Length)
             {
-                var c = text[pos];
+                char c = text[pos];
 
                 // Rule c.2: If one or more characters from the exclusive subset of the Byte character set occurs, switch to Byte mode
                 if (!IsAlphanumeric(c))
@@ -258,7 +258,7 @@ public partial class QRCodeGenerator
                 }
 
                 // Rule c.3: If a sequence of at least [13,15,17] Numeric characters occurs before more data from the exclusive subset of the Alphanumeric character set, switch to Numeric mode
-                var numericCount = CountConsecutive(text, pos, IsNumeric);
+                int numericCount = CountConsecutive(text, pos, IsNumeric);
                 if (numericCount >= threshold)
                 {
                     nextMode = EncodingMode.Numeric;
@@ -277,11 +277,11 @@ public partial class QRCodeGenerator
         // Implements rules from ISO/IEC 18004:2015 Annex J.2 section d.
         private static int ProcessNumericMode(string text, int startPos, int version, out EncodingMode nextMode)
         {
-            var pos = startPos;
+            int pos = startPos;
 
             while (pos < text.Length)
             {
-                var c = text[pos];
+                char c = text[pos];
 
                 // Rule d.2: If one or more characters from the exclusive subset of the Byte character set occurs, switch to Byte mode
                 // Rule d.3: If one or more characters from the exclusive subset of the Alphanumeric character set occurs, switch to Alphanumeric mode
@@ -319,8 +319,8 @@ public partial class QRCodeGenerator
         // Counts consecutive characters matching a predicate starting from a position.
         private static int CountConsecutive(string text, int startPos, Func<char, bool> predicate)
         {
-            var count = 0;
-            for (var i = startPos; i < text.Length && predicate(text[i]); i++)
+            int count = 0;
+            for (int i = startPos; i < text.Length && predicate(text[i]); i++)
                 count++;
             return count;
         }

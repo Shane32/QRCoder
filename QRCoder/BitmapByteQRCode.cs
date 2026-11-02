@@ -101,8 +101,8 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
             moduleLight[i + 2] = lightColorRgb[0];
         }
 
-        var moduleMatrix = QrCodeData.ModuleMatrix;
-        var sideLength = moduleMatrix.Count * pixelsPerModule;
+        List<BitArray> moduleMatrix = QrCodeData.ModuleMatrix;
+        int sideLength = moduleMatrix.Count * pixelsPerModule;
 
         // The size of each row must be rounded up to a multiple of 4 bytes by padding.
         // Pre-calculate padding bytes
@@ -137,7 +137,7 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
         // Draw qr code
         for (int y = moduleMatrix.Count - 1; y >= 0; y--)
         {
-            var modules = moduleMatrix[y];
+            BitArray modules = moduleMatrix[y];
 
             // Write data for first line of pixelsPerModule lines
             int lineStart = ix;
@@ -210,7 +210,7 @@ public static class BitmapByteQRCodeHelper
         EciMode eciMode = EciMode.Default, int requestedVersion = -1)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
                 requestedVersion);
         using var qrCode = new BitmapByteQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex);
@@ -226,7 +226,7 @@ public static class BitmapByteQRCodeHelper
     public static byte[] GetQRCode(string txt, QRCodeGenerator.ECCLevel eccLevel, int size)
     {
         using var qrGen = new QRCodeGenerator();
-        using var qrCode = qrGen.CreateQrCode(txt, eccLevel);
+        using QRCodeData qrCode = qrGen.CreateQrCode(txt, eccLevel);
         using var qrBmp = new BitmapByteQRCode(qrCode);
         return qrBmp.GetGraphic(size);
 

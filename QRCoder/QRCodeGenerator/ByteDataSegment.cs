@@ -75,7 +75,7 @@ public partial class QRCodeGenerator
         /// <returns>The next index in the BitArray after the last bit written</returns>
         public override int WriteTo(BitArray bitArray, int startIndex, int version)
         {
-            var index = startIndex;
+            int index = startIndex;
 
             // write eci mode if present
             if (HasEciMode)
@@ -170,7 +170,7 @@ public partial class QRCodeGenerator
     /// <returns>The number of bits required to encode the text.</returns>
     private static int GetPlainTextToBinaryByteBitLength(string plainText, EciMode eciMode, bool utf8BOM, bool forceUtf8)
     {
-        var targetEncoding = GetTargetEncoding(plainText, eciMode, utf8BOM, forceUtf8, out var includeUtf8BOM);
+        Encoding targetEncoding = GetTargetEncoding(plainText, eciMode, utf8BOM, forceUtf8, out bool includeUtf8BOM);
         int byteCount = targetEncoding.GetByteCount(plainText);
         return (byteCount * 8) + (includeUtf8BOM ? 24 : 0);
     }
@@ -213,7 +213,7 @@ public partial class QRCodeGenerator
     /// </remarks>
     private static int PlainTextToBinaryByte(string plainText, EciMode eciMode, bool utf8BOM, bool forceUtf8, BitArray bitArray, int offset)
     {
-        var targetEncoding = GetTargetEncoding(plainText, eciMode, utf8BOM, forceUtf8, out var includeUtf8BOM);
+        Encoding targetEncoding = GetTargetEncoding(plainText, eciMode, utf8BOM, forceUtf8, out bool includeUtf8BOM);
 
 #if HAS_SPAN
         // We can use stackalloc for small arrays to prevent heap allocations

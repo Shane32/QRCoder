@@ -126,7 +126,7 @@ public static partial class PayloadGenerator
         private string UrlEncode(string i)
         {
             string j = i;
-            foreach (var kv in _urlEncodeTable)
+            foreach (KeyValuePair<string, string> kv in _urlEncodeTable)
             {
                 j = j.Replace(kv.Key, kv.Value);
             }
@@ -171,12 +171,12 @@ public static partial class PayloadGenerator
         {
             if (string.IsNullOrEmpty(_parameter))
             {
-                var connectionString = $"{_methodStr}:{_password}@{_hostname}:{_port}";
-                var connectionStringEncoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(connectionString));
+                string connectionString = $"{_methodStr}:{_password}@{_hostname}:{_port}";
+                string connectionStringEncoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(connectionString));
                 return $"ss://{connectionStringEncoded}{(!string.IsNullOrEmpty(_tag) ? $"#{_tag}" : string.Empty)}";
             }
-            var authString = $"{_methodStr}:{_password}";
-            var authStringEncoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(authString))
+            string authString = $"{_methodStr}:{_password}";
+            string authStringEncoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(authString))
                 .Replace('+', '-')
                 .Replace('/', '_')
                 .TrimEnd('=');

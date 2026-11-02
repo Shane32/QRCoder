@@ -7,7 +7,7 @@ public class StringExtensionsTests
     [Fact]
     public void can_append_numbers_using_invariant_culture()
     {
-        var originalCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo originalCulture = Thread.CurrentThread.CurrentCulture;
         var culture = new CultureInfo("de-DE");
         culture.NumberFormat.NegativeSign = "~";
 

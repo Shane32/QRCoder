@@ -32,7 +32,7 @@ public class QRCodeGeneratorBenchmark
     [Benchmark]
     public void CreateQRCodeLongest()
     {
-        var str = new string('a', 2600);
+        string str = new string('a', 2600);
         var qrGenerator = new QRCoder.QRCodeGenerator();
         _ = qrGenerator.CreateQrCode(str, QRCoder.QRCodeGenerator.ECCLevel.L);
     }

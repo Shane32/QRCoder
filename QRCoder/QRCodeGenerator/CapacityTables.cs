@@ -35,7 +35,7 @@ public partial class QRCodeGenerator
         /// </returns>
         public static ECCInfo GetEccInfo(int version, ECCLevel eccLevel)
         {
-            foreach (var item in _capacityECCTable)
+            foreach (ECCInfo item in _capacityECCTable)
             {
                 if (item.Version == version && item.ErrorCorrectionLevel == eccLevel)
                 {
@@ -87,10 +87,10 @@ public partial class QRCodeGenerator
         {
             // only iterates through non-micro QR codes
             // capacity table is already sorted by version number ascending, so the smallest version that can hold the data is the first one found
-            foreach (var x in _capacityTable)
+            foreach (VersionInfo x in _capacityTable)
             {
                 // find the requested ECC level and encoding mode in the capacity table
-                foreach (var y in x.Details)
+                foreach (VersionInfoDetails y in x.Details)
                 {
                     if (y.ErrorCorrectionLevel == eccLevel && y.CapacityDict[encMode] >= length)
                     {
@@ -107,7 +107,7 @@ public partial class QRCodeGenerator
 
             static void Throw(EncodingMode encMode, ECCLevel eccLevel)
             {
-                var maxSizeByte = _capacityTable.Where(
+                int maxSizeByte = _capacityTable.Where(
                     x => x.Details.Any(
                         y => (y.ErrorCorrectionLevel == eccLevel))
                     ).Max(x => x.Details.Single(y => y.ErrorCorrectionLevel == eccLevel).CapacityDict[encMode]);
@@ -127,10 +127,10 @@ public partial class QRCodeGenerator
         public static bool TryCalculateMinimumVersion(DataSegment segment, ECCLevel eccLevel, out int version)
         {
             // Versions 1-9: Count indicator length is constant within this range
-            var segmentBitLength = segment.GetBitLength(1);
+            int segmentBitLength = segment.GetBitLength(1);
             for (version = 1; version <= 9; version++)
             {
-                var eccInfo = GetEccInfo(version, eccLevel);
+                ECCInfo eccInfo = GetEccInfo(version, eccLevel);
                 // Check if this version has enough capacity for the segment's total bits
                 if (eccInfo.TotalDataBits >= segmentBitLength)
                 {
@@ -142,7 +142,7 @@ public partial class QRCodeGenerator
             segmentBitLength = segment.GetBitLength(10);
             for (version = 10; version <= 26; version++)
             {
-                var eccInfo = GetEccInfo(version, eccLevel);
+                ECCInfo eccInfo = GetEccInfo(version, eccLevel);
                 // Check if this version has enough capacity for the segment's total bits
                 if (eccInfo.TotalDataBits >= segmentBitLength)
                 {
@@ -154,7 +154,7 @@ public partial class QRCodeGenerator
             segmentBitLength = segment.GetBitLength(27);
             for (version = 27; version <= 40; version++)
             {
-                var eccInfo = GetEccInfo(version, eccLevel);
+                ECCInfo eccInfo = GetEccInfo(version, eccLevel);
                 // Check if this version has enough capacity for the segment's total bits
                 if (eccInfo.TotalDataBits >= segmentBitLength)
                 {
@@ -181,10 +181,10 @@ public partial class QRCodeGenerator
         {
             // only iterates through non-micro QR codes
             // capacity table is already sorted by version number ascending, so the smallest version that can hold the data is the first one found
-            foreach (var x in _microCapacityTable)
+            foreach (VersionInfo x in _microCapacityTable)
             {
                 // find the requested ECC level and encoding mode in the capacity table
-                foreach (var y in x.Details)
+                foreach (VersionInfoDetails y in x.Details)
                 {
                     // Use ECC level L for Micro QR Code versions 2, 3 and 4 when Default is specified
                     if (y.ErrorCorrectionLevel == eccLevel || (eccLevel == ECCLevel.Default && y.ErrorCorrectionLevel == ECCLevel.L))
@@ -200,7 +200,7 @@ public partial class QRCodeGenerator
             }
 
             // if no version was found, throw an exception
-            var maxSizeByte = _microCapacityTable
+            int maxSizeByte = _microCapacityTable
                 .SelectMany(x => x.Details)
                 .Where(y => (y.ErrorCorrectionLevel == eccLevel || (eccLevel == ECCLevel.Default && y.ErrorCorrectionLevel == ECCLevel.L))
                     && y.CapacityDict.ContainsKey(encMode))
@@ -218,7 +218,7 @@ public partial class QRCodeGenerator
         private static List<ECCInfo> CreateCapacityECCTable(int[] capacityECCBaseValues)
         {
             var localCapacityECCTable = new List<ECCInfo>(160 + 8);
-            for (var i = 0; i < (4 * 6 * 40); i += (4 * 6))
+            for (int i = 0; i < (4 * 6 * 40); i += (4 * 6))
             {
                 localCapacityECCTable.AddRange(new[]
                 {
@@ -300,7 +300,7 @@ public partial class QRCodeGenerator
         private static List<VersionInfo> CreateCapacityTable(int[] capacityBaseValues)
         {
             var localCapacityTable = new List<VersionInfo>(40);
-            for (var i = 0; i < (16 * 40); i += 16)
+            for (int i = 0; i < (16 * 40); i += 16)
             {
                 localCapacityTable.Add(new VersionInfo(
                     version: (i + 16) / 16,

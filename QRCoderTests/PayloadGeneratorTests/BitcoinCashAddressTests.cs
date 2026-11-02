@@ -5,10 +5,10 @@ public class BitcoinCashAddressTests
     [Fact]
     public void bitcoincash_address_generator_can_generate_address()
     {
-        var address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
-        var amount = .123;
-        var label = "Some Label to Encode";
-        var message = "Some Message to Encode";
+        string address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
+        double amount = .123;
+        string label = "Some Label to Encode";
+        string message = "Some Message to Encode";
 
         var generator = new PayloadGenerator.BitcoinCashAddress(address, amount, label, message);
 
@@ -20,9 +20,9 @@ public class BitcoinCashAddressTests
     [Fact]
     public void bitcoincash_address_generator_should_skip_missing_label()
     {
-        var address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
-        var amount = .123;
-        var message = "Some Message to Encode";
+        string address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
+        double amount = .123;
+        string message = "Some Message to Encode";
 
 
         var generator = new PayloadGenerator.BitcoinCashAddress(address, amount, null, message);
@@ -35,8 +35,8 @@ public class BitcoinCashAddressTests
     [Fact]
     public void bitcoincash_address_generator_should_skip_missing_message()
     {
-        var address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
-        var amount = .123;
+        string address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
+        double amount = .123;
 
 
         var generator = new PayloadGenerator.BitcoinCashAddress(address, amount);
@@ -49,8 +49,8 @@ public class BitcoinCashAddressTests
     [Fact]
     public void bitcoincash_address_generator_should_round_to_satoshi()
     {
-        var address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
-        var amount = .123456789;
+        string address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
+        double amount = .123456789;
 
 
         var generator = new PayloadGenerator.BitcoinCashAddress(address, amount);
@@ -67,12 +67,12 @@ public class BitcoinCashAddressTests
         var currentCulture = CultureInfo.DefaultThreadCurrentCulture;
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
 #else
-        var currentCulture = Thread.CurrentThread.CurrentCulture;
+        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
         Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
 #endif
 
-        var address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
-        var amount = .123;
+        string address = "qqtlfk37qyey50f4wfuhc7jw85zsdp8s2swffjk890";
+        double amount = .123;
 
 
         var generator = new PayloadGenerator.BitcoinCashAddress(address, amount);

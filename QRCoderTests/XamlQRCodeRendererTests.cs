@@ -1,4 +1,5 @@
 #if TEST_XAML
+using System.Windows.Media;
 using QRCoder.Xaml;
 
 namespace QRCoderTests;
@@ -9,10 +10,10 @@ public class XamlQRCodeRendererTests
     public void can_create_xaml_qrcode_standard_graphic()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var xCode = new XamlQRCode(data).GetGraphic(10);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        DrawingImage xCode = new XamlQRCode(data).GetGraphic(10);
 
-        var bmp = HelperFunctions.BitmapSourceToBitmap(xCode);
+        Bitmap bmp = HelperFunctions.BitmapSourceToBitmap(xCode);
         bmp.ShouldMatchApproved();
     }
 

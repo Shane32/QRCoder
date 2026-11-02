@@ -16,8 +16,8 @@ public class PngByteQRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var pngCodeGfx = new PngByteQRCode(data).GetGraphic(5);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = new PngByteQRCode(data).GetGraphic(5);
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -26,8 +26,8 @@ public class PngByteQRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 0, 0 }, new byte[] { 0, 0, 255 });
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 0, 0 }, new byte[] { 0, 0, 255 });
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -36,8 +36,8 @@ public class PngByteQRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, Color.Red, Color.Blue);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, Color.Red, Color.Blue);
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -46,8 +46,8 @@ public class PngByteQRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 });
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 });
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -56,8 +56,8 @@ public class PngByteQRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
-        var pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 }, false);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = new PngByteQRCode(data).GetGraphic(5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 }, false);
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -73,7 +73,7 @@ public class PngByteQRCodeRendererTests
     public void can_render_pngbyte_qrcode_from_helper()
     {
         //Create QR code                   
-        var pngCodeGfx = PngByteQRCodeHelper.GetQRCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L, 10);
+        byte[] pngCodeGfx = PngByteQRCodeHelper.GetQRCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.L, 10);
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 
@@ -81,7 +81,7 @@ public class PngByteQRCodeRendererTests
     public void can_render_pngbyte_qrcode_from_helper_2()
     {
         //Create QR code                   
-        var pngCodeGfx = PngByteQRCodeHelper.GetQRCode("This is a quick test! 123#?", 5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 }, QRCodeGenerator.ECCLevel.L);
+        byte[] pngCodeGfx = PngByteQRCodeHelper.GetQRCode("This is a quick test! 123#?", 5, new byte[] { 255, 255, 255, 127 }, new byte[] { 0, 0, 255 }, QRCodeGenerator.ECCLevel.L);
         pngCodeGfx.ShouldMatchApprovedImage();
     }
 }

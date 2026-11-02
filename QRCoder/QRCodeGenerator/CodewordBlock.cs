@@ -48,7 +48,7 @@ public partial class QRCodeGenerator
         public static void ReturnList(List<CodewordBlock> list)
         {
 #if HAS_SPAN
-            foreach (var item in list)
+            foreach (CodewordBlock item in list)
             {
                 ArrayPool<byte>.Shared.Return(item.ECCWords.Array!);
             }

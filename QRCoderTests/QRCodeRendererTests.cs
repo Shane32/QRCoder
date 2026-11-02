@@ -8,8 +8,8 @@ public class QRCodeRendererTests
     public void can_create_qrcode_standard_graphic()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var bmp = new QRCode(data).GetGraphic(10);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        Bitmap bmp = new QRCode(data).GetGraphic(10);
         bmp.ShouldMatchApproved();
     }
 
@@ -17,8 +17,8 @@ public class QRCodeRendererTests
     public void can_create_qrcode_standard_graphic_hex()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var bmp = new QRCode(data).GetGraphic(10, "#000000", "#ffffff");
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        Bitmap bmp = new QRCode(data).GetGraphic(10, "#000000", "#ffffff");
         bmp.ShouldMatchApproved();
     }
 
@@ -27,8 +27,8 @@ public class QRCodeRendererTests
     public void can_create_qrcode_standard_graphic_without_quietzones()
     {
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var bmp = new QRCode(data).GetGraphic(5, Color.Black, Color.White, false);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        Bitmap bmp = new QRCode(data).GetGraphic(5, Color.Black, Color.White, false);
         bmp.ShouldMatchApproved();
     }
 
@@ -38,9 +38,9 @@ public class QRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
-        var bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: HelperFunctions.GetIconBitmap());
+        Bitmap bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: HelperFunctions.GetIconBitmap());
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
         bmp.ShouldMatchApproved();
     }
@@ -50,8 +50,8 @@ public class QRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
-        var bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.White, icon: HelperFunctions.GetIconBitmap());
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        Bitmap bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.White, icon: HelperFunctions.GetIconBitmap());
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
         bmp.ShouldMatchApproved();
     }
@@ -61,10 +61,10 @@ public class QRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
-        var logo = HelperFunctions.GetIconBitmap();
-        var bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: logo, iconBorderWidth: 6);
+        Bitmap logo = HelperFunctions.GetIconBitmap();
+        Bitmap bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: logo, iconBorderWidth: 6);
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
         bmp.ShouldMatchApproved();
     }
@@ -74,10 +74,10 @@ public class QRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
-        var logo = HelperFunctions.GetIconBitmap();
-        var bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.White, icon: logo, iconBorderWidth: 6);
+        Bitmap logo = HelperFunctions.GetIconBitmap();
+        Bitmap bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.White, icon: logo, iconBorderWidth: 6);
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
         bmp.ShouldMatchApproved();
     }
@@ -87,10 +87,10 @@ public class QRCodeRendererTests
     {
         //Create QR code
         var gen = new QRCodeGenerator();
-        var data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
+        QRCodeData data = gen.CreateQrCode("This is a quick test! 123#?", QRCodeGenerator.ECCLevel.H);
 
-        var logo = HelperFunctions.GetIconBitmap();
-        var bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: logo, iconBorderWidth: 6, iconBackgroundColor: Color.DarkGreen);
+        Bitmap logo = HelperFunctions.GetIconBitmap();
+        Bitmap bmp = new QRCode(data).GetGraphic(10, Color.Black, Color.Transparent, icon: logo, iconBorderWidth: 6, iconBackgroundColor: Color.DarkGreen);
         //Used logo is licensed under public domain. Ref.: https://thenounproject.com/Iconathon1/collection/redefining-women/?i=2909346
         bmp.ShouldMatchApproved();
     }
@@ -107,7 +107,7 @@ public class QRCodeRendererTests
     public void can_render_qrcode_from_helper()
     {
         //Create QR code                   
-        var bmp = QRCodeHelper.GetQRCode("This is a quick test! 123#?", 10, Color.Black, Color.White, QRCodeGenerator.ECCLevel.H);
+        Bitmap bmp = QRCodeHelper.GetQRCode("This is a quick test! 123#?", 10, Color.Black, Color.White, QRCodeGenerator.ECCLevel.H);
         bmp.ShouldMatchApproved();
     }
 }

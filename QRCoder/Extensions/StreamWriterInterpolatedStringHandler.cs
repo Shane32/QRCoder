@@ -17,7 +17,9 @@ internal struct StreamWriterInterpolatedStringHandler
     /// <param name="formattedCount">The number of interpolated values.</param>
     /// <param name="writer">The writer to write to.</param>
     public StreamWriterInterpolatedStringHandler(int literalLength, int formattedCount, StreamWriter writer)
-        => _writer = writer;
+    {
+        _writer = writer;
+    }
 
     /// <summary>
     /// Writes a literal string.

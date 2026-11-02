@@ -15,7 +15,7 @@ public static class HelperFunctions
     public static BitmapSource ToBitmapSource(DrawingImage source)
     {
         var drawingVisual = new DrawingVisual();
-        var drawingContext = drawingVisual.RenderOpen();
+        DrawingContext drawingContext = drawingVisual.RenderOpen();
         drawingContext.DrawImage(source, new SW.Rect(new SW.Point(0, 0), new SW.Size(source.Width, source.Height)));
         drawingContext.Close();
 
@@ -49,8 +49,8 @@ public static class HelperFunctions
     public static Bitmap GetIconBitmap()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
-        using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
+        string resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
+        using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         return new Bitmap(stream);
     }
 
@@ -60,8 +60,8 @@ public static class HelperFunctions
     public static byte[] GetIconBytes()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
-        using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
+        string resourceName = "QRCoderTests.assets.noun_software engineer_2909346.png";
+        using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         using var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);
         return memoryStream.ToArray();
@@ -73,8 +73,8 @@ public static class HelperFunctions
     public static string GetIconSvg()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "QRCoderTests.assets.noun_Scientist_2909361.svg";
-        using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
+        string resourceName = "QRCoderTests.assets.noun_Scientist_2909361.svg";
+        using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Embedded resource '{resourceName}' not found.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }

@@ -50,7 +50,7 @@ internal static class StringExtensions
     /// <returns>Returns the color as a byte array.</returns>
     internal static byte[] HexColorToByteArray(this string colorString)
     {
-        var offset = 0;
+        int offset = 0;
         if (colorString.StartsWith('#'))
             offset = 1;
         byte[] byteColor = new byte[(colorString.Length - offset) / 2];
@@ -67,8 +67,8 @@ internal static class StringExtensions
     /// <param name="allowExtraBytes">Whether to parse and discard color bytes beyond the buffer length.</param>
     internal static void HexColorToBytes(this string colorString, Span<byte> color, bool allowExtraBytes = false)
     {
-        var offset = colorString.StartsWith('#') ? 1 : 0;
-        var byteCount = (colorString.Length - offset) / 2;
+        int offset = colorString.StartsWith('#') ? 1 : 0;
+        int byteCount = (colorString.Length - offset) / 2;
         if (byteCount < color.Length || (!allowExtraBytes && byteCount != color.Length))
             throw new ArgumentException("Color length must match the destination buffer length", nameof(color));
 

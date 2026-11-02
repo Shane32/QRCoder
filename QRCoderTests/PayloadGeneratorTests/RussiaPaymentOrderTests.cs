@@ -5,11 +5,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_mandatory_fields()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810965770000413";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810965770000413";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
         generator
@@ -20,11 +20,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_encoding_win1251()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810965770000413";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810965770000413";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc, null, PayloadGenerator.RussiaPaymentOrder.CharacterSets.windows_1251);
         generator.ToBytes().ShouldMatchApproved("txt");
     }
@@ -32,11 +32,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_encoding_koi8()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810965770000413";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810965770000413";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc, null, PayloadGenerator.RussiaPaymentOrder.CharacterSets.koi8_r);
         generator.ToBytes().ShouldMatchApproved("txt");
     }
@@ -44,11 +44,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_custom_separator()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО | \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО | \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
         generator
@@ -59,41 +59,41 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_should_throw_no_separator_exception()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО | \"БАНК\"";
-        var name = "|@;:^_~{}!#$%&()*+,/"; //All chars that could be used as separator
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО | \"БАНК\"";
+        string name = "|@;:^_~{}!#$%&()*+,/"; //All chars that could be used as separator
+        string correspAcc = "30101810400000000225";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
         exception.Message.ShouldBe("No valid separator found.");
     }
 
     [Fact]
     public void russiapayment_generator_should_throw_data_too_long_exception()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "A very very very very very long bank name";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "A very very very very very long bank name";
         // We use € symbol for the test case, because it needs 2-bytes. Otherwise we couldn't generate more than 300 bytes
         // of mandatory data to trigger the test case and stay at the same time within the 160 chars field validation limit
-        var name = "A very €€€€ €€€€ €€€€ €€€€ very very very very very very very very very very very very very very very very very very very very very very very very ver long name";
-        var correspAcc = "30101810400000000225";
+        string name = "A very €€€€ €€€€ €€€€ €€€€ very very very very very very very very very very very very very very very very very very very very very very very very ver long name";
+        string correspAcc = "30101810400000000225";
         var generator = new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc);
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => generator.ToString());
         exception.Message.ShouldStartWith("Data too long");
     }
 
     [Fact]
     public void russiapayment_generator_should_throw_no_data_too_long_exception()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "ОАО | \"БАНК\"";
-        var name = "A name";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "ОАО | \"БАНК\"";
+        string name = "A name";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             FirstName = "Another long long long long long long long long long long long long long long firstname",
@@ -112,12 +112,12 @@ public class RussiaPaymentOrderTests
     public void russiapayment_generator_should_throw_must_not_be_null_exception()
     {
         string? account = null;
-        var bic = "044525225";
-        var bankName = "ОАО | \"БАНК\"";
-        var name = "|@;:^_~{}!#$%&()*+,/";
-        var correspAcc = "30101810400000000225";
+        string bic = "044525225";
+        string bankName = "ОАО | \"БАНК\"";
+        string name = "|@;:^_~{}!#$%&()*+,/";
+        string correspAcc = "30101810400000000225";
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account!, bankName, bic, correspAcc));
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account!, bankName, bic, correspAcc));
         exception.Message.ShouldBe($"The input for 'PersonalAcc' must not be null.");
     }
 
@@ -125,23 +125,23 @@ public class RussiaPaymentOrderTests
     public void russiapayment_generator_should_throw_unmatched_pattern_exception()
     {
         string account = "40702810138250123017";
-        var bic = "abcd"; //Invalid BIC
-        var bankName = "ОАО | \"БАНК\"";
-        var name = "|@;:^_~{}!#$%&()*+,/";
-        var correspAcc = "30101810400000000225";
+        string bic = "abcd"; //Invalid BIC
+        string bankName = "ОАО | \"БАНК\"";
+        string name = "|@;:^_~{}!#$%&()*+,/";
+        string correspAcc = "30101810400000000225";
 
-        var exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc));
+        PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException exception = Should.Throw<PayloadGenerator.RussiaPaymentOrder.RussiaPaymentOrderException>(() => new PayloadGenerator.RussiaPaymentOrder(name, account, bankName, bic, correspAcc));
         exception.Message.ShouldBe("The input for 'BIC' (abcd) doesn't match the pattern ^\\d{9}$");
     }
 
     [Fact]
     public void russiapayment_generator_can_generate_payload_some_additional_fields()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             FirstName = "Raffael",
@@ -159,11 +159,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_all_additional_fields_pt1()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             FirstName = "R",
@@ -189,11 +189,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_all_additional_fields_pt2()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             CounterId = "1234",
@@ -220,11 +220,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_all_additional_fields_pt3()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             PayeeINN = "INN1",
@@ -248,11 +248,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_all_additional_fields_pt4()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             PersAcc = "2222",
@@ -276,11 +276,11 @@ public class RussiaPaymentOrderTests
     [Fact]
     public void russiapayment_generator_can_generate_payload_all_additional_fields_pt5()
     {
-        var account = "40702810138250123017";
-        var bic = "044525225";
-        var bankName = "=ОАО \"БАНК\"";
-        var name = "ООО «Три кита»";
-        var correspAcc = "30101810400000000225";
+        string account = "40702810138250123017";
+        string bic = "044525225";
+        string bankName = "=ОАО \"БАНК\"";
+        string name = "ООО «Три кита»";
+        string correspAcc = "30101810400000000225";
         var optionalFields = new PayloadGenerator.RussiaPaymentOrder.OptionalFields()
         {
             SpecFio = "T. Eacher",

@@ -55,8 +55,8 @@ public class SvgQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as an SVG string.</returns>
     public string GetGraphic(int pixelsPerModule, Color darkColor, Color lightColor, bool drawQuietZones = true, SizingMode sizingMode = SizingMode.WidthHeightAttribute, SvgLogo? logo = null)
     {
-        var offset = drawQuietZones ? 0 : 4;
-        var edgeSize = QrCodeData.ModuleMatrix.Count * pixelsPerModule - (offset * 2 * pixelsPerModule);
+        int offset = drawQuietZones ? 0 : 4;
+        int edgeSize = QrCodeData.ModuleMatrix.Count * pixelsPerModule - (offset * 2 * pixelsPerModule);
         var viewBox = new Size(edgeSize, edgeSize);
         return GetGraphic(viewBox, darkColor, lightColor, drawQuietZones, sizingMode, logo);
     }
@@ -73,8 +73,8 @@ public class SvgQRCode : AbstractQRCode, IDisposable
     /// <returns>Returns the QR code graphic as an SVG string.</returns>
     public string GetGraphic(int pixelsPerModule, string darkColorHex, string lightColorHex, bool drawQuietZones = true, SizingMode sizingMode = SizingMode.WidthHeightAttribute, SvgLogo? logo = null)
     {
-        var offset = drawQuietZones ? 0 : 4;
-        var edgeSize = QrCodeData.ModuleMatrix.Count * pixelsPerModule - (offset * 2 * pixelsPerModule);
+        int offset = drawQuietZones ? 0 : 4;
+        int edgeSize = QrCodeData.ModuleMatrix.Count * pixelsPerModule - (offset * 2 * pixelsPerModule);
         var viewBox = new Size(edgeSize, edgeSize);
         return GetGraphic(viewBox, darkColorHex, lightColorHex, drawQuietZones, sizingMode, logo);
     }
@@ -199,7 +199,7 @@ public class SvgQRCode : AbstractQRCode, IDisposable
             }
             else
             {
-                var rawLogo = (string)logo.GetRawLogo();
+                string rawLogo = (string)logo.GetRawLogo();
                 var svg = System.Xml.Linq.XDocument.Parse(rawLogo);
                 svg.Root!.SetAttributeValue("x", CleanSvgVal(logoAttr!.Value.X));
                 svg.Root.SetAttributeValue("y", CleanSvgVal(logoAttr.Value.Y));
@@ -296,10 +296,10 @@ public class SvgQRCode : AbstractQRCode, IDisposable
     /// </summary>
     private static RectangleF GetLogoAttributes(SvgLogo logo, Size viewBox)
     {
-        var imgWidth = logo.GetIconSizePercent() * viewBox.Width / 100f;
-        var imgHeight = logo.GetIconSizePercent() * viewBox.Height / 100f;
-        var imgPosX = viewBox.Width / 2f - imgWidth / 2f;
-        var imgPosY = viewBox.Height / 2f - imgHeight / 2f;
+        float imgWidth = logo.GetIconSizePercent() * viewBox.Width / 100f;
+        float imgHeight = logo.GetIconSizePercent() * viewBox.Height / 100f;
+        float imgPosX = viewBox.Width / 2f - imgWidth / 2f;
+        float imgPosY = viewBox.Height / 2f - imgHeight / 2f;
         return new RectangleF(imgPosX, imgPosY, imgWidth, imgHeight);
     }
 
@@ -583,7 +583,7 @@ public static class SvgQRCodeHelper
     public static string GetQRCode(string plainText, int pixelsPerModule, string darkColorHex, string lightColorHex, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false, EciMode eciMode = EciMode.Default, int requestedVersion = -1, bool drawQuietZones = true, SizingMode sizingMode = SizingMode.WidthHeightAttribute, SvgLogo? logo = null)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
         using var qrCode = new SvgQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorHex, lightColorHex, drawQuietZones, sizingMode, logo);
     }

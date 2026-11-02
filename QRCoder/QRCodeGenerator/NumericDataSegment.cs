@@ -73,7 +73,7 @@ public partial class QRCodeGenerator
         /// <returns>The next index in the BitArray after the last bit written</returns>
         public static int WriteTo(string text, int startIndex, int length, BitArray bitArray, int bitIndex, int version)
         {
-            var index = bitIndex;
+            int index = bitIndex;
 
             // write mode indicator
             index = DecToBin((int)EncodingMode.Numeric, 4, bitArray, index);
@@ -116,16 +116,16 @@ public partial class QRCodeGenerator
     /// <returns>The next index in the BitArray after the last bit written.</returns>
     private static int PlainTextToBinaryNumeric(string plainText, int offset, int length, BitArray bitArray, int bitIndex)
     {
-        var endIndex = offset + length;
+        int endIndex = offset + length;
 
         // Process each group of three digits.
         for (int i = offset; i < endIndex - 2; i += 3)
         {
             // Parse the next three characters as a decimal integer.
 #if HAS_SPAN
-            var dec = int.Parse(plainText.AsSpan(i, 3), NumberStyles.None, CultureInfo.InvariantCulture);
+            int dec = int.Parse(plainText.AsSpan(i, 3), NumberStyles.None, CultureInfo.InvariantCulture);
 #else
-            var dec = int.Parse(plainText.Substring(i, 3), NumberStyles.None, CultureInfo.InvariantCulture);
+            int dec = int.Parse(plainText.Substring(i, 3), NumberStyles.None, CultureInfo.InvariantCulture);
 #endif
             // Convert the decimal to binary and store it in the BitArray.
             bitIndex = DecToBin(dec, 10, bitArray, bitIndex);
@@ -137,9 +137,9 @@ public partial class QRCodeGenerator
         if (length > 0)  // Two remaining digits are encoded in 7 bits; one remaining digit is encoded in 4 bits.
         {
 #if HAS_SPAN
-            var dec = int.Parse(plainText.AsSpan(offset, length), NumberStyles.None, CultureInfo.InvariantCulture);
+            int dec = int.Parse(plainText.AsSpan(offset, length), NumberStyles.None, CultureInfo.InvariantCulture);
 #else
-            var dec = int.Parse(plainText.Substring(offset, length), NumberStyles.None, CultureInfo.InvariantCulture);
+            int dec = int.Parse(plainText.Substring(offset, length), NumberStyles.None, CultureInfo.InvariantCulture);
 #endif
             bitIndex = DecToBin(dec, length == 2 ? 7 : 4, bitArray, bitIndex);
         }

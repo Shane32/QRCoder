@@ -1,3 +1,4 @@
+using System.Drawing;
 using BenchmarkDotNet.Attributes;
 using QRCoder;
 
@@ -10,7 +11,7 @@ public class QRCodeRendererBenchmark
 
     public QRCodeRendererBenchmark()
     {
-        var eccLvl = QRCoder.QRCodeGenerator.ECCLevel.L;
+        QRCodeGenerator.ECCLevel eccLvl = QRCoder.QRCodeGenerator.ECCLevel.L;
         _samples = new Dictionary<string, QRCodeData>()
         {
             { "small", QRCoder.QRCodeGenerator.GenerateQrCode("ABCD", eccLvl) },
@@ -23,27 +24,27 @@ public class QRCodeRendererBenchmark
     public void RenderQRCodeSmall()
     {
         var qrCode = new QRCode(_samples["small"]);
-        using var bmp = qrCode.GetGraphic(10);
+        using Bitmap bmp = qrCode.GetGraphic(10);
     }
 
     [Benchmark]
     public void RenderQRCodeMedium()
     {
         var qrCode = new QRCode(_samples["medium"]);
-        using var bmp = qrCode.GetGraphic(10);
+        using Bitmap bmp = qrCode.GetGraphic(10);
     }
 
     [Benchmark]
     public void RenderQRCodeBig()
     {
         var qrCode = new QRCode(_samples["big"]);
-        using var bmp = qrCode.GetGraphic(10);
+        using Bitmap bmp = qrCode.GetGraphic(10);
     }
 
     [Benchmark]
     public void RenderQRCodeHuge()
     {
         var qrCode = new QRCode(_samples["big"]);
-        using var bmp = qrCode.GetGraphic(50);
+        using Bitmap bmp = qrCode.GetGraphic(50);
     }
 }

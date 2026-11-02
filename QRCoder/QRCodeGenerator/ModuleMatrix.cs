@@ -56,7 +56,7 @@ public partial class QRCodeGenerator
 
             Bytes = new byte[ByteLength];
 #else
-            var bytes = Interlocked.Exchange(ref _pooledBytes, null);
+            byte[]? bytes = Interlocked.Exchange(ref _pooledBytes, null);
             if (bytes != null)
             {
                 if (bytes.Length >= ByteLength)
@@ -112,8 +112,8 @@ public partial class QRCodeGenerator
             Debug.Assert(!Disposed);
             Debug.Assert(Size == data.ModuleMatrix.Count - 8);
 
-            var source = data.ModuleMatrix;
-            var target = Bytes;
+            List<BitArray> source = data.ModuleMatrix;
+            byte[] target = Bytes;
 
 #if NETSTANDARD1_3
             Array.Clear(target, 0, target.Length);
@@ -121,7 +121,7 @@ public partial class QRCodeGenerator
 
             for (int y = 0; y < Size; y++)
             {
-                var bitArray = source[y + 4];
+                BitArray bitArray = source[y + 4];
 
 #if NETSTANDARD1_3
                 int startIndex = y * Stride;
@@ -143,7 +143,7 @@ public partial class QRCodeGenerator
 #if HAS_SPAN
             if (BitConverter.IsLittleEndian)
             {
-                var span = target.AsSpan(0, ByteLength);
+                Span<byte> span = target.AsSpan(0, ByteLength);
 
                 if (Environment.Is64BitProcess)
                 {
@@ -186,7 +186,7 @@ public partial class QRCodeGenerator
 
             for (int x = 0; x < rectangle.Width; x++)
             {
-                var column = GetColumn(rectangle.X + x);
+                Column column = GetColumn(rectangle.X + x);
                 for (int y = 0; y < rectangle.Height; y++)
                 {
                     column[rectangle.Y + y] = true;
@@ -201,7 +201,7 @@ public partial class QRCodeGenerator
 
             for (int x = 0; x < rectangle.Width; x++)
             {
-                var column = GetColumn(rectangle.X + x);
+                Column column = GetColumn(rectangle.X + x);
                 for (int y = 0; y < rectangle.Height; y++)
                 {
                     if (column[rectangle.Y + y])
@@ -251,8 +251,8 @@ public partial class QRCodeGenerator
             // Penalty 1: Penalty for groups of five or more same-color modules in a row (or column)
             for (int i = 0; i < size; i++)
             {
-                var row = GetRow(i);
-                var column = GetColumn(i);
+                Row row = GetRow(i);
+                Column column = GetColumn(i);
 
                 int modInRow = 0, modInColumn = 0;
 
@@ -310,8 +310,8 @@ public partial class QRCodeGenerator
             // Penalty 2: Penalty for square blocks of four modules in the same color
             for (int y = 0; y < size - 1; y++)
             {
-                var currentRow = GetRow(y);
-                var nextRow = GetRow(y + 1);
+                Row currentRow = GetRow(y);
+                Row nextRow = GetRow(y + 1);
 
                 for (int x = 0; x < size - 1; x++)
                 {
@@ -334,7 +334,7 @@ public partial class QRCodeGenerator
             for (int i = 0; i < size; i++)
             {
                 // Horizontal pattern matching
-                var r = GetRow(i);
+                Row r = GetRow(i);
 
                 for (int j = 0; j < size - 10; j++)
                 {
@@ -355,7 +355,7 @@ public partial class QRCodeGenerator
                 }
 
                 // Vertical pattern matching
-                var c = GetColumn(i);
+                Column c = GetColumn(i);
 
                 for (int j = 0; j < size - 10; j++)
                 {

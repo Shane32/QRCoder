@@ -57,13 +57,13 @@ public partial class QRCodeGenerator
 
             var points = new List<Point>(7 * 7);
 
-            for (var version = 2; version <= 40; version++)
+            for (int version = 2; version <= 40; version++)
             {
-                var indexBase = (version - 2) * 7;
+                int indexBase = (version - 2) * 7;
 
-                for (var x = 0; x < 7 && alignmentPatternBaseValues[indexBase + x] != 0; x++)
+                for (int x = 0; x < 7 && alignmentPatternBaseValues[indexBase + x] != 0; x++)
                 {
-                    for (var y = 0; y < 7 && alignmentPatternBaseValues[indexBase + y] != 0; y++)
+                    for (int y = 0; y < 7 && alignmentPatternBaseValues[indexBase + y] != 0; y++)
                     {
                         points.Add(new Point(alignmentPatternBaseValues[indexBase + x], alignmentPatternBaseValues[indexBase + y]));
                     }

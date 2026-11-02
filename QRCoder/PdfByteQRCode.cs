@@ -43,9 +43,9 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
     public byte[] GetGraphic(int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex, int dpi = 150, long jpgQuality = 85)
     {
         // Get QR code dimensions
-        var moduleCount = QrCodeData.ModuleMatrix.Count;
-        var imgSize = moduleCount * pixelsPerModule;
-        var pdfMediaSize = imgSize * 72 / (float)dpi;
+        int moduleCount = QrCodeData.ModuleMatrix.Count;
+        int imgSize = moduleCount * pixelsPerModule;
+        float pdfMediaSize = imgSize * 72 / (float)dpi;
 
         // Parse colors
 #if HAS_SPAN
@@ -55,8 +55,8 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
         darkColorHtmlHex.HexColorToBytes(darkColor);
         lightColorHtmlHex.HexColorToBytes(lightColor);
 #else
-        var darkColor = darkColorHtmlHex.HexColorToByteArray();
-        var lightColor = lightColorHtmlHex.HexColorToByteArray();
+        byte[] darkColor = darkColorHtmlHex.HexColorToByteArray();
+        byte[] lightColor = lightColorHtmlHex.HexColorToByteArray();
         ValidateColor(darkColor);
         ValidateColor(lightColor);
 #endif
@@ -109,7 +109,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             );
 
             // Content stream - PDF drawing instructions
-            var scale = imgSize * 72 / (float)dpi / moduleCount;                                // Scale factor to convert module units to PDF points
+            float scale = imgSize * 72 / (float)dpi / moduleCount;                                // Scale factor to convert module units to PDF points
             var content = new StringBuilder();
             const float inv255 = 1 / 255f;
             content.Append("q\r\n");                                                            // 'q' = Save graphics state
@@ -164,7 +164,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             );
 
             writer.Flush();
-            var startxref = checked((int)stream.Position);
+            int startxref = checked((int)stream.Position);
 
             // Cross-reference table - maps object numbers to byte offsets
             writer.Write("xref\r\n");                           // Cross-reference table keyword
@@ -172,7 +172,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             writer.Write("0000000000 65535 f\r\n");             // Entry 0: always free, generation 65535, 'f' = free
 
             // Write byte offset for each object
-            foreach (var refValue in xrefs)
+            foreach (long refValue in xrefs)
             {
                 // Write each entry as a 10-digit zero-padded byte offset, 5-digit zero-padded generation number (0), and 'n' = in use
                 writer.WriteInvariant($"{checked((int)refValue):0000000000} 00000 n\r\n");
@@ -211,8 +211,8 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
     /// <param name="pathCommands">The builder receiving the PDF path commands.</param>
     private void CreatePathFromModules(StringBuilder pathCommands)
     {
-        var matrix = QrCodeData.ModuleMatrix;
-        var size = matrix.Count;
+        List<BitArray> matrix = QrCodeData.ModuleMatrix;
+        int size = matrix.Count;
 
         for (int y = 0; y < size; y++)
         {
@@ -281,7 +281,7 @@ public static class PdfByteQRCodeHelper
         EciMode eciMode = EciMode.Default, int requestedVersion = -1)
     {
         using var qrGenerator = new QRCodeGenerator();
-        using var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
                 requestedVersion);
         using var qrCode = new PdfByteQRCode(qrCodeData);
         return qrCode.GetGraphic(pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex);
@@ -297,7 +297,7 @@ public static class PdfByteQRCodeHelper
     public static byte[] GetQRCode(string txt, ECCLevel eccLevel, int size)
     {
         using var qrGen = new QRCodeGenerator();
-        using var qrCode = qrGen.CreateQrCode(txt, eccLevel);
+        using QRCodeData qrCode = qrGen.CreateQrCode(txt, eccLevel);
         using var qrBmp = new PdfByteQRCode(qrCode);
         return qrBmp.GetGraphic(size);
     }
