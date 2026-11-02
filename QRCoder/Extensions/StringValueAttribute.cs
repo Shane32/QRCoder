@@ -45,7 +45,7 @@ public static class CustomExtensions
     public static string? GetStringValue(this Enum value)
     {
 #if NETSTANDARD1_3
-        var fieldInfo = value.GetType().GetRuntimeField(value.ToString());
+        FieldInfo fieldInfo = value.GetType().GetRuntimeField(value.ToString());
 #else
         FieldInfo fieldInfo = value.GetType().GetField(value.ToString())!;
 #endif
