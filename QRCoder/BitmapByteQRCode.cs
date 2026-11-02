@@ -46,7 +46,7 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <param name="pixelsPerModule">The number of pixels each dark/light module of the QR code will occupy in the final QR code image.</param>
     /// <returns>Returns the QR code graphic as a bitmap byte array.</returns>
     public byte[] GetGraphic(int pixelsPerModule)
-        => GetGraphic(pixelsPerModule, [0x00, 0x00, 0x00], [0xFF, 0xFF, 0xFF]);
+        => GetGraphicCore(pixelsPerModule, [0x00, 0x00, 0x00], [0xFF, 0xFF, 0xFF]);
 
     /// <summary>
     /// Returns the QR code graphic as a bitmap byte array.
@@ -56,7 +56,17 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <param name="lightColorHtmlHex">The color of the light modules in HTML hex format.</param>
     /// <returns>Returns the QR code graphic as a bitmap byte array.</returns>
     public byte[] GetGraphic(int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex)
+#if HAS_SPAN
+    {
+        Span<byte> darkColor = stackalloc byte[3];
+        Span<byte> lightColor = stackalloc byte[3];
+        darkColorHtmlHex.HexColorToBytes(darkColor, allowExtraBytes: true);
+        lightColorHtmlHex.HexColorToBytes(lightColor, allowExtraBytes: true);
+        return GetGraphicCore(pixelsPerModule, darkColor, lightColor);
+    }
+#else
         => GetGraphic(pixelsPerModule, darkColorHtmlHex.HexColorToByteArray(), lightColorHtmlHex.HexColorToByteArray());
+#endif
 
     /// <summary>
     /// Returns the QR code graphic as a bitmap byte array.
@@ -66,6 +76,14 @@ public class BitmapByteQRCode : AbstractQRCode, IDisposable
     /// <param name="lightColorRgb">The color of the light modules as an RGB byte array.</param>
     /// <returns>Returns the QR code graphic as a bitmap byte array.</returns>
     public byte[] GetGraphic(int pixelsPerModule, byte[] darkColorRgb, byte[] lightColorRgb)
+        => GetGraphicCore(pixelsPerModule, darkColorRgb, lightColorRgb);
+
+    private byte[] GetGraphicCore(int pixelsPerModule,
+#if HAS_SPAN
+        ReadOnlySpan<byte> darkColorRgb, ReadOnlySpan<byte> lightColorRgb)
+#else
+        byte[] darkColorRgb, byte[] lightColorRgb)
+#endif
     {
         // Pre-calculate color/module bytes
         int bytesPerModule = pixelsPerModule * 3;
