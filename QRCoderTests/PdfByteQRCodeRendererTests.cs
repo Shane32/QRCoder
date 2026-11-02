@@ -32,6 +32,50 @@ public class PdfByteQRCodeRendererTests
         pdfCodeGfx.ShouldMatchApproved("pdf");
     }
 
+    [Theory]
+    [InlineData("123456", "#123456")]
+    [InlineData("#aBcDeF", "#ABCDEF")]
+    [InlineData("#123456Z", "#123456")]
+    [InlineData("# 1 2 3", "#010203")]
+    public void equivalent_hex_colors_render_identical_pdf_bytes(string color, string expectedColor)
+    {
+        using var gen = new QRCodeGenerator();
+        using var data = gen.CreateQrCode("Equivalent PDF colors", QRCodeGenerator.ECCLevel.L);
+        using var pdfCode = new PdfByteQRCode(data);
+
+        pdfCode.GetGraphic(3, color, "#FFFFFF").ShouldBe(pdfCode.GetGraphic(3, expectedColor, "#FFFFFF"));
+        pdfCode.GetGraphic(3, "#000000", color).ShouldBe(pdfCode.GetGraphic(3, "#000000", expectedColor));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("#")]
+    [InlineData("#1234")]
+    [InlineData("#12345678")]
+    public void rejects_colors_with_incorrect_rgb_length(string color)
+    {
+        using var gen = new QRCodeGenerator();
+        using var data = gen.CreateQrCode("Invalid PDF colors", QRCodeGenerator.ECCLevel.L);
+        using var pdfCode = new PdfByteQRCode(data);
+
+        Should.Throw<ArgumentException>(() => pdfCode.GetGraphic(3, color, "#FFFFFF"));
+        Should.Throw<ArgumentException>(() => pdfCode.GetGraphic(3, "#000000", color));
+    }
+
+    [Theory]
+    [InlineData("#GG3456")]
+    [InlineData("#12GG56")]
+    [InlineData("#1234GG")]
+    public void rejects_colors_with_invalid_hex_digits(string color)
+    {
+        using var gen = new QRCodeGenerator();
+        using var data = gen.CreateQrCode("Invalid PDF colors", QRCodeGenerator.ECCLevel.L);
+        using var pdfCode = new PdfByteQRCode(data);
+
+        Should.Throw<FormatException>(() => pdfCode.GetGraphic(3, color, "#FFFFFF"));
+        Should.Throw<FormatException>(() => pdfCode.GetGraphic(3, "#000000", color));
+    }
+
     [Fact]
     public void renders_identical_pdf_bytes_across_cultures()
     {

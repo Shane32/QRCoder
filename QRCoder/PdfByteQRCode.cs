@@ -48,10 +48,17 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
         var pdfMediaSize = imgSize * 72 / (float)dpi;
 
         // Parse colors
+#if HAS_SPAN
+        Span<byte> darkColor = stackalloc byte[3];
+        Span<byte> lightColor = stackalloc byte[3];
+        darkColorHtmlHex.HexColorToBytes(darkColor);
+        lightColorHtmlHex.HexColorToBytes(lightColor);
+#else
         var darkColor = darkColorHtmlHex.HexColorToByteArray();
         var lightColor = lightColorHtmlHex.HexColorToByteArray();
         ValidateColor(darkColor);
         ValidateColor(lightColor);
+#endif
 
         //Create PDF document
         using var stream = new MemoryStream();
@@ -237,6 +244,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
         }
     }
 
+#if !HAS_SPAN
     /// <summary>
     /// Validates that an RGB color contains exactly three bytes.
     /// </summary>
@@ -246,6 +254,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
         if (color.Length != 3)
             throw new ArgumentException("Color must be a 3-byte RGB array", nameof(color));
     }
+#endif
 }
 
 /// <summary>
