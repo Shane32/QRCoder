@@ -42,6 +42,7 @@ internal static class StringExtensions
         => value.Length > 0 && value[0] == c;
 #endif
 
+#if !HAS_SPAN
     /// <summary>
     /// Converts a hex color string to a byte array.
     /// </summary>
@@ -54,13 +55,30 @@ internal static class StringExtensions
             offset = 1;
         byte[] byteColor = new byte[(colorString.Length - offset) / 2];
         for (int i = 0; i < byteColor.Length; i++)
-#if HAS_SPAN
-            byteColor[i] = byte.Parse(colorString.AsSpan(i * 2 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-#else
             byteColor[i] = byte.Parse(colorString.Substring(i * 2 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-#endif
         return byteColor;
     }
+#else
+    /// <summary>
+    /// Converts a hex color string into a caller-provided buffer without allocating.
+    /// </summary>
+    /// <param name="colorString">Color in HEX format like #ffffff.</param>
+    /// <param name="color">The buffer receiving the color bytes.</param>
+    /// <param name="allowExtraBytes">Whether to parse and discard color bytes beyond the buffer length.</param>
+    internal static void HexColorToBytes(this string colorString, Span<byte> color, bool allowExtraBytes = false)
+    {
+        var offset = colorString.StartsWith('#') ? 1 : 0;
+        var byteCount = (colorString.Length - offset) / 2;
+        if (byteCount < color.Length || (!allowExtraBytes && byteCount != color.Length))
+            throw new ArgumentException("Color length must match the destination buffer length", nameof(color));
+
+        for (int i = 0; i < color.Length; i++)
+            color[i] = byte.Parse(colorString.AsSpan(i * 2 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+
+        for (int i = color.Length; i < byteCount; i++)
+            _ = byte.Parse(colorString.AsSpan(i * 2 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+    }
+#endif
 
 #if NETSTANDARD1_3
     /// <inheritdoc cref="char.ToString()"/>
