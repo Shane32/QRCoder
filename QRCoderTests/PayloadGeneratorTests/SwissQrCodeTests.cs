@@ -786,8 +786,10 @@ public class SwissQrCodeTests
         var currentCulture = Thread.CurrentThread.CurrentCulture;
         try
         {
-            // fa-IR uses "/" as decimal separator
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("fa-IR");
+            // A culture whose decimal separator is "/" (set explicitly so OS regional overrides can't hide the bug)
+            var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            culture.NumberFormat.NumberDecimalSeparator = "/";
+            Thread.CurrentThread.CurrentCulture = culture;
 
             var contactGeneral = PayloadGenerator.SwissQrCode.Contact.WithStructuredAddress("John Doe", "3003", "Bern", "CH", "Parlamentsgebäude", "1");
             var iban = new PayloadGenerator.SwissQrCode.Iban("CH2430043000000789012", PayloadGenerator.SwissQrCode.Iban.IbanType.QrIban);
