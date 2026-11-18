@@ -568,7 +568,7 @@ public static partial class PayloadGenerator
 
             //CcyAmtDate "logical" element
             //Amoutn has to use . as decimal seperator in any case. See https://www.paymentstandards.ch/dam/downloads/ig-qr-bill-en.pdf page 27.
-            swissQrCodePayload.AppendInvariant($"{(_amount != null ? $"{_amount:0.00}".Replace(",", ".") : string.Empty)}{_br}"); //Amt
+            swissQrCodePayload.AppendInvariant($"{(_amount != null ? _amount.Value.ToString("0.00", CultureInfo.InvariantCulture) : string.Empty)}{_br}"); //Amt
             swissQrCodePayload.AppendInvariant($"{_currency}{_br}"); //Ccy
             //Removed in S-QR version 2.0
             //swissQrCodePayload.AppendInvariant($"{(requestedDateOfPayment != null ? ((DateTime)requestedDateOfPayment).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty)}{_br}"); //ReqdExctnDt

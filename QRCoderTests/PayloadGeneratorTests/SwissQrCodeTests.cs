@@ -779,4 +779,27 @@ public class SwissQrCodeTests
 
         generator.ToString().ShouldContain("QRR\r\n\r\n");
     }
+
+    [Fact]
+    public void swissqrcode_generator_amount_disregards_current_culture()
+    {
+        var currentCulture = Thread.CurrentThread.CurrentCulture;
+        try
+        {
+            // fa-IR uses "/" as decimal separator
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("fa-IR");
+
+            var contactGeneral = PayloadGenerator.SwissQrCode.Contact.WithStructuredAddress("John Doe", "3003", "Bern", "CH", "Parlamentsgebäude", "1");
+            var iban = new PayloadGenerator.SwissQrCode.Iban("CH2430043000000789012", PayloadGenerator.SwissQrCode.Iban.IbanType.QrIban);
+            var reference = new PayloadGenerator.SwissQrCode.Reference(ReferenceType.QRR);
+
+            var generator = new PayloadGenerator.SwissQrCode(iban, PayloadGenerator.SwissQrCode.Currency.CHF, contactGeneral, reference, amount: 12.5m);
+
+            generator.ToString().ShouldContain("\r\n12.50\r\nCHF\r\n");
+        }
+        finally
+        {
+            Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
+    }
 }
