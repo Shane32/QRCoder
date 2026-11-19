@@ -15,11 +15,11 @@ jobs:
     env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
       name: Checkout Code
 
     - name: Install additional .NET SDKs
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: |
           2.1.x
@@ -33,7 +33,7 @@ jobs:
       run: dotnet test -c Debug --nologo /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
     - name: Upload coverage files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-files
         path: QRCoderTests/coverage.*.xml
@@ -41,7 +41,7 @@ jobs:
         overwrite: true
 
     - name: Upload to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
@@ -49,11 +49,11 @@ jobs:
   additional-tests:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       name: Checkout Code
 
     - name: Install .NET SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -72,11 +72,11 @@ jobs:
     needs: [test, additional-tests]
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
       name: Checkout Code
 
     - name: Install .NET SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
         source-url: https://nuget.pkg.github.com/Shane32/index.json
@@ -88,7 +88,7 @@ jobs:
       run: dotnet pack -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -o out
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Nuget packages
         path: out/*
