@@ -13,7 +13,7 @@ jobs:
       contents: write # Upload packages as GitHub release assets.
       id-token: write # Authenticate to NuGet.org using OIDC.
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
       name: Checkout Code
 
     - name: Check github.ref starts with 'refs/tags/v'
@@ -34,7 +34,7 @@ jobs:
         echo "version=$version" >> $GITHUB_ENV
 
     - name: Install .NET SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -43,7 +43,7 @@ jobs:
       run: dotnet pack -c Release -p:Version=$version -o out
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Nuget packages
         path: out/*
@@ -61,7 +61,7 @@ jobs:
       run: dotnet nuget push "out/*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
     - name: Upload Nuget packages as release artifacts
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
