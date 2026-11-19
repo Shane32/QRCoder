@@ -8,6 +8,10 @@ on:
 jobs:
   pack-push-ci:
     runs-on: windows-latest
+    environment: nuget
+    permissions:
+      contents: write # Upload packages as GitHub release assets.
+      id-token: write # Authenticate to NuGet.org using OIDC.
     steps:
     - uses: actions/checkout@v5
       name: Checkout Code
@@ -33,9 +37,6 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.0.x
-        source-url: https://api.nuget.org/v3/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
 
     - name: Build NuGet packages
       shell: bash
@@ -47,8 +48,17 @@ jobs:
         name: Nuget packages
         path: out/*
 
-    - name: Publish packages to Github packages
-      run: dotnet nuget push "out\*" -k ${{secrets.NUGET_AUTH_TOKEN}}
+    - name: Authenticate to NuGet.org
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
+    - name: Publish packages to NuGet.org
+      shell: pwsh
+      env:
+        NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+      run: dotnet nuget push "out/*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
     - name: Upload Nuget packages as release artifacts
       uses: actions/github-script@v8
