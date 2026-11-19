@@ -55,10 +55,11 @@ jobs:
         user: ${{ vars.NUGET_USER }}
 
     - name: Publish packages to NuGet.org
+      working-directory: out
       shell: pwsh
       env:
         NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
-      run: dotnet nuget push "out/*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push "*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
     - name: Upload Nuget packages as release artifacts
       uses: actions/github-script@v9
