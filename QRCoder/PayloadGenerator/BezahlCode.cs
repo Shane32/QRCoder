@@ -276,7 +276,7 @@ public static partial class PayloadGenerator
                         if (!string.IsNullOrEmpty(_mandateId))
                             bezahlCodePayload.AppendInvariant($"mandateid={Uri.EscapeDataString(_mandateId)}&");
                         if (_dateOfSignature != DateTime.MinValue)
-                            bezahlCodePayload.AppendInvariant($"dateofsignature={_dateOfSignature.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
+                            bezahlCodePayload.AppendInvariant($"dateofsignature={_dateOfSignature:ddMMyyyy}&");
                     }
                 }
                 bezahlCodePayload.Append(string.Format(CultureInfo.InvariantCulture, "amount={0:0.00}&", _amount).Replace(".", ","));
@@ -284,16 +284,16 @@ public static partial class PayloadGenerator
                 if (!string.IsNullOrEmpty(_reason))
                     bezahlCodePayload.AppendInvariant($"reason={Uri.EscapeDataString(_reason)}&");
                 bezahlCodePayload.AppendInvariant($"currency={_currency}&");
-                bezahlCodePayload.AppendInvariant($"executiondate={_executionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
+                bezahlCodePayload.AppendInvariant($"executiondate={_executionDate:ddMMyyyy}&");
 #pragma warning disable CS0618
                 if (_authority == AuthorityType.periodicsinglepayment || _authority == AuthorityType.periodicsinglepaymentsepa)
                 {
                     bezahlCodePayload.AppendInvariant($"periodictimeunit={_periodicTimeunit}&");
                     bezahlCodePayload.AppendInvariant($"periodictimeunitrotation={_periodicTimeunitRotation}&");
                     if (_periodicFirstExecutionDate != DateTime.MinValue)
-                        bezahlCodePayload.AppendInvariant($"periodicfirstexecutiondate={_periodicFirstExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
+                        bezahlCodePayload.AppendInvariant($"periodicfirstexecutiondate={_periodicFirstExecutionDate:ddMMyyyy}&");
                     if (_periodicLastExecutionDate != DateTime.MinValue)
-                        bezahlCodePayload.AppendInvariant($"periodiclastexecutiondate={_periodicLastExecutionDate.ToString("ddMMyyyy", CultureInfo.InvariantCulture)}&");
+                        bezahlCodePayload.AppendInvariant($"periodiclastexecutiondate={_periodicLastExecutionDate:ddMMyyyy}&");
                 }
 #pragma warning restore CS0618
             }
