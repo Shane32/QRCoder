@@ -55,20 +55,11 @@ jobs:
         user: ${{ vars.NUGET_USER }}
 
     - name: Publish packages to NuGet.org
+      working-directory: out
       shell: pwsh
       env:
         NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
-      run: |
-        $packages = @(Get-ChildItem -Path out -Filter *.nupkg -File)
-        if ($packages.Count -eq 0) {
-          throw 'No NuGet packages found in out.'
-        }
-        foreach ($package in $packages) {
-          dotnet nuget push $package.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
-          if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-          }
-        }
+      run: dotnet nuget push "*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 
     - name: Upload Nuget packages as release artifacts
       uses: actions/github-script@v9
