@@ -185,7 +185,7 @@ public class QRCodeData : IDisposable
             targetStream.WriteByte((byte)ModuleMatrix.Count);
 
 #if HAS_SPAN
-            var writer = new StackBufferedByteWriter(targetStream, stackalloc byte[256]);
+            using var writer = new StackBufferedByteWriter(targetStream, stackalloc byte[256]);
 #else
             Stream writer = targetStream;
 #endif
@@ -222,10 +222,6 @@ public class QRCodeData : IDisposable
 
                 writer.WriteByte((byte)data);
             }
-
-#if HAS_SPAN
-            writer.Flush();
-#endif
         }
         finally
         {

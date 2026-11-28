@@ -29,13 +29,17 @@ internal ref struct StackBufferedByteWriter
     /// <summary>
     /// Writes pending bytes to the target stream.
     /// </summary>
-    public void Flush()
+    public void Dispose() => Flush();
+
+    private void Flush()
     {
         if (_count == 0)
             return;
 
-        _target.Write(_buffer.Slice(0, _count));
+        Span<byte> pending = _buffer.Slice(0, _count);
+        // Clear the buffer count so disposal cannot retry a failed write.
         _count = 0;
+        _target.Write(pending);
     }
 }
 #endif
