@@ -226,51 +226,29 @@ public partial class QRCodeGenerator
         }
 
 #if HAS_SPAN
-        const int STACK_BUFFER_SIZE = 512;
+        // Even a version 40-L QR code holds at most 2,953 byte-mode payload bytes.
+        const int MAX_STACK_SIZE_IN_BYTES = 2953;
         int count = targetEncoding.GetByteCount(plainText);
+        byte[]? rentedBytes = null;
+        Span<byte> codeBytes = count <= MAX_STACK_SIZE_IN_BYTES
+            ? stackalloc byte[count]
+            : (rentedBytes = ArrayPool<byte>.Shared.Rent(count)).AsSpan(0, count);
 
-        // Code-page providers can produce different replacement bytes at chunk boundaries.
-        if (count > STACK_BUFFER_SIZE && !ReferenceEquals(targetEncoding, Encoding.UTF8))
+        try
         {
-            byte[] rentedBytes = ArrayPool<byte>.Shared.Rent(count);
-            try
-            {
-                Span<byte> encodedBytes = rentedBytes.AsSpan(0, count);
-                targetEncoding.GetBytes(plainText, encodedBytes);
-                CopyToBitArray(encodedBytes, bitArray, offset);
-                return offset + (int)((uint)count * 8);
-            }
-            finally
-            {
+            targetEncoding.GetBytes(plainText, codeBytes);
+            CopyToBitArray(codeBytes, bitArray, offset);
+        }
+        finally
+        {
+            if (rentedBytes != null)
                 ArrayPool<byte>.Shared.Return(rentedBytes, clearArray: true);
-            }
         }
-
-        Span<byte> codeBytes = stackalloc byte[STACK_BUFFER_SIZE];
-        if (count > codeBytes.Length)
-        {
-            // Keep the encoder's state across chunks so multibyte characters and fallbacks are preserved.
-            Encoder encoder = targetEncoding.GetEncoder();
-            ReadOnlySpan<char> remaining = plainText.AsSpan();
-            bool completed;
-            do
-            {
-                encoder.Convert(remaining, codeBytes, flush: true, out int charsUsed, out int bytesUsed, out completed);
-                CopyToBitArray(codeBytes.Slice(0, bytesUsed), bitArray, offset);
-                offset += (int)((uint)bytesUsed * 8);
-                remaining = remaining.Slice(charsUsed);
-            } while (!completed);
-
-            return offset;
-        }
-
-        codeBytes = codeBytes.Slice(0, count);
-        targetEncoding.GetBytes(plainText, codeBytes);
 #else
         byte[] codeBytes = targetEncoding.GetBytes(plainText);
+        CopyToBitArray(codeBytes, bitArray, offset);
 #endif
 
-        CopyToBitArray(codeBytes, bitArray, offset);
         return offset + (int)((uint)codeBytes.Length * 8);
     }
 }

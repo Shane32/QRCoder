@@ -620,13 +620,14 @@ public class QRGeneratorTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void byte_encoding_preserves_utf8_across_buffer_boundaries(bool includeBom)
+    public void can_encode_maximum_utf8_byte_payload(bool includeBom)
     {
-        // The four-byte character does not fit at the end of the first 512-byte buffer.
-        string text = new string('a', 511) + "\U0001F355" + new string('b', 520) + "\uD800";
-        byte[] bytes = Encoding.UTF8.GetBytes(text);
-        if (includeBom)
-            bytes = Encoding.UTF8.GetPreamble().Concat(bytes).ToArray();
+        const int MAX_BYTE_PAYLOAD = 2953;
+        const string suffix = "\U0001F355\uD800";
+        byte[] preamble = includeBom ? Encoding.UTF8.GetPreamble() : Array.Empty<byte>();
+        int prefixLength = MAX_BYTE_PAYLOAD - preamble.Length - Encoding.UTF8.GetByteCount(suffix);
+        string text = new string('a', prefixLength) + suffix;
+        byte[] bytes = preamble.Concat(Encoding.UTF8.GetBytes(text)).ToArray();
 
         using QRCodeData expected = QRCodeGenerator.GenerateQrCode(bytes, ECCLevel.L);
         using QRCodeData actual = QRCodeGenerator.GenerateQrCode(text, ECCLevel.L, forceUtf8: true, utf8BOM: includeBom);
