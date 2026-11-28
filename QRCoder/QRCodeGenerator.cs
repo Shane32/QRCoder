@@ -366,7 +366,7 @@ public partial class QRCodeGenerator : IDisposable
             // Reuse one coefficient buffer for the division of every block. The largest data block has 123 codewords.
             int coefficientCapacity = Math.Max(eccInfo.ECCPerBlock, Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2));
 #if HAS_SPAN
-            Span<byte> coefficients = stackalloc byte[coefficientCapacity];
+            Span<byte> coefficients = stackalloc byte[128].Slice(0, coefficientCapacity);
 #else
             byte[] coefficients = new byte[coefficientCapacity];
 #endif
