@@ -18,6 +18,7 @@
     <PackageReference Include="Svg" Version="3.4.7" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+    <PackageReference Include="ZXing.Net" Version="0.16.11" />
     <PackageReference Include="shouldly" Version="4.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
     <PackageReference Include="System.Management" Version="6.0.1">

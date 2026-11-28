@@ -309,9 +309,6 @@ public partial class QRCodeGenerator : IDisposable
         // Calculate error correction blocks
         List<CodewordBlock> codeWordWithECC = CalculateECCBlocks();
 
-        // Calculate interleaved code word lengths
-        int interleavedLength = CalculateInterleavedLength();
-
         // Interleave code words
         BitArray interleavedData = InterleaveData();
 
@@ -363,66 +360,34 @@ public partial class QRCodeGenerator : IDisposable
 
         List<CodewordBlock> CalculateECCBlocks()
         {
-            // Reuse one coefficient buffer for the division of every block. The largest data block has 123 codewords.
-            int coefficientCapacity = Math.Max(eccInfo.ECCPerBlock, Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2));
-#if HAS_SPAN
-            Span<byte> coefficients = stackalloc byte[128].Slice(0, coefficientCapacity);
-#else
-            byte[] coefficients = new byte[coefficientCapacity];
-#endif
             using var generatorPolynom = Polynom.CreateGeneratorPolynom(eccInfo.ECCPerBlock);
             List<CodewordBlock> codewordBlocks = CodewordBlock.GetList(eccInfo.BlocksInGroup1 + eccInfo.BlocksInGroup2);
-            AddCodewordBlocks(eccInfo.BlocksInGroup1, eccInfo.CodewordsInGroup1, 0, bitArray.Length, coefficients);
+            AddCodewordBlocks(eccInfo.BlocksInGroup1, eccInfo.CodewordsInGroup1, 0, bitArray.Length);
             int group2Offset = eccInfo.BlocksInGroup1 * eccInfo.CodewordsInGroup1 * 8;
-            AddCodewordBlocks(eccInfo.BlocksInGroup2, eccInfo.CodewordsInGroup2, group2Offset, bitArray.Length - group2Offset, coefficients);
+            AddCodewordBlocks(eccInfo.BlocksInGroup2, eccInfo.CodewordsInGroup2, group2Offset, bitArray.Length - group2Offset);
             return codewordBlocks;
 
-            void AddCodewordBlocks(int blocksInGroup, int codewordsInGroup, int offset, int count,
-#if HAS_SPAN
-                Span<byte> scratch)
-#else
-                byte[] scratch)
-#endif
+            void AddCodewordBlocks(int blocksInGroup, int codewordsInGroup, int offset, int count)
             {
                 int blockLength = Math.Min(codewordsInGroup * 8, count);
                 for (int i = 0; i < blocksInGroup; i++)
                 {
-                    ArraySegment<byte> eccWords = CalculateECCWords(bitArray, offset, blockLength, generatorPolynom, scratch);
+#if HAS_SPAN
+                    byte[] eccWords = ArrayPool<byte>.Shared.Rent(eccInfo.ECCPerBlock);
+#else
+                    byte[] eccWords = new byte[eccInfo.ECCPerBlock];
+#endif
+                    CalculateECCWords(bitArray, offset, blockLength, generatorPolynom, eccWords);
                     codewordBlocks.Add(new CodewordBlock(offset, blockLength, eccWords));
                     offset += blockLength;
                 }
             }
         }
 
-        // Calculate the length of the interleaved data
-        int CalculateInterleavedLength()
-        {
-            int length = 0;
-            int codewords = Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2);
-            if (version == -1 || version == -3)
-            {
-                codewords--;
-                length += 4;
-            }
-            for (int i = 0; i < codewords; i++)
-            {
-                foreach (CodewordBlock codeBlock in codeWordWithECC)
-                    if ((uint)codeBlock.CodeWordsLength / 8 > i)
-                        length += 8;
-            }
-            for (int i = 0; i < eccInfo.ECCPerBlock; i++)
-            {
-                foreach (CodewordBlock codeBlock in codeWordWithECC)
-                    if (codeBlock.ECCWords.Count > i)
-                        length += 8;
-            }
-            length += CapacityTables.GetRemainderBits(version);
-            return length;
-        }
-
         // Interleave the data
         BitArray InterleaveData()
         {
+            int interleavedLength = eccInfo.TotalDataBits + codeWordWithECC.Count * eccInfo.ECCPerBlock * 8 + CapacityTables.GetRemainderBits(version);
             var data = new BitArray(interleavedLength);
             int pos = 0;
             int codewords = Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2);
@@ -443,8 +408,7 @@ public partial class QRCodeGenerator : IDisposable
             for (int i = 0; i < eccInfo.ECCPerBlock; i++)
             {
                 foreach (CodewordBlock codeBlock in codeWordWithECC)
-                    if (codeBlock.ECCWords.Count > i)
-                        pos = DecToBin(codeBlock.ECCWords.Array![i], 8, data, pos);
+                    pos = DecToBin(codeBlock.ECCWords[i], 8, data, pos);
             }
 
             return data;
@@ -668,68 +632,28 @@ public partial class QRCodeGenerator : IDisposable
     /// <summary>
     /// Calculates a block's error correction codewords using in-place polynomial division.
     /// </summary>
-    private static ArraySegment<byte> CalculateECCWords(BitArray bitArray, int offset, int bitCount, Polynom generatorPolynom,
-#if HAS_SPAN
-        Span<byte> coefficients)
-#else
-        byte[] coefficients)
-#endif
+    internal static void CalculateECCWords(BitArray bitArray, int offset, int bitCount, Polynom generatorPolynom, byte[] remainder)
     {
-        int coefficientCount = (bitCount + 7) / 8;
-        for (int i = 0, bitOffset = 0; i < coefficientCount; ++i, bitOffset += 8)
+        int eccWords = generatorPolynom.Count - 1;
+        Array.Clear(remainder, 0, eccWords);
+        // Each data codeword advances the remainder by one degree, including zero codewords.
+        for (int bitOffset = 0; bitOffset < bitCount; bitOffset += 8)
         {
             // The last codeword in Micro QR M1 and M3 has four data bits followed by four zero bits.
-            coefficients[i] = BinToDec(bitArray, offset + bitOffset, Math.Min(8, bitCount - bitOffset));
-        }
-
-        int eccWords = generatorPolynom.Count - 1;
-        // The message is shifted up by the ECC degree. The coefficients are stored in descending exponent order.
-        int lastExponent = eccWords;
-        while (lastExponent > 0)
-        {
-            byte leadingCoefficient = coefficients[0];
-            int trailingCount = coefficientCount - 1;
+            byte codeword = BinToDec(bitArray, offset + bitOffset, Math.Min(8, bitCount - bitOffset));
+            byte leadingCoefficient = (byte)(codeword ^ remainder[0]);
+            Array.Copy(remainder, 1, remainder, 0, eccWords - 1);
+            remainder[eccWords - 1] = 0;
             if (leadingCoefficient == 0)
-            {
-                // Keep the current polynomial width when a zero leading term is shifted out.
-#if HAS_SPAN
-                coefficients.Slice(1, trailingCount).CopyTo(coefficients);
-#else
-                Array.Copy(coefficients, 1, coefficients, 0, trailingCount);
-#endif
-                coefficients[trailingCount] = 0;
-                lastExponent--;
                 continue;
-            }
 
             int leadingLog = GaloisField.GetAlphaExpFromIntVal(leadingCoefficient);
-            int newCount = Math.Max(trailingCount, eccWords);
-            for (int i = 0; i < newCount; i++)
+            for (int i = 0; i < eccWords; i++)
             {
-                int value = i < trailingCount ? coefficients[i + 1] : 0;
-                if (i < eccWords)
-                {
-                    int exponent = (generatorPolynom[i + 1].Coefficient + leadingLog) % 255;
-                    value ^= GaloisField.GetIntValFromAlphaExp((byte)exponent);
-                }
-
-                coefficients[i] = (byte)value;
+                int exponent = (generatorPolynom[i + 1].Coefficient + leadingLog) % 255;
+                remainder[i] ^= GaloisField.GetIntValFromAlphaExp((byte)exponent);
             }
-
-            // The leading term cancels. A longer remainder extends the polynomial to a lower exponent.
-            lastExponent += trailingCount - newCount;
-            coefficientCount = newCount;
         }
-
-        // The coefficients are used again for the next block. Keep this result until interleaving.
-#if HAS_SPAN
-        byte[] result = ArrayPool<byte>.Shared.Rent(coefficientCount);
-        coefficients.Slice(0, coefficientCount).CopyTo(result);
-#else
-        byte[] result = new byte[coefficientCount];
-        Array.Copy(coefficients, result, coefficientCount);
-#endif
-        return new ArraySegment<byte>(result, 0, coefficientCount);
     }
 
     /// <summary>

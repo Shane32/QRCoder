@@ -18,7 +18,7 @@ public partial class QRCodeGenerator
         /// <param name="codeWordsOffset">The offset of the data codewords within the main BitArray. Data codewords carry the actual information.</param>
         /// <param name="codeWordsLength">The length in bits of the data codewords within the main BitArray.</param>
         /// <param name="eccWords">The array of error correction codewords for this block. These codewords help recover the data if the QR code is damaged.</param>
-        public CodewordBlock(int codeWordsOffset, int codeWordsLength, ArraySegment<byte> eccWords)
+        public CodewordBlock(int codeWordsOffset, int codeWordsLength, byte[] eccWords)
         {
             CodeWordsOffset = codeWordsOffset;
             CodeWordsLength = codeWordsLength;
@@ -36,9 +36,9 @@ public partial class QRCodeGenerator
         public int CodeWordsLength { get; }
 
         /// <summary>
-        /// Gets the error correction codewords associated with this block.
+        /// Gets the buffer containing this block's error correction codewords in its first ECCPerBlock bytes.
         /// </summary>
-        public ArraySegment<byte> ECCWords { get; }
+        public byte[] ECCWords { get; }
 
         private static List<CodewordBlock>? _codewordBlocks;
 
@@ -50,7 +50,7 @@ public partial class QRCodeGenerator
 #if HAS_SPAN
             foreach (CodewordBlock item in list)
             {
-                ArrayPool<byte>.Shared.Return(item.ECCWords.Array!);
+                ArrayPool<byte>.Shared.Return(item.ECCWords);
             }
 #endif
             list.Clear();

@@ -630,13 +630,52 @@ public class QRGeneratorTests
     [Fact]
     public void can_generate_from_bytes_with_all_zero_blocks()
     {
-        // All-zero message blocks exercise the existing polynomial width handling for zero leading terms.
+        // The version 39-H symbol's data and parity were verified against ZXing.Net.
         using QRCodeData data = QRCodeGenerator.GenerateQrCode(new byte[1200], ECCLevel.H);
         using var sha256 = System.Security.Cryptography.SHA256.Create();
         byte[] hash = sha256.ComputeHash(data.GetRawData(QRCodeData.Compression.Uncompressed));
 
         BitConverter.ToString(hash).Replace("-", string.Empty)
-            .ShouldBe("57826A14052FC7EA35C78695563FE7CD30F92041D3BA1414FC71880652EB5626");
+            .ShouldBe("54F33F901765EF34CCA645ACF52CC25821D48BCBBC8F4E665E4AE5C5B653FBED");
+    }
+
+    [Theory]
+    [InlineData(15)]
+    [InlineData(16)]
+    public void both_version_40_h_block_sizes_write_all_30_zero_parity_bytes(int dataCodewords)
+    {
+        var data = new BitArray(dataCodewords * 8);
+        using var generator = QRCodeGenerator.Polynom.CreateGeneratorPolynom(30);
+        // A rented buffer can be oversized and contain the previous block's parity.
+        byte[] remainder = Enumerable.Repeat((byte)0xff, 31).ToArray();
+
+        QRCodeGenerator.CalculateECCWords(data, 0, data.Length, generator, remainder);
+
+        remainder.Take(30).ShouldBe(new byte[30]);
+        remainder[30].ShouldBe((byte)0xff);
+    }
+
+    [Fact]
+    public void zero_prefix_before_nonzero_data_produces_the_reference_parity()
+    {
+        // Second data block of the version 6-L symbol for 88 NUL bytes followed by 32 'A' bytes.
+        byte[] codewords = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x04,
+            0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14,
+            0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x14, 0x10,
+            0xec, 0x11, 0xec, 0x11, 0xec, 0x11, 0xec, 0x11, 0xec, 0x11, 0xec, 0x11, 0xec, 0x11
+        ];
+        var data = new BitArray(codewords.Length * 8);
+        for (int bit = 0; bit < data.Length; bit++)
+            data[bit] = (codewords[bit / 8] & (0x80 >> (bit % 8))) != 0;
+        using var generator = QRCodeGenerator.Polynom.CreateGeneratorPolynom(18);
+        var remainder = new byte[18];
+
+        QRCodeGenerator.CalculateECCWords(data, 0, data.Length, generator, remainder);
+
+        // Generated independently with ZXing.Net 0.16.11.
+        byte[] expected = [0x8e, 0x3c, 0xaa, 0xd4, 0x79, 0x06, 0x22, 0x0b, 0x00, 0x0f, 0x25, 0x97, 0x3c, 0x85, 0x2b, 0x2e, 0x50, 0x36];
+        remainder.ShouldBe(expected);
     }
 
     [Fact]
