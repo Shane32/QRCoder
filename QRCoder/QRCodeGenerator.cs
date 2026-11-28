@@ -676,9 +676,8 @@ public partial class QRCodeGenerator : IDisposable
 #endif
     {
         int coefficientCount = (bitCount + 7) / 8;
-        for (int i = 0; i < coefficientCount; i++)
+        for (int i = 0, bitOffset = 0; i < coefficientCount; ++i, bitOffset += 8)
         {
-            int bitOffset = i * 8;
             // The last codeword in Micro QR M1 and M3 has four data bits followed by four zero bits.
             coefficients[i] = BinToDec(bitArray, offset + bitOffset, Math.Min(8, bitCount - bitOffset));
         }
