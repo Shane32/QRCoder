@@ -1,7 +1,4 @@
 using System.Diagnostics;
-#if HAS_SPAN
-using System.Runtime.CompilerServices;
-#endif
 
 namespace QRCoder;
 
@@ -172,9 +169,6 @@ public partial class QRCodeGenerator
         /// <param name="blockedModules">List of rectangles representing areas that must not be overwritten.</param>
         /// <param name="eccLevel">The error correction level of the QR code, which affects format string values.</param>
         /// <returns>The index of the selected mask pattern.</returns>
-#if HAS_SPAN
-        [SkipLocalsInit] // Score clears the active columns before reading them.
-#endif
         public static int MaskCode(QRCodeData qrCode, int version, ModuleMatrix blockedModules, ECCLevel eccLevel)
         {
             int selectedPattern = -1;        // no pattern selected yet
