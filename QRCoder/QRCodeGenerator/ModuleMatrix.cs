@@ -242,7 +242,11 @@ public partial class QRCodeGenerator
         /// </summary>
         /// <param name="columnState">Scratch buffer of at least <see cref="Size"/> elements, used to track the state of each column.</param>
         /// <returns>The total penalty score of the QR code.</returns>
+#if HAS_SPAN
+        public int Score(Span<int> columnState)
+#else
         public int Score(int[] columnState)
+#endif
         {
             Debug.Assert(columnState.Length >= Size);
 
@@ -260,7 +264,11 @@ public partial class QRCodeGenerator
             byte[] bytes = Bytes;
 
             // Each column keeps its current run length in the upper bits and its last 11 modules in the lower bits.
+#if HAS_SPAN
+            columnState.Slice(0, size).Clear();
+#else
             Array.Clear(columnState, 0, size);
+#endif
 
             // All penalties are computed in a single row-major pass over the matrix.
             for (int y = 0; y < size; y++)

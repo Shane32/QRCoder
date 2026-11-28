@@ -72,7 +72,12 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 #endif
         try
         {
-            var xrefs = new List<long>();
+#if HAS_SPAN
+            Span<long> xrefs = stackalloc long[4];
+#else
+            long[] xrefs = new long[4];
+#endif
+            int objectCount = 0;
 
             // PDF header - declares PDF version 1.5
             writer.Write("%PDF-1.5\r\n");
@@ -83,10 +88,10 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             writer.Write("\r\n");
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs[objectCount++] = stream.Position;
 
             // Object 1: Catalog - root of PDF document structure
-            writer.WriteInvariant($"{xrefs.Count} 0 obj\r\n");  // Object number and generation number (0)
+            writer.WriteInvariant($"{objectCount} 0 obj\r\n");  // Object number and generation number (0)
             writer.Write(
                 "<<\r\n" +                                      // Begin dictionary
                 "/Type /Catalog\r\n" +                          // Declares this as the document catalog
@@ -96,10 +101,10 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             );
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs[objectCount++] = stream.Position;
 
             // Object 2: Pages - defines page tree structure
-            writer.WriteInvariant($"{xrefs.Count} 0 obj\r\n");  // Object number and generation number (0)
+            writer.WriteInvariant($"{objectCount} 0 obj\r\n");  // Object number and generation number (0)
             writer.Write(
                 "<<\r\n" +                                      // Begin dictionary
                 "/Count 1\r\n" +                                // Number of pages in document
@@ -127,10 +132,10 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             content.Append('Q');                                                                // 'Q' = Restore graphics state
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs[objectCount++] = stream.Position;
 
             // Object 3: Page - indirect page object (Kids array must reference pages indirectly)
-            writer.WriteInvariant($"{xrefs.Count} 0 obj\r\n");                                  // Object number and generation number (0)
+            writer.WriteInvariant($"{objectCount} 0 obj\r\n");                                  // Object number and generation number (0)
             writer.Write(
                 "<<\r\n" +                                                                      // Begin dictionary
                 "/Type /Page\r\n" +                                                             // Declares this as a page
@@ -145,10 +150,10 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
             );
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs[objectCount++] = stream.Position;
 
             // Object 4: Content stream - contains the drawing instructions
-            writer.WriteInvariant($"{xrefs.Count} 0 obj\r\n");             // Object number and generation number (0)
+            writer.WriteInvariant($"{objectCount} 0 obj\r\n");             // Object number and generation number (0)
             // Content commands are ASCII, so their character count equals the encoded byte length.
             writer.WriteInvariant($"<< /Length {content.Length} >>\r\n");  // Dictionary with stream length in bytes
             writer.Write("stream\r\n");                                    // Begin stream data
@@ -168,14 +173,14 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
 
             // Cross-reference table - maps object numbers to byte offsets
             writer.Write("xref\r\n");                           // Cross-reference table keyword
-            writer.WriteInvariant($"0 {xrefs.Count + 1}\r\n");  // First object number (0) and count of entries
+            writer.WriteInvariant($"0 {objectCount + 1}\r\n");  // First object number (0) and count of entries
             writer.Write("0000000000 65535 f\r\n");             // Entry 0: always free, generation 65535, 'f' = free
 
             // Write byte offset for each object
-            foreach (long refValue in xrefs)
+            for (int i = 0; i < objectCount; i++)
             {
                 // Write each entry as a 10-digit zero-padded byte offset, 5-digit zero-padded generation number (0), and 'n' = in use
-                writer.WriteInvariant($"{checked((int)refValue):0000000000} 00000 n\r\n");
+                writer.WriteInvariant($"{checked((int)xrefs[i]):0000000000} 00000 n\r\n");
             }
 
             // Trailer - provides location of catalog and xref table
@@ -183,7 +188,7 @@ public class PdfByteQRCode : AbstractQRCode, IDisposable
                 "trailer\r\n" +                                     // Trailer keyword
                 "<<\r\n"                                            // Begin trailer dictionary
             );
-            writer.WriteInvariant($"/Size {xrefs.Count + 1}\r\n");  // Total number of entries in xref table
+            writer.WriteInvariant($"/Size {objectCount + 1}\r\n");  // Total number of entries in xref table
             writer.Write(
                 "/Root 1 0 R\r\n" +                                 // Reference to catalog object
                 ">>\r\n" +                                          // End trailer dictionary
