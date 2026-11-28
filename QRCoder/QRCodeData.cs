@@ -184,7 +184,11 @@ public class QRCodeData : IDisposable
             // Add header - rowsize
             targetStream.WriteByte((byte)ModuleMatrix.Count);
 
-            // Write data one byte at a time
+#if HAS_SPAN
+            using var writer = new StackBufferedByteWriter(targetStream, stackalloc byte[256]);
+#else
+            Stream writer = targetStream;
+#endif
             int data = 0;
             int bits = 0;
 
@@ -203,7 +207,7 @@ public class QRCodeData : IDisposable
 
                     if (bits == 8)
                     {
-                        targetStream.WriteByte((byte)data);
+                        writer.WriteByte((byte)data);
                         data = 0;
                         bits = 0;
                     }
@@ -216,7 +220,7 @@ public class QRCodeData : IDisposable
 
                 data <<= 8 - bits;
 
-                targetStream.WriteByte((byte)data);
+                writer.WriteByte((byte)data);
             }
         }
         finally
