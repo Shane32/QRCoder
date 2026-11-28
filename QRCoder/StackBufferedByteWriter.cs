@@ -23,21 +23,22 @@ internal ref struct StackBufferedByteWriter
     {
         _buffer[_count++] = value;
         if (_count == _buffer.Length)
-            Flush();
+        {
+            // Clear the count so disposal cannot retry a failed write.
+            _count = 0;
+            _target.Write(_buffer);
+        }
     }
 
     /// <summary>
     /// Writes pending bytes to the target stream.
     /// </summary>
-    public void Dispose() => Flush();
-
-    private void Flush()
+    public void Dispose()
     {
         if (_count == 0)
             return;
 
-        Span<byte> pending = _buffer.Slice(0, _count);
-        // Clear the buffer count so disposal cannot retry a failed write.
+        ReadOnlySpan<byte> pending = _buffer.Slice(0, _count);
         _count = 0;
         _target.Write(pending);
     }
