@@ -363,28 +363,33 @@ public partial class QRCodeGenerator : IDisposable
 
         List<CodewordBlock> CalculateECCBlocks()
         {
-            List<CodewordBlock> codewordBlocks;
-            // Generate the generator polynomial using the number of ECC words.
-            using (var generatorPolynom = Polynom.CreateGeneratorPolynom(eccInfo.ECCPerBlock))
-            {
-                //Calculate error correction words
-                codewordBlocks = CodewordBlock.GetList(eccInfo.BlocksInGroup1 + eccInfo.BlocksInGroup2);
-                AddCodeWordBlocks(1, eccInfo.BlocksInGroup1, eccInfo.CodewordsInGroup1, 0, bitArray.Length, generatorPolynom);
-                int offset = eccInfo.BlocksInGroup1 * eccInfo.CodewordsInGroup1 * 8;
-                AddCodeWordBlocks(2, eccInfo.BlocksInGroup2, eccInfo.CodewordsInGroup2, offset, bitArray.Length - offset, generatorPolynom);
-                return codewordBlocks;
-            }
+            // Reuse one coefficient buffer for the division of every block. The largest data block has 123 codewords.
+            int coefficientCapacity = Math.Max(eccInfo.ECCPerBlock, Math.Max(eccInfo.CodewordsInGroup1, eccInfo.CodewordsInGroup2));
+#if HAS_SPAN
+            Span<byte> coefficients = stackalloc byte[128].Slice(0, coefficientCapacity);
+#else
+            byte[] coefficients = new byte[coefficientCapacity];
+#endif
+            using var generatorPolynom = Polynom.CreateGeneratorPolynom(eccInfo.ECCPerBlock);
+            List<CodewordBlock> codewordBlocks = CodewordBlock.GetList(eccInfo.BlocksInGroup1 + eccInfo.BlocksInGroup2);
+            AddCodewordBlocks(eccInfo.BlocksInGroup1, eccInfo.CodewordsInGroup1, 0, bitArray.Length, coefficients);
+            int group2Offset = eccInfo.BlocksInGroup1 * eccInfo.CodewordsInGroup1 * 8;
+            AddCodewordBlocks(eccInfo.BlocksInGroup2, eccInfo.CodewordsInGroup2, group2Offset, bitArray.Length - group2Offset, coefficients);
+            return codewordBlocks;
 
-            void AddCodeWordBlocks(int blockNum, int blocksInGroup, int codewordsInGroup, int offset2, int count, Polynom generatorPolynom)
+            void AddCodewordBlocks(int blocksInGroup, int codewordsInGroup, int offset, int count,
+#if HAS_SPAN
+                Span<byte> scratch)
+#else
+                byte[] scratch)
+#endif
             {
-                _ = blockNum;
-                int groupLength = codewordsInGroup * 8;
-                groupLength = groupLength > count ? count : groupLength;
+                int blockLength = Math.Min(codewordsInGroup * 8, count);
                 for (int i = 0; i < blocksInGroup; i++)
                 {
-                    ArraySegment<byte> eccWordList = CalculateECCWords(bitArray, offset2, groupLength, eccInfo, generatorPolynom);
-                    codewordBlocks.Add(new CodewordBlock(offset2, groupLength, eccWordList));
-                    offset2 += groupLength;
+                    ArraySegment<byte> eccWords = CalculateECCWords(bitArray, offset, blockLength, generatorPolynom, scratch);
+                    codewordBlocks.Add(new CodewordBlock(offset, blockLength, eccWords));
+                    offset += blockLength;
                 }
             }
         }
@@ -661,86 +666,70 @@ public partial class QRCodeGenerator : IDisposable
     }
 
     /// <summary>
-    /// Calculates the Error Correction Codewords (ECC) for a segment of data using the provided ECC information.
-    /// This method applies polynomial division, using the message polynomial and a generator polynomial,
-    /// to compute the remainder which forms the ECC codewords.
+    /// Calculates a block's error correction codewords using in-place polynomial division.
     /// </summary>
-    private static ArraySegment<byte> CalculateECCWords(BitArray bitArray, int offset, int count, ECCInfo eccInfo, Polynom generatorPolynomBase)
-    {
-        int eccWords = eccInfo.ECCPerBlock;
-        // Calculate the message polynomial from the bit array data.
-        Polynom messagePolynom = CalculateMessagePolynom(bitArray, offset, count);
-        Polynom generatorPolynom = generatorPolynomBase.Clone();
-
-        // Adjust the exponents in the message polynomial to account for ECC length.
-        for (int i = 0; i < messagePolynom.Count; i++)
-            messagePolynom[i] = new PolynomItem(messagePolynom[i].Coefficient,
-                messagePolynom[i].Exponent + eccWords);
-
-        // Adjust the generator polynomial exponents based on the message polynomial.
-        for (int i = 0; i < generatorPolynom.Count; i++)
-            generatorPolynom[i] = new PolynomItem(generatorPolynom[i].Coefficient,
-                generatorPolynom[i].Exponent + (messagePolynom.Count - 1));
-
-        // Divide the message polynomial by the generator polynomial to find the remainder.
-        Polynom leadTermSource = messagePolynom;
-        for (int i = 0; (leadTermSource.Count > 0 && leadTermSource[leadTermSource.Count - 1].Exponent > 0); i++)
-        {
-            if (leadTermSource[0].Coefficient == 0)  // Simplify the polynomial if the leading coefficient is zero.
-            {
-                leadTermSource.RemoveAt(0);
-                leadTermSource.Add(new PolynomItem(0, leadTermSource[leadTermSource.Count - 1].Exponent - 1));
-            }
-            else  // Otherwise, perform polynomial reduction using XOR and multiplication with the generator polynomial.
-            {
-                // Convert the first coefficient to its corresponding alpha exponent unless it's zero.
-                // Coefficients that are zero remain zero because log(0) is undefined.
-                int index0Coefficient = leadTermSource[0].Coefficient;
-                index0Coefficient = GaloisField.GetAlphaExpFromIntVal((byte)index0Coefficient);
-                var alphaNotation = new PolynomItem(index0Coefficient, leadTermSource[0].Exponent);
-                Polynom resPoly = MultiplyGeneratorPolynomByLeadterm(generatorPolynom, alphaNotation, i);
-                ConvertToDecNotationInPlace(resPoly);
-                Polynom newPoly = XORPolynoms(leadTermSource, resPoly);
-                // Free memory used by the previous polynomials.
-                resPoly.Dispose();
-                leadTermSource.Dispose();
-                // Update the message polynomial with the new remainder.
-                leadTermSource = newPoly;
-            }
-        }
-
-        // Free memory used by the generator polynomial.
-        generatorPolynom.Dispose();
-
-        // Convert the resulting polynomial into a byte array representing the ECC codewords.
+    private static ArraySegment<byte> CalculateECCWords(BitArray bitArray, int offset, int bitCount, Polynom generatorPolynom,
 #if HAS_SPAN
-        byte[] array = ArrayPool<byte>.Shared.Rent(leadTermSource.Count);
-        var ret = new ArraySegment<byte>(array, 0, leadTermSource.Count);
+        Span<byte> coefficients)
 #else
-        var ret = new ArraySegment<byte>(new byte[leadTermSource.Count]);
-        byte[] array = ret.Array!;
+        byte[] coefficients)
 #endif
-
-        for (int i = 0; i < leadTermSource.Count; i++)
-            array[i] = (byte)leadTermSource[i].Coefficient;
-
-        // Free memory used by the message polynomial.
-        leadTermSource.Dispose();
-
-        return ret;
-    }
-
-    /// <summary>
-    /// Converts all polynomial item coefficients from their alpha exponent notation to decimal representation in place.
-    /// This conversion facilitates operations that require polynomial coefficients in their integer forms.
-    /// </summary>
-    private static void ConvertToDecNotationInPlace(Polynom poly)
     {
-        for (int i = 0; i < poly.Count; i++)
+        int coefficientCount = (bitCount + 7) / 8;
+        for (int i = 0, bitOffset = 0; i < coefficientCount; ++i, bitOffset += 8)
         {
-            // Convert the alpha exponent of the coefficient to its decimal value and create a new polynomial item with the updated coefficient.
-            poly[i] = new PolynomItem(GaloisField.GetIntValFromAlphaExp((byte)poly[i].Coefficient), poly[i].Exponent);
+            // The last codeword in Micro QR M1 and M3 has four data bits followed by four zero bits.
+            coefficients[i] = BinToDec(bitArray, offset + bitOffset, Math.Min(8, bitCount - bitOffset));
         }
+
+        int eccWords = generatorPolynom.Count - 1;
+        // The message is shifted up by the ECC degree. The coefficients are stored in descending exponent order.
+        int lastExponent = eccWords;
+        while (lastExponent > 0)
+        {
+            byte leadingCoefficient = coefficients[0];
+            int trailingCount = coefficientCount - 1;
+            if (leadingCoefficient == 0)
+            {
+                // Keep the current polynomial width when a zero leading term is shifted out.
+#if HAS_SPAN
+                coefficients.Slice(1, trailingCount).CopyTo(coefficients);
+#else
+                Array.Copy(coefficients, 1, coefficients, 0, trailingCount);
+#endif
+                coefficients[trailingCount] = 0;
+                lastExponent--;
+                continue;
+            }
+
+            int leadingLog = GaloisField.GetAlphaExpFromIntVal(leadingCoefficient);
+            int newCount = Math.Max(trailingCount, eccWords);
+            for (int i = 0; i < newCount; i++)
+            {
+                int value = i < trailingCount ? coefficients[i + 1] : 0;
+                if (i < eccWords)
+                {
+                    int exponent = (generatorPolynom[i + 1].Coefficient + leadingLog) % 255;
+                    value ^= GaloisField.GetIntValFromAlphaExp((byte)exponent);
+                }
+
+                coefficients[i] = (byte)value;
+            }
+
+            // The leading term cancels. A longer remainder extends the polynomial to a lower exponent.
+            lastExponent += trailingCount - newCount;
+            coefficientCount = newCount;
+        }
+
+        // The coefficients are used again for the next block. Keep this result until interleaving.
+#if HAS_SPAN
+        byte[] result = ArrayPool<byte>.Shared.Rent(coefficientCount);
+        coefficients.Slice(0, coefficientCount).CopyTo(result);
+#else
+        byte[] result = new byte[coefficientCount];
+        Array.Copy(coefficients, result, coefficientCount);
+#endif
+        return new ArraySegment<byte>(result, 0, coefficientCount);
     }
 
     /// <summary>
@@ -771,63 +760,13 @@ public partial class QRCodeGenerator : IDisposable
         => (uint)(c - min) <= (uint)(max - min);
 
     /// <summary>
-    /// Converts a segment of a BitArray representing QR code data into a polynomial,
-    /// padding the final byte if necessary (for Micro QR variants like M1 or M3).
-    /// </summary>
-    /// <param name="bitArray">The full bit array representing encoded QR code data.</param>
-    /// <param name="offset">Starting position in the bit array.</param>
-    /// <param name="bitCount">Total number of bits to convert into codewords.</param>
-    /// <returns>A polynomial representing the message codewords.</returns>
-    private static Polynom CalculateMessagePolynom(BitArray bitArray, int offset, int bitCount)
-    {
-        // Calculate how many full 8-bit codewords are present
-        int fullBytes = bitCount / 8;
-
-        // Determine if there is a remaining partial byte (e.g., 4 bits for Micro QR M1 and M3 versions)
-        int remainingBits = bitCount % 8;
-
-        if (remainingBits > 0)
-        {
-            // Pad the last byte with zero bits to make it a full 8-bit codeword
-            int addlBits = 8 - remainingBits;
-            int minBitArrayLength = offset + bitCount + addlBits;
-
-            // Extend BitArray length if needed to fit the padded bits
-            if (bitArray.Length < minBitArrayLength)
-                bitArray.Length = minBitArrayLength;
-
-            // Pad the remaining bits with false (0) values
-            for (int i = 0; i < addlBits; i++)
-                bitArray[offset + bitCount + i] = false;
-        }
-
-        // Total number of codewords (includes extra for partial byte if present)
-        int polynomLength = fullBytes + (remainingBits > 0 ? 1 : 0);
-
-        // Initialize the polynomial
-        var messagePol = new Polynom(polynomLength);
-
-        // Exponent for polynomial terms starts from highest degree
-        int exponent = polynomLength - 1;
-
-        // Convert each 8-bit segment into a decimal value and add it to the polynomial
-        for (int i = 0; i < polynomLength; i++)
-        {
-            messagePol.Add(new PolynomItem(BinToDec(bitArray, offset), exponent--));
-            offset += 8;
-        }
-
-        return messagePol;
-    }
-
-    /// <summary>
     /// Converts a segment of a BitArray into its decimal (integer) equivalent.
     /// </summary>
     /// <returns>The integer value that represents the specified binary data.</returns>
-    private static byte BinToDec(BitArray bitArray, int offset)
+    private static byte BinToDec(BitArray bitArray, int offset, int bitCount)
     {
         int ret = 0;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < bitCount; i++)
         {
             ret ^= bitArray[offset + i] ? 1 << (7 - i) : 0;
         }
@@ -1024,57 +963,6 @@ public partial class QRCodeGenerator : IDisposable
                 bitArray[(int)((uint)i * 8) + j + offset] = (byteVal & (1 << (7 - j))) != 0;
             }
         }
-    }
-
-    /// <summary>
-    /// Performs a bitwise XOR operation between two polynomials, commonly used in QR code error correction coding.
-    /// </summary>
-    /// <returns>The resultant polynomial after performing the XOR operation.</returns>
-    private static Polynom XORPolynoms(Polynom messagePolynom, Polynom resPolynom)
-    {
-        // Determine the larger of the two polynomials to guide the XOR operation.
-        var resultPolynom = new Polynom(Math.Max(messagePolynom.Count, resPolynom.Count) - 1);
-        Polynom longPoly, shortPoly;
-        if (messagePolynom.Count >= resPolynom.Count)
-        {
-            longPoly = messagePolynom;
-            shortPoly = resPolynom;
-        }
-        else
-        {
-            longPoly = resPolynom;
-            shortPoly = messagePolynom;
-        }
-
-        // XOR the coefficients of the two polynomials.
-        for (int i = 1; i < longPoly.Count; i++)
-        {
-            var polItemRes = new PolynomItem(
-                longPoly[i].Coefficient ^ (shortPoly.Count > i ? shortPoly[i].Coefficient : 0),
-                messagePolynom[0].Exponent - i
-            );
-            resultPolynom.Add(polItemRes);
-        }
-
-        return resultPolynom;
-    }
-
-    /// <summary>
-    /// Multiplies a generator polynomial by a leading term polynomial, reducing the result by a specified lower exponent,
-    /// used in constructing QR code error correction codewords.
-    /// </summary>
-    private static Polynom MultiplyGeneratorPolynomByLeadterm(Polynom genPolynom, PolynomItem leadTerm, int lowerExponentBy)
-    {
-        var resultPolynom = new Polynom(genPolynom.Count);
-        foreach (PolynomItem polItemBase in genPolynom)
-        {
-            var polItemRes = new PolynomItem(
-                (polItemBase.Coefficient + leadTerm.Coefficient) % 255,
-                polItemBase.Exponent - lowerExponentBy
-            );
-            resultPolynom.Add(polItemRes);
-        }
-        return resultPolynom;
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>

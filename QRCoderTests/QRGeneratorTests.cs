@@ -628,6 +628,18 @@ public class QRGeneratorTests
     }
 
     [Fact]
+    public void can_generate_from_bytes_with_all_zero_blocks()
+    {
+        // All-zero message blocks exercise the existing polynomial width handling for zero leading terms.
+        using QRCodeData data = QRCodeGenerator.GenerateQrCode(new byte[1200], ECCLevel.H);
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        byte[] hash = sha256.ComputeHash(data.GetRawData(QRCodeData.Compression.Uncompressed));
+
+        BitConverter.ToString(hash).Replace("-", string.Empty)
+            .ShouldBe("57826A14052FC7EA35C78695563FE7CD30F92041D3BA1414FC71880652EB5626");
+    }
+
+    [Fact]
     public void trim_leading_zeros_works()
     {
         var gen = new QRCodeGenerator();
