@@ -1,4 +1,7 @@
 using System.Diagnostics;
+#if HAS_SPAN
+using System.Runtime.CompilerServices;
+#endif
 
 namespace QRCoder;
 
@@ -169,6 +172,9 @@ public partial class QRCodeGenerator
         /// <param name="blockedModules">List of rectangles representing areas that must not be overwritten.</param>
         /// <param name="eccLevel">The error correction level of the QR code, which affects format string values.</param>
         /// <returns>The index of the selected mask pattern.</returns>
+#if HAS_SPAN
+        [SkipLocalsInit] // Score clears the active columns before reading them.
+#endif
         public static int MaskCode(QRCodeData qrCode, int version, ModuleMatrix blockedModules, ECCLevel eccLevel)
         {
             int selectedPattern = -1;        // no pattern selected yet
@@ -186,9 +192,9 @@ public partial class QRCodeGenerator
             // Temporary QRCodeData object to test different mask patterns without altering the original.
             using var copy = new ModuleMatrix(qrCode.ModuleMatrix.Count - 8);
 
-            // Standard QR codes have at most 177 columns, so the scratch buffer needs at most 708 bytes.
 #if HAS_SPAN
-            Span<int> columnState = version < 0 ? default : stackalloc int[size];
+            Debug.Assert(size <= 177, "Standard QR codes have at most 177 columns.");
+            Span<int> columnState = version < 0 ? default : ((Span<int>)stackalloc int[256]).Slice(0, size);
 #else
             int[]? columnState = version < 0 ? null : new int[size];
 #endif
