@@ -215,21 +215,6 @@ public partial class QRCodeGenerator
     {
         Encoding targetEncoding = GetTargetEncoding(plainText, eciMode, utf8BOM, forceUtf8, out bool includeUtf8BOM);
 
-#if HAS_SPAN
-        // We can use stackalloc for small arrays to prevent heap allocations
-        const int MAX_STACK_SIZE_IN_BYTES = 512;
-
-        int count = targetEncoding.GetByteCount(plainText);
-        byte[]? bufferFromPool = null;
-        Span<byte> codeBytes = (count <= MAX_STACK_SIZE_IN_BYTES)
-            ? (stackalloc byte[MAX_STACK_SIZE_IN_BYTES])
-            : (bufferFromPool = ArrayPool<byte>.Shared.Rent(count));
-        codeBytes = codeBytes.Slice(0, count);
-        targetEncoding.GetBytes(plainText, codeBytes);
-#else
-        byte[] codeBytes = targetEncoding.GetBytes(plainText);
-#endif
-
         // Write the data to the BitArray
         if (includeUtf8BOM)
         {
@@ -239,14 +224,53 @@ public partial class QRCodeGenerator
             DecToBin(0xBF, 8, bitArray, offset + 16);
             offset += 24;
         }
-        CopyToBitArray(codeBytes, bitArray, offset);
-        offset += (int)((uint)codeBytes.Length * 8);
 
 #if HAS_SPAN
-        if (bufferFromPool != null)
-            ArrayPool<byte>.Shared.Return(bufferFromPool);
+        const int STACK_BUFFER_SIZE = 512;
+        int count = targetEncoding.GetByteCount(plainText);
+
+        // Code-page providers can produce different replacement bytes at chunk boundaries.
+        if (count > STACK_BUFFER_SIZE && !ReferenceEquals(targetEncoding, Encoding.UTF8))
+        {
+            byte[] rentedBytes = ArrayPool<byte>.Shared.Rent(count);
+            try
+            {
+                Span<byte> encodedBytes = rentedBytes.AsSpan(0, count);
+                targetEncoding.GetBytes(plainText, encodedBytes);
+                CopyToBitArray(encodedBytes, bitArray, offset);
+                return offset + (int)((uint)count * 8);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rentedBytes, clearArray: true);
+            }
+        }
+
+        Span<byte> codeBytes = stackalloc byte[STACK_BUFFER_SIZE];
+        if (count > codeBytes.Length)
+        {
+            // Keep the encoder's state across chunks so multibyte characters and fallbacks are preserved.
+            Encoder encoder = targetEncoding.GetEncoder();
+            ReadOnlySpan<char> remaining = plainText.AsSpan();
+            bool completed;
+            do
+            {
+                encoder.Convert(remaining, codeBytes, flush: true, out int charsUsed, out int bytesUsed, out completed);
+                CopyToBitArray(codeBytes.Slice(0, bytesUsed), bitArray, offset);
+                offset += (int)((uint)bytesUsed * 8);
+                remaining = remaining.Slice(charsUsed);
+            } while (!completed);
+
+            return offset;
+        }
+
+        codeBytes = codeBytes.Slice(0, count);
+        targetEncoding.GetBytes(plainText, codeBytes);
+#else
+        byte[] codeBytes = targetEncoding.GetBytes(plainText);
 #endif
 
-        return offset;
+        CopyToBitArray(codeBytes, bitArray, offset);
+        return offset + (int)((uint)codeBytes.Length * 8);
     }
 }
