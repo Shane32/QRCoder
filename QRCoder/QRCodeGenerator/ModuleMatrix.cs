@@ -240,64 +240,93 @@ public partial class QRCodeGenerator
         /// A lower score indicates a QR code that is easier for decoders to read accurately.
         /// The score is the sum of four penalty rules applied to the QR code.
         /// </summary>
+        /// <param name="columnState">Scratch buffer of at least <see cref="Size"/> elements, used to track the state of each column.</param>
         /// <returns>The total penalty score of the QR code.</returns>
-        public int Score()
+        public int Score(int[] columnState)
         {
+            Debug.Assert(columnState.Length >= Size);
+
+            // Finder-like patterns 1011101 0000 and 0000 1011101, as 11-bit windows with the oldest module in the highest bit.
+            const int PATTERN_LEFT = 0x5D0;
+            const int PATTERN_RIGHT = 0x05D;
+            const int WINDOW_MASK = 0x7FF;
+            const int RUN_SHIFT = 11;
+
             int score = 0;
             int blackModules = 0;
 
             int size = Size;
+            int stride = Stride;
+            byte[] bytes = Bytes;
 
-            // Penalty 1: Penalty for groups of five or more same-color modules in a row (or column)
-            for (int i = 0; i < size; i++)
+            // Each column keeps its current run length in the upper bits and its last 11 modules in the lower bits.
+            Array.Clear(columnState, 0, size);
+
+            // All penalties are computed in a single row-major pass over the matrix.
+            for (int y = 0; y < size; y++)
             {
-                Row row = GetRow(i);
-                Column column = GetColumn(i);
+                int rowStart = y * stride;
+                int rowRun = 0;
+                int rowWindow = 0;
+                int previousColumnBits = 0;
 
-                int modInRow = 0, modInColumn = 0;
-
-                bool lastValRow = false, lastValColumn = false;
-
-                for (int j = 0; j < size; j++)
+                for (int x = 0; x < size; x++)
                 {
-                    bool current = row[j];
+                    int current = (bytes[rowStart + (x >> 3)] >> (x & 7)) & 1;
 
-                    if (current)
-                        blackModules++;
+                    blackModules += current;
 
-                    // Check rows for consecutive modules
-                    if (current == lastValRow)
+                    // Penalty 1: Penalty for groups of five or more same-color modules in a row
+                    if (current == (rowWindow & 1))
                     {
-                        modInRow++;
-                        if (modInRow == 5)
+                        rowRun++;
+                        if (rowRun == 5)
                             score += 3;
-                        else if (modInRow > 5)
+                        else if (rowRun > 5)
                             score++;
                     }
                     else
                     {
-                        modInRow = 1;
+                        rowRun = 1;
                     }
 
-                    lastValRow = current;
+                    // Penalty 3: Penalty for specific patterns within the row
+                    rowWindow = ((rowWindow << 1) | current) & WINDOW_MASK;
+                    if (x >= 10 && (rowWindow == PATTERN_LEFT || rowWindow == PATTERN_RIGHT))
+                        score += 40;
 
-                    // Check columns for consecutive modules
-                    current = column[j];
+                    int state = columnState[x];
+                    int columnWindow = state & WINDOW_MASK;
+                    int columnRun = state >> RUN_SHIFT;
 
-                    if (current == lastValColumn)
+                    // Penalty 1: Penalty for groups of five or more same-color modules in a column
+                    if (current == (columnWindow & 1))
                     {
-                        modInColumn++;
-                        if (modInColumn == 5)
+                        columnRun++;
+                        if (columnRun == 5)
                             score += 3;
-                        else if (modInColumn > 5)
+                        else if (columnRun > 5)
                             score++;
                     }
                     else
                     {
-                        modInColumn = 1;
+                        columnRun = 1;
                     }
 
-                    lastValColumn = current;
+                    // Penalty 3: Penalty for specific patterns within the column
+                    columnWindow = ((columnWindow << 1) | current) & WINDOW_MASK;
+                    if (y >= 10 && (columnWindow == PATTERN_LEFT || columnWindow == PATTERN_RIGHT))
+                        score += 40;
+
+                    columnState[x] = (columnRun << RUN_SHIFT) | columnWindow;
+
+                    // Penalty 2: Penalty for square blocks of four modules in the same color.
+                    // The two lowest bits of the column window are the modules in this row and the row above.
+                    int columnBits = columnWindow & 3;
+                    if (y > 0 && x > 0 && columnBits == previousColumnBits && (columnBits == 0 || columnBits == 3))
+                        score += 3;
+
+                    previousColumnBits = columnBits;
                 }
             }
 
@@ -306,75 +335,6 @@ public partial class QRCodeGenerator
             int prevMultipleOf5 = Math.Abs(percentDiv5 - 10);
             int nextMultipleOf5 = Math.Abs(percentDiv5 - 9);
             score += Math.Min(prevMultipleOf5, nextMultipleOf5) * 10;
-
-            // Penalty 2: Penalty for square blocks of four modules in the same color
-            for (int y = 0; y < size - 1; y++)
-            {
-                Row currentRow = GetRow(y);
-                Row nextRow = GetRow(y + 1);
-
-                for (int x = 0; x < size - 1; x++)
-                {
-                    bool topRightModule = currentRow[x + 1];
-
-                    if (topRightModule != nextRow[x + 1])
-                    {
-                        // If the right modules don't match, skip the next column.
-                        // They wouldn't match being the left modules either.
-                        x++;
-                    }
-                    else if (topRightModule == currentRow[x] && topRightModule == nextRow[x])
-                    {
-                        score += 3;
-                    }
-                }
-            }
-
-            // Penalty 3: Penalty for specific patterns within the QR code (patterns that should be avoided)
-            for (int i = 0; i < size; i++)
-            {
-                // Horizontal pattern matching
-                Row r = GetRow(i);
-
-                for (int j = 0; j < size - 10; j++)
-                {
-                    if (r[j + 6])
-                    {
-                        if (!r[j + 1] && r[j + 4] && !r[j + 5] && !r[j + 9])
-                        {
-                            if (r[j] && r[j + 2] && r[j + 3] && !r[j + 7] && !r[j + 8] && !r[j + 10] ||
-                                !r[j] && !r[j + 2] && !r[j + 3] && r[j + 7] && r[j + 8] && r[j + 10])
-                            {
-                                score += 40;
-                            }
-                        }
-
-                        // If r[j + 6] was set, then r[j + 5] would be set when we move one column.
-                        j++;
-                    }
-                }
-
-                // Vertical pattern matching
-                Column c = GetColumn(i);
-
-                for (int j = 0; j < size - 10; j++)
-                {
-                    if (c[j + 6])
-                    {
-                        if (!c[j + 1] && c[j + 4] && !c[j + 5] && !c[j + 9])
-                        {
-                            if (c[j] && c[j + 2] && c[j + 3] && !c[j + 7] && !c[j + 8] && !c[j + 10] ||
-                                !c[j] && !c[j + 2] && !c[j + 3] && c[j + 7] && c[j + 8] && c[j + 10])
-                            {
-                                score += 40;
-                            }
-                        }
-
-                        // If c[j + 6] was set, then c[j + 5] would be set when we move one row.
-                        j++;
-                    }
-                }
-            }
 
             return score;
         }
@@ -395,33 +355,7 @@ public partial class QRCodeGenerator
 #endif
         }
 
-        public Row GetRow(int y) => new Row(this, y);
-
         public Column GetColumn(int x) => new Column(this, x);
-
-        public readonly struct Row
-        {
-            private readonly ModuleMatrix _moduleMatrix;
-
-            private readonly int _startByteIndex;
-
-            public Row(ModuleMatrix moduleMatrix, int y)
-            {
-                Debug.Assert((uint)y < (uint)moduleMatrix.Size);
-                _moduleMatrix = moduleMatrix;
-                _startByteIndex = moduleMatrix.Stride * y;
-            }
-
-            public bool this[int x]
-            {
-                get
-                {
-                    Debug.Assert((uint)x < (uint)_moduleMatrix.Size);
-
-                    return (_moduleMatrix.Bytes[_startByteIndex + (x >> 3)] & (1 << (x & 7))) != 0;
-                }
-            }
-        }
 
         public readonly struct Column
         {
