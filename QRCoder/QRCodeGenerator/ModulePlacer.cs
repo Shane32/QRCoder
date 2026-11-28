@@ -1,6 +1,3 @@
-#if HAS_SPAN
-using System.Buffers;
-#endif
 using System.Diagnostics;
 
 namespace QRCoder;
@@ -189,9 +186,9 @@ public partial class QRCodeGenerator
             // Temporary QRCodeData object to test different mask patterns without altering the original.
             using var copy = new ModuleMatrix(qrCode.ModuleMatrix.Count - 8);
 
-            // Scratch buffer used by the penalty scoring of normal QR codes.
 #if HAS_SPAN
-            int[]? columnState = version < 0 ? null : ArrayPool<int>.Shared.Rent(size);
+            Debug.Assert(size <= 177, "Standard QR codes have at most 177 columns.");
+            Span<int> columnState = version < 0 ? default : ((Span<int>)stackalloc int[256]).Slice(0, size);
 #else
             int[]? columnState = version < 0 ? null : new int[size];
 #endif
@@ -219,7 +216,7 @@ public partial class QRCodeGenerator
                 MaskPattern pattern = MaskPattern.Patterns[maskPattern];
                 pattern.Apply(copy, blockedModules);
 
-                int score = columnState == null ? copy.ScoreMicro() : copy.Score(columnState);
+                int score = version < 0 ? copy.ScoreMicro() : copy.Score(columnState!);
 
                 // Select the pattern with the lowest score, indicating better QR code readability.
                 if (patternScore > score)
@@ -228,11 +225,6 @@ public partial class QRCodeGenerator
                     patternScore = score;
                 }
             }
-
-#if HAS_SPAN
-            if (columnState != null)
-                ArrayPool<int>.Shared.Return(columnState);
-#endif
 
             // Apply the best mask pattern to the actual QR code.
             Func<int, int, bool> selectedPatternFunc = MaskPattern.Patterns[selectedPattern].Generator;
