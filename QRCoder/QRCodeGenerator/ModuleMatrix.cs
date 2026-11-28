@@ -355,33 +355,7 @@ public partial class QRCodeGenerator
 #endif
         }
 
-        public Row GetRow(int y) => new Row(this, y);
-
         public Column GetColumn(int x) => new Column(this, x);
-
-        public readonly struct Row
-        {
-            private readonly ModuleMatrix _moduleMatrix;
-
-            private readonly int _startByteIndex;
-
-            public Row(ModuleMatrix moduleMatrix, int y)
-            {
-                Debug.Assert((uint)y < (uint)moduleMatrix.Size);
-                _moduleMatrix = moduleMatrix;
-                _startByteIndex = moduleMatrix.Stride * y;
-            }
-
-            public bool this[int x]
-            {
-                get
-                {
-                    Debug.Assert((uint)x < (uint)_moduleMatrix.Size);
-
-                    return (_moduleMatrix.Bytes[_startByteIndex + (x >> 3)] & (1 << (x & 7))) != 0;
-                }
-            }
-        }
 
         public readonly struct Column
         {
